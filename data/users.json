@@ -1,13 +1,13 @@
 [
-    {"id": 0, "name" : "Louisa" },
-    {"id": 1, "name" : "Emma F"},
-    {"id": 2, "name" : "Emma B"},
-    {"id": 3, "name" : "Lilou"},
-    {"id": 4, "name" : "Célia"},
-    {"id": 5, "name" : "Zelda"},
-    {"id": 6, "name" : "Alice"},
-    {"id": 7, "name" : "Maëlyne"},
-    {"id": 8, "name" : "Romane"},
-    {"id": 9, "name" : "Ludivine"},
-    {"id": 10, "name" : "Elyne"}
+    {"id": 0, "name" : "joueur1" },
+    {"id": 1, "name" : "joueur2"},
+    {"id": 2, "name" : "joueur3"},
+    {"id": 3, "name" : "joueur4"},
+    {"id": 4, "name" : "joueur5"},
+    {"id": 5, "name" : "joueur6"},
+    {"id": 6, "name" : "joueur7"},
+    {"id": 7, "name" : "joueur8"},
+    {"id": 8, "name" : "joueur9"},
+    {"id": 9, "name" : "joueur10"},
+    {"id": 10, "name" : "joueur11"}
 ]

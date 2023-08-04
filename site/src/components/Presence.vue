@@ -1,6 +1,7 @@
 <template>
     <img height="16" :class="selected==1 ? '' : 'imgback'" src="@/assets/verifie.png" @click="toggle(1)"/>
     <img height="16" :class="selected==2 ? '' : 'imgback'" src="@/assets/annuler.png" @click="toggle(2)"/>
+    <img height="16" :class="selected==0 ? '' : 'imgback'" src="@/assets/warning.png" @click="toggle(0)"/>
 </template>
 
 <script>

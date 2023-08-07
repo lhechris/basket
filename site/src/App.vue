@@ -1,10 +1,36 @@
 <template>
   <nav>
     <router-link to="/">Home</router-link> |
+    <span v-if="logged" ><router-link to="/selection">Selection</router-link> | </span>
+    <router-link to="/auth">
+      <span v-if="logged" >Logout</span>
+      <span v-else>Login</span>
+    </router-link> |
     <router-link to="/about">About</router-link>
   </nav>
   <router-view/>
 </template>
+
+<script>
+
+import {islogged} from "@/js/api.js"
+import {ref} from "vue"
+
+export default {
+
+  setup() {
+    const logged=ref(false)
+
+    islogged().then( r=> {
+      logged.value=r==1
+    })
+
+    return {logged}
+
+  }
+}
+
+</script>
 
 <style>
 #app {

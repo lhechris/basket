@@ -15,34 +15,42 @@
             </table> 
         </div>
 
-        <c-button 
-            shape="rounded-pill"
-            color="primary"
-            v-if="page>0" @click="pagemoins()"
-            >Précédent
-        </c-button>
-
-        <c-button 
-            shape="rounded-pill"
-            color="primary"
-            v-if="page<matches.length-1" @click="pageplus()"
-            >Suivant
-        </c-button>
-
+        <c-pagination>
+            <c-pagination-item 
+                    href="#" 
+                    @click="pagemoins()" 
+                    :disabled="page<=0"
+                >&laquo;
+            </c-pagination-item>
+            <c-pagination-item 
+                    :active="page==n"
+                    href="#" 
+                    @click="pageselect(n)" 
+                    v-for="(c,n) in matches" 
+                    :key="n" 
+                >{{ n }}
+            </c-pagination-item>
+            <c-pagination-item 
+                    href="#" 
+                    @click="pageplus()" 
+                    :disabled="page>=matches.length-1"
+                >&raquo;
+            </c-pagination-item>
+        </c-pagination>
     </div>
 </template>
 
 <script>
-import {getMatches, getUsers, getPresences,setPresences} from '@/js/api.js'
+import {getMatches, getUsers, getPresences,setPresence} from '@/js/api.js'
 import Presence from '@/components/Presence.vue'
 import {ref} from 'vue'
-import {CButton} from "@coreui/vue"
+import {CPagination,CPaginationItem} from "@coreui/vue"
 
 import '@coreui/coreui/dist/css/coreui.min.css'
 export default {
 
     components: {
-        Presence,CButton
+        Presence,CPagination,CPaginationItem
         
   },    
     setup() {
@@ -65,7 +73,7 @@ export default {
 
         function update(usr,match,val) {
             presences.value[usr][match]=val
-            setPresences(usr,match,val)
+            setPresence(usr,match,val)
         }
 
         function pageplus() {
@@ -80,7 +88,12 @@ export default {
             }
         }
 
-        return {users,matches,presences,page,update,pageplus,pagemoins}
+        function pageselect(n) {
+            page.value=n
+        }
+
+
+        return {users,matches,presences,page,update,pageplus,pagemoins,pageselect}
     }
 }
 </script>

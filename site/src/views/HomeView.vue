@@ -1,18 +1,18 @@
 <template>
   <div class="home">
     <!--<img alt="Vue logo" src="../assets/logo.png">-->
-    <Matchs />
+    <matchs-dispo />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import Matchs from '@/components/Matchs.vue'
+import MatchsDispo from '@/components/MatchsDispo.vue'
 
 export default {
   name: 'HomeView',
   components: {
-    Matchs
+    MatchsDispo
   }
 }
 </script>

@@ -3,10 +3,12 @@
 
 ini_set("display_errors", 1);
 
+include_once("constantes.php");
 include_once("users.php");
 include_once("matchs.php");
 include_once("auth.php");
 include_once("presences.php");
+include_once("selections.php");
 
 
 if ($_SERVER["REQUEST_METHOD"]=="GET") { 
@@ -20,14 +22,27 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 
 	} else 	if (array_key_exists('presences',$_GET)) {
 		getPresences();
+
+	} else 	if (array_key_exists('selections',$_GET)) {
+		if (islogged()) {
+			getSelections();
+		}
+	} else 	if (array_key_exists('islogged',$_GET)) {
+			getIslogged();
 	}
 
 
 }
 else if ($_SERVER["REQUEST_METHOD"]=="POST") 
 {
-	if (!islogged()) {
-		retourneNotAuth();
+	if (array_key_exists("login",$_POST)) {
+		login($_POST['login'],$_POST['passwd']);
+		return;
+	}
+
+	if (array_key_exists("logout",$_POST)) {
+		logout();
+		return;
 	}
 
 	// Gestion du POST
@@ -35,21 +50,16 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 	if (!is_array($json)) {	
 		retourneErreur("incorrect entry");
 		return;
-	}
-
-	if (array_key_exists("login",$json)) {
-		//LOGIN
-		login($json);
-		return;
-	
-	} else if (array_key_exists("logout",$json)) {
-		//LOGOUT
-		logout();
-		return;
 
 	} else if (array_key_exists("usr",$json) && array_key_exists("match",$json) && array_key_exists("value",$json)) {
 		//PRESENCE
 		return setPresence($json);
+
+	} else if (array_key_exists("usr",$json) && array_key_exists("match",$json) && array_key_exists("selection",$json)) {
+		//SELECTION
+		if (islogged()) {
+			return setSelection($json);
+		}
 
 	} else {
 		retourneErreur("Invalid Request");	

@@ -3,11 +3,12 @@
 require_once("constantes.php");
 require_once("matchs.php");
 require_once("users.php");
+
 /**
  * retourne le fichier json
  */
-function getPresencesArray() {
-	$fullpath = REPERTOIRE_DATA."presences.json";
+function getSelectionsArray() {
+	$fullpath = REPERTOIRE_DATA."selections.json";
 	if (!file_exists($fullpath)) { 
 		return array();
 	}
@@ -24,23 +25,23 @@ function getPresencesArray() {
 /**
  * 
  */
-function getPresences() {
+function getSelections() {
 
-	responseJson(getPresencesArray());
+	responseJson(getSelectionsArray());
 
 }
 
 /**
  * Met à jour le fichier json
  */
-function setPresence($json) {
+function setSelection($json) {
 
-	if ( is_int($json['usr']) && is_int($json['match']) && is_int($json['value'])) {
+	if ( is_int($json['usr']) && is_int($json['match']) && is_int($json['selection'])) {
 		
 		$users=getUsersArray();
 		$matchs=getMatchsArray();
-		$pres=getPresencesArray();
-
+		$select=getSelectionsArray();
+		
 		$idu=-1;
 		$idm=-1;
 
@@ -56,21 +57,21 @@ function setPresence($json) {
 			}
 		}
 		$msg="idu=".$idu." idm=".$idm;
-		$pres[$idu][$idm] = $json['value'];
+		$select[$idu][$idm] = $json['selection'];
 
 		if (($idu==-1) || ($idm==-1)) {
 			responseError("Bad input");
 			return;
 		}
 
-		$fullpath=REPERTOIRE_DATA."presences.json";
+		$fullpath=REPERTOIRE_DATA."selections.json";
 	
 		if (!$fp = fopen($fullpath, 'w')) {
 			responseError("Impossible d'ouvrir le fichier");
 			return;
 	   }
 	
-	   if (fwrite($fp, json_encode($pres,JSON_UNESCAPED_SLASHES)) === FALSE) {
+	   if (fwrite($fp, json_encode($select,JSON_UNESCAPED_SLASHES)) === FALSE) {
 		   responseError("Impossible d'écrire dans le fichier");
 		   fclose($fp);  
 		   return;

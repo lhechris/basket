@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!valueserror" class="main" >
+    <div class="main" >
         <div v-for="(c,n) in matches" :key="n">
             <table v-if="page==n">
                 <tr>
@@ -43,7 +43,6 @@
         </c-pagination>
 
     </div>
-    <div v-else>Désolé page non disponible</div>
 </template>
 
 <script>
@@ -89,11 +88,15 @@ export default {
                 } else {
                     return -1
                 }
+            } else {
+                return -1
             }
+            
         }
 
         function update(usr,match,val) {
-            if (getSelections(usr,match)>0) {
+            console.log("update("+usr+","+match+","+val+")")
+            if (getSelection(usr,match)>=0) {
                 selections.value[usr][match]=val
                 setSelection(usr,match,val)
             }

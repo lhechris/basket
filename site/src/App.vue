@@ -5,8 +5,7 @@
     <router-link to="/auth">
       <span v-if="logged" >Logout</span>
       <span v-else>Login</span>
-    </router-link> |
-    <router-link to="/about">About</router-link>
+    </router-link>
   </nav>
   <router-view/>
 </template>

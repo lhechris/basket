@@ -64,11 +64,13 @@ export default {
             if (!logged.value) {
                 login(email.value,passwd.value).then( r => {
                     logged.value=r==1
+                    window.location.reload()
                 })
             } else {
                 logout().then( r=> {
                     console.log(r)
                     logged.value=r==1
+                    window.location.reload()
                 })
             }
             email.value=""

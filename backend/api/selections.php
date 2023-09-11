@@ -10,7 +10,24 @@ require_once("users.php");
 function getSelectionsArray() {
 	$fullpath = REPERTOIRE_DATA."selections.json";
 	if (!file_exists($fullpath)) { 
-		return array();
+		$users=getUsersArray();
+		$matchs=getMatchsArray();
+		
+		//cherche l'identifiant max pour user
+		$mu=0;
+		foreach($users as $u) {
+			if ($mu<$u["id"]) { $mu=$u["id"];}
+		}	
+		
+		//cherche l'identifiant max pour match
+		$mm=0;
+		foreach($matchs as $m) {
+			if ($mm<$m["id"]) { $mm=$m["id"];}
+		}
+		$mat=array_pad(array(),$mm+1,0);
+		$sel=array_pad(array(),$mu+1,$mat);
+		writeSelectionFile($sel);
+		return $sel;
 	}
 
     //Recupere le fichier json
@@ -64,23 +81,9 @@ function setSelection($json) {
 			return;
 		}
 
-		$fullpath=REPERTOIRE_DATA."selections.json";
-	
-		if (!$fp = fopen($fullpath, 'w')) {
-			responseError("Impossible d'ouvrir le fichier");
-			return;
-	   }
-	
-	   if (fwrite($fp, json_encode($select,JSON_UNESCAPED_SLASHES)) === FALSE) {
-		   responseError("Impossible d'écrire dans le fichier");
-		   fclose($fp);  
-		   return;
-	   }
-
-		fclose($fp);
-
-		//responseText("success");
-		responseText($msg);
+		if (writeSelectionFile($select)) {
+			responseText("success");
+		}
 
 	} else {
 		responseError("Bad input");
@@ -88,5 +91,24 @@ function setSelection($json) {
 
 }
 
+
+function writeSelectionFile($json) {
+	$fullpath=REPERTOIRE_DATA."selections.json";
+	
+	if (!$fp = fopen($fullpath, 'w')) {
+		responseError("Impossible d'ouvrir le fichier");
+		return false;
+   }
+
+   if (fwrite($fp, json_encode($json,JSON_UNESCAPED_SLASHES)) === FALSE) {
+	   responseError("Impossible d'écrire dans le fichier");
+	   fclose($fp);  
+	   return false;
+   }
+
+	fclose($fp);
+	return true;
+
+}
 
 ?>

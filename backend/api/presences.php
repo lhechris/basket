@@ -9,7 +9,27 @@ require_once("users.php");
 function getPresencesArray() {
 	$fullpath = REPERTOIRE_DATA."presences.json";
 	if (!file_exists($fullpath)) { 
-		return array();
+		//on cree le fichier
+		
+		$pres=array();
+		$users=getUsersArray();
+		$entrainements=getEntrainementsArray();
+		
+		//cherche l'identifiant max pour user
+		$mu=0;
+		foreach($users as $u) {
+			if ($mu<$u["id"]) { $mu=$u["id"];}
+		}	
+		
+		//cherche l'identifiant max pour entrainement
+		$me=0;
+		foreach($entrainements as $e) {
+			if ($me<$e["id"]) { $me=$e["id"];}
+		}
+		$ent=array_pad(array(),$me+1,0);
+		$pres=array_pad(array(),$mu+1,$ent);
+		writePresenceFile($pres);
+		return $pres;
 	}
 
     //Recupere le fichier json
@@ -63,29 +83,35 @@ function setPresence($json) {
 			return;
 		}
 
-		$fullpath=REPERTOIRE_DATA."presences.json";
-	
-		if (!$fp = fopen($fullpath, 'w')) {
-			responseError("Impossible d'ouvrir le fichier");
-			return;
-	   }
-	
-	   if (fwrite($fp, json_encode($pres,JSON_UNESCAPED_SLASHES)) === FALSE) {
-		   responseError("Impossible d'écrire dans le fichier");
-		   fclose($fp);  
-		   return;
-	   }
-
-		fclose($fp);
-
-		//responseText("success");
-		responseText($msg);
+		if (writePresenceFile($pres)) {
+			responseText("success");
+		} 
 
 	} else {
 		responseError("Bad input");
 	}
 
 }
+
+
+function writePresenceFile($json) {
+	$fullpath=REPERTOIRE_DATA."presences.json";
+	
+	if (!$fp = fopen($fullpath, 'w')) {
+		responseError("Impossible d'ouvrir le fichier");
+		return false;
+   }
+
+   if (fwrite($fp, json_encode($json,JSON_UNESCAPED_SLASHES)) === FALSE) {
+	   responseError("Impossible d'écrire dans le fichier");
+	   fclose($fp);  
+	   return false;
+   }
+
+	fclose($fp);	
+	return true;
+}
+
 
 
 ?>

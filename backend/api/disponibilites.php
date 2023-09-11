@@ -9,7 +9,27 @@ require_once("users.php");
 function getDisponibilitesArray() {
 	$fullpath = REPERTOIRE_DATA."disponibilites.json";
 	if (!file_exists($fullpath)) { 
-		return array();
+		//on cree le fichier
+
+		$users=getUsersArray();
+		$matchs=getMatchsArray();
+		
+		//cherche l'identifiant max pour user
+		$mu=0;
+		foreach($users as $u) {
+			if ($mu<$u["id"]) { $mu=$u["id"];}
+		}	
+		
+		//cherche l'identifiant max pour entrainement
+		$mm=0;
+		foreach($matchs as $m) {
+			if ($mm<$m["id"]) { $mm=$m["id"];}
+		}
+		$mat=array_pad(array(),$mm+1,0);
+		$dispo=array_pad(array(),$mu+1,$mat);
+		writePresenceFile($dispo);
+		return $dispo;
+		
 	}
 
     //Recupere le fichier json
@@ -63,23 +83,9 @@ function setDisponibilite($json) {
 			return;
 		}
 
-		$fullpath=REPERTOIRE_DATA."disponibilites.json";
-	
-		if (!$fp = fopen($fullpath, 'w')) {
-			responseError("Impossible d'ouvrir le fichier");
-			return;
-	   }
-	
-	   if (fwrite($fp, json_encode($dispo,JSON_UNESCAPED_SLASHES)) === FALSE) {
-		   responseError("Impossible d'écrire dans le fichier");
-		   fclose($fp);  
-		   return;
-	   }
-
-		fclose($fp);
-
-		//responseText("success");
-		responseText($msg);
+		if (writeDispoFile($dispo)) {
+			responseText("success");
+		}
 
 	} else {
 		responseError("Bad input");
@@ -87,5 +93,23 @@ function setDisponibilite($json) {
 
 }
 
+
+function writeDispoFile($json) {
+	$fullpath=REPERTOIRE_DATA."disponibilites.json";
+	
+	if (!$fp = fopen($fullpath, 'w')) {
+		responseError("Impossible d'ouvrir le fichier");
+		return false;
+   }
+
+   if (fwrite($fp, json_encode($json,JSON_UNESCAPED_SLASHES)) === FALSE) {
+	   responseError("Impossible d'écrire dans le fichier");
+	   fclose($fp);  
+	   return false;
+   }
+
+	fclose($fp);
+	return true;
+}
 
 ?>

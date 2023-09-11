@@ -24,6 +24,13 @@ export function getMatches() {
     });
 }
 
+export function getEntrainements() {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('entrainements').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+}
+
+
 export function getUsers() {
     return new Promise( (successClbk,failClbk) => {
         getResource('users').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
@@ -41,11 +48,25 @@ export function setPresence(usr,match,val) {
 
     axios.post(baseurl, {
         usr:usr,
+        entrainement:match,
+        pres:val
+    })
+}
+export function getDisponibilites() {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('disponibilites').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+}
+
+export function setDisponibilite(usr,match,val) {
+    var baseurl = "/api/";
+
+    axios.post(baseurl, {
+        usr:usr,
         match:match,
         value:val
     })
 }
-
 export function getSelections() {
     return new Promise( (successClbk,failClbk) => {
         getResource('selections').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    

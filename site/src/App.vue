@@ -1,6 +1,7 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
+    <router-link to="/">Disponibilité</router-link> |
+    <span v-if="logged" ><router-link to="/entrainement">Entrainement</router-link> | </span>
     <span v-if="logged" ><router-link to="/selection">Selection</router-link> | </span>
     <router-link to="/auth">
       <span v-if="logged" >Logout</span>

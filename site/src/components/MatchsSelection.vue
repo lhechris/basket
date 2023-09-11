@@ -10,7 +10,7 @@
                     <th>{{ u.name }}</th>
                     <td>{{ countMatchs(u.id) }}</td>
                     <td v-for="(m,k) in matches[n]" :key="k">
-                        <Selection :pres="presences[u.id][m.id]" :sel="getSelection(u.id,m.id)" @onUpdate="update(u.id,m.id,$event)"/>
+                        <Selection :pres="disponibilites[u.id][m.id]" :sel="getSelection(u.id,m.id)" @onUpdate="update(u.id,m.id,$event)"/>
                     </td>
                 </tr>
                 <tr>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import {getMatches, getUsers, getPresences,getSelections,setSelection} from '@/js/api.js'
+import {getMatches, getUsers, getDisponibilites,getSelections,setSelection} from '@/js/api.js'
 import Selection from '@/components/Selection.vue'
 import {ref} from 'vue'
 import {CPagination,CPaginationItem} from "@coreui/vue"
@@ -61,7 +61,7 @@ export default {
     setup() {
         const matches = ref([])
         const users = ref([]);
-        const presences = ref([])
+        const disponibilites = ref([])
         const selections = ref([])
         const page = ref(0)
 
@@ -69,8 +69,8 @@ export default {
             users.value = u;
         })
 
-        getPresences().then( p => {
-            presences.value = p
+        getDisponibilites().then( p => {
+            disponibilites.value = p
         })
 
         getSelections().then( p => {
@@ -95,7 +95,6 @@ export default {
         }
 
         function update(usr,match,val) {
-            console.log("update("+usr+","+match+","+val+")")
             if (getSelection(usr,match)>=0) {
                 selections.value[usr][match]=val
                 setSelection(usr,match,val)
@@ -138,7 +137,7 @@ export default {
             return nb
         }
 
-        return {users,matches,presences,selections,page,getSelection,update,pageplus,pagemoins,pageselect,countJoueuses,countMatchs}
+        return {users,matches,disponibilites,selections,page,getSelection,update,pageplus,pagemoins,pageselect,countJoueuses,countMatchs}
     }
 }
 </script>

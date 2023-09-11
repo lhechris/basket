@@ -32,7 +32,7 @@ function getIslogged() {
  */
 function login($email,$passwd) {
 	
-	if (($email=="admin") && ($passwd=="admin")) {
+	if (($email=="coach") && ($passwd=="aslbu11f1")) {
 		$_SESSION['islogged']="1";
 	} else {
 		$_SESSION['islogged']="0";

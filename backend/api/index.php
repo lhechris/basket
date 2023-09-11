@@ -6,8 +6,10 @@ ini_set("display_errors", 1);
 include_once("constantes.php");
 include_once("users.php");
 include_once("matchs.php");
+include_once("entrainements.php");
 include_once("auth.php");
 include_once("presences.php");
+include_once("disponibilites.php");
 include_once("selections.php");
 
 
@@ -20,8 +22,14 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 	} else 	if (array_key_exists('matchs',$_GET)) {
 		getMatchs();
 
+	} else 	if (array_key_exists('entrainements',$_GET)) {
+		getEntrainements();
+
 	} else 	if (array_key_exists('presences',$_GET)) {
 		getPresences();
+
+	} else 	if (array_key_exists('disponibilites',$_GET)) {
+		getDisponibilites();
 
 	} else 	if (array_key_exists('selections',$_GET)) {
 		if (islogged()) {
@@ -52,6 +60,10 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 		return;
 
 	} else if (array_key_exists("usr",$json) && array_key_exists("match",$json) && array_key_exists("value",$json)) {
+		//DISPO
+		return setDisponibilite($json);
+
+	} else if (array_key_exists("usr",$json) && array_key_exists("entrainement",$json) && array_key_exists("pres",$json)) {
 		//PRESENCE
 		return setPresence($json);
 

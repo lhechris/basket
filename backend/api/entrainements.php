@@ -3,6 +3,7 @@
 require_once("constantes.php");
 
 function getEntrainementsArray() {
+
 	$fullpath = REPERTOIRE_DATA."entrainements.json";
 	if (!file_exists($fullpath)) { 
 		return array();

@@ -6,9 +6,12 @@ session_start();
  */
 function islogged() {
 	$ret = false;
+	loginfo("test variable".strval($ret));
+
 	if (array_key_exists('islogged',$_SESSION)) {
-		$ret = ($_SESSION['islogged'] == "1");
+		$ret = $_SESSION['islogged'] === "1";
 	}
+	loginfo("islogged:".gettype($ret));
 	return $ret;
 }
 

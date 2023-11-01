@@ -3,10 +3,13 @@
 require_once("constantes.php");
 require_once("entrainements.php");
 require_once("users.php");
+require_once("auth.php");
+
 /**
  * retourne le fichier json
  */
 function getPresencesArray() {
+	
 	$fullpath = REPERTOIRE_DATA."presences.json";
 	if (!file_exists($fullpath)) { 
 		//on cree le fichier

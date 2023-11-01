@@ -76,6 +76,7 @@ export default {
         getSelections().then( p => {
             selections.value = p
         })
+        
 
         getMatches().then( m => {
             matches.value = m

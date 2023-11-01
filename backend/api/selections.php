@@ -8,6 +8,7 @@ require_once("users.php");
  * retourne le fichier json
  */
 function getSelectionsArray() {
+
 	$fullpath = REPERTOIRE_DATA."selections.json";
 	if (!file_exists($fullpath)) { 
 		$users=getUsersArray();

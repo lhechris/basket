@@ -1,6 +1,7 @@
 <?php
 
 define("REPERTOIRE_DATA","../../data/");
+define("ACTIVELOG",false);
 
 function responseError($msg) {
     header("Content-Type:text/html");
@@ -19,6 +20,17 @@ function responseText($msg) {
 	header("HTTP/1.1 200");
 	echo $msg;
 
+}
+
+function loginfo($msg) {
+
+	if (!ACTIVELOG) {return;}
+
+	if (!$fp = fopen("info.log", 'a')) {
+		return;
+	}
+	fwrite($fp,$msg."\n");
+	fclose($fp);
 }
 
 

@@ -23,10 +23,18 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 		getMatchs();
 
 	} else 	if (array_key_exists('entrainements',$_GET)) {
-		getEntrainements();
+		if (islogged()) {
+			getEntrainements();
+		} else {
+			responseJson(array());
+		}
 
 	} else 	if (array_key_exists('presences',$_GET)) {
-		getPresences();
+		if (islogged()) {
+			getPresences();
+		} else {
+			responseJson(array());
+		}
 
 	} else 	if (array_key_exists('disponibilites',$_GET)) {
 		getDisponibilites();
@@ -34,6 +42,8 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 	} else 	if (array_key_exists('selections',$_GET)) {
 		if (islogged()) {
 			getSelections();
+		} else {
+			responseJson(array());
 		}
 	} else 	if (array_key_exists('islogged',$_GET)) {
 			getIslogged();
@@ -65,7 +75,9 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 
 	} else if (array_key_exists("usr",$json) && array_key_exists("entrainement",$json) && array_key_exists("pres",$json)) {
 		//PRESENCE
-		return setPresence($json);
+		if (islogged()) {
+			return setPresence($json);
+		}
 
 	} else if (array_key_exists("usr",$json) && array_key_exists("match",$json) && array_key_exists("selection",$json)) {
 		//SELECTION

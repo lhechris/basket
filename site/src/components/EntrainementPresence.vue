@@ -1,46 +1,33 @@
 <template>
     <div class="main" >
-        <div v-for="(c,n) in entrainements" :key="n">
-            <table v-if="page==n">
-                <tr>
-                    <th></th>
-                    <th class="coldate" v-for="(m,i) in entrainements[n]" :key="i">{{ m.date }}<br/><span class="lieu">{{ m.lieu }}</span> </th>
-                </tr>
+        <div v-for="(m,n) in entrainements" :key="n">
+            <div v-if="page==n">
+                <div class="descr" >
+                    <span class="date">{{ m.date }}</span><br/>
+                    
+                </div>
+                <table>
                 <tr v-for="(u,j) in users" :key="j">
                     <th>{{ u.name }}</th>
-                    <td v-for="(m,k) in entrainements[n]" :key="k">
+                    <td>
                         <Presence :sel="presences[u.id][m.id]" @onUpdate="update(u.id,m.id,$event)"/>
                     </td>
                 </tr>
-                <tr>
-                    <th></th>
-                    <td v-for="(m,k) in entrainements[n]" :key="k">
-                        {{ countJoueuses(m.id) }}
-                    </td>
-                </tr>
-            </table> 
+                </table>
+            </div>
         </div>
-
         <c-pagination>
             <c-pagination-item 
                     href="#/entrainement" 
                     @click="pagemoins()" 
                     :disabled="page<=0"
-                >&laquo;
-            </c-pagination-item>
-            <c-pagination-item 
-                    :active="page==n"
-                    href="#/entrainement" 
-                    @click="pageselect(n)" 
-                    v-for="(c,n) in entrainements" 
-                    :key="n" 
-                >{{ n }}
+                >Précédent
             </c-pagination-item>
             <c-pagination-item 
                     href="#/entrainement" 
                     @click="pageplus()" 
                     :disabled="page>=entrainements.length-1"
-                >&raquo;
+                >Suivant
             </c-pagination-item>
         </c-pagination>
     </div>
@@ -75,6 +62,16 @@ export default {
 
         getEntrainements().then( m => {
             entrainements.value = m
+            //selectionne la page courante
+            let d1=new Date()
+            for (let i in m) {
+                let s=m[i].date.split("/")
+                let d2=new Date(s[2]+"-"+s[1]+"-"+s[0]+1)
+                if (d2 > d1)  {
+                    page.value=i
+                    break
+                }                
+            }            
         })
 
         function countJoueuses(mid) {
@@ -118,22 +115,37 @@ export default {
     display:block;
     margin-left:auto;
     margin-right:auto;    
-    width: 600px;
-    height : 600px;
+    width: 400px;
+    height : 500px;
     /*overflow : scroll;
     scrollbar-color: rebeccapurple green;
     scrollbar-width: thin;*/
 }
 
+.date {
+    font-weight:600;
+    font-size : 1.2rem;
+}
+
+.descr {
+    border-radius: 6px;
+    background-color: #70da82;
+}
 .lieu {
     font-size: 0.8rem;
 }
+
+table {
+    margin-top : 1rem;
+    width : 100%;
+}
 tr,td, th  {
-    border : 2px solid grey;
+    border : 2px none grey;
 }
 
 th {
-    text-align: center;
+    font-size : 0.9rem;
+    text-align: right;
 }
 
 

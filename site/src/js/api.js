@@ -24,6 +24,27 @@ export function getMatches() {
     });
 }
 
+export function setMatches(matchs) {
+    var baseurl = "/api/";
+
+    
+    return new Promise((successClbk,failClbk) => {
+
+        axios.post(baseurl, matchs).then(response =>{
+        var r=response.data;        
+        successClbk(r);
+
+        }).catch(errmsg => {
+            failClbk(errmsg);
+        })
+
+    });
+
+
+
+}
+
+
 export function getEntrainements() {
     return new Promise( (successClbk,failClbk) => {
         getResource('entrainements').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    

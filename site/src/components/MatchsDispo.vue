@@ -1,18 +1,21 @@
 <template>
     <div class="main" >
-        <div v-for="(c,n) in matches" :key="n">
-            <table v-if="page==n">
-                <tr>
-                    <th></th>
-                    <th class="coldate" v-for="(m,i) in matches[n]" :key="i">{{ m.date }}<br/><span class="lieu">{{ m.lieu }}</span> </th>
-                </tr>
+        <div v-for="(m,n) in matches" :key="n">
+            <div v-if="page==n">
+                <div class="descr">
+                    <span class="date">{{ m.date }}</span><br/>
+                    <span class="lieu">{{ m.lieu }}</span><br/>
+                    <span class="resultat">{{ m.resultat }}</span>
+                </div>
+                <table>
                 <tr v-for="(u,j) in users" :key="j">
                     <th>{{ u.name }}</th>
-                    <td v-for="(m,k) in matches[n]" :key="k">
+                    <td>
                         <Presence :sel="disponibilites[u.id][m.id]" @onUpdate="update(u.id,m.id,$event)"/>
                     </td>
                 </tr>
-            </table> 
+                </table>
+            </div>
         </div>
 
         <c-pagination>
@@ -20,21 +23,13 @@
                     href="#" 
                     @click="pagemoins()" 
                     :disabled="page<=0"
-                >&laquo;
-            </c-pagination-item>
-            <c-pagination-item 
-                    :active="page==n"
-                    href="#" 
-                    @click="pageselect(n)" 
-                    v-for="(c,n) in matches" 
-                    :key="n" 
-                >{{ n }}
+                >Match précédent
             </c-pagination-item>
             <c-pagination-item 
                     href="#" 
                     @click="pageplus()" 
                     :disabled="page>=matches.length-1"
-                >&raquo;
+                >Match suivant
             </c-pagination-item>
         </c-pagination>
     </div>
@@ -69,7 +64,19 @@ export default {
 
         getMatches().then( m => {
             matches.value = m
+            //selectionne la page courante
+            let d1=new Date()
+            for (let i in m) {
+                let s=m[i].date.split("/")
+                let d2=new Date(s[2]+"-"+s[1]+"-"+s[0])
+                if (d2 > d1)  {
+                    page.value=i
+                    break
+                }                
+            }
         })
+
+
 
         function update(usr,match,val) {
             disponibilites.value[usr][match]=val
@@ -101,23 +108,45 @@ export default {
 .main {
     display:block;
     margin-left:auto;
-    margin-right:auto;    
-    width: 600px;
-    height : 600px;
+    margin-right:auto; 
+    width: 400px;
+    height : 500px;
     /*overflow : scroll;
     scrollbar-color: rebeccapurple green;
     scrollbar-width: thin;*/
 }
+.descr {
+    border-radius: 6px;
+    background-color: #70b6da;
+}
 
 .lieu {
-    font-size: 0.8rem;
+    font-weight: 600;
+    font-size: 1rem;
 }
+.date {
+    font-weight:600;
+    font-size : 1.2rem;
+}
+
+.resultat {
+    font-size : 0.8rem;
+}
+
+table {
+    margin-top : 1rem;
+    width : 100%;
+
+}
+
 tr,td, th  {
-    border : 2px solid grey;
+    border : 1px none grey;
 }
 
 th {
-    text-align: center;
+    text-align: right;
+    font-size : 0.9rem;
+    
 }
 
 

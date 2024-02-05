@@ -24,12 +24,13 @@ function getEntrainements() {
 	$ret=[];
 
 	//decoupe en paquet de 5 colonnes
-	for ($n=0;$n<count($json);$n+=5) {
+	/*for ($n=0;$n<count($json);$n+=5) {
 		$t=array_slice($json,$n,5);
 		array_push($ret,$t);
 	}
 	
-	responseJson($ret);
+	responseJson($ret);*/
+	responseJson($json);
 
 }
 

@@ -75,7 +75,6 @@ function setDisponibilite($json) {
 				$idm=$json['match'];
 			}
 		}
-		$msg="idu=".$idu." idm=".$idm;
 		$dispo[$idu][$idm] = $json['value'];
 
 		if (($idu==-1) || ($idm==-1)) {

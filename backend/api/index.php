@@ -84,9 +84,10 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 		if (islogged()) {
 			return setSelection($json);
 		}
-
+	
 	} else {
-		retourneErreur("Invalid Request");	
+		setMatchs($json);
+		//retourneErreur("Invalid Request");	
 	}
 }
 else 

@@ -10,8 +10,13 @@
   "dependencies": {
     "@coreui/coreui": "^4.3.0",
     "@coreui/vue": "^4.10.0",
+    "@popperjs/core": "^2.11.6",
+    "@vueform/toggle": "^2.1.4",
     "axios": "^1.4.0",
+    "browserslist": "^4.22.3",
     "core-js": "^3.8.3",
+    "postcss": "^8.1.0",
+    "update-browserslist-db": "^1.0.13",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vue-scrolling-table": "^2.0.0"

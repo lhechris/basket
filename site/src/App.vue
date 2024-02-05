@@ -3,6 +3,7 @@
     <router-link to="/">Disponibilité</router-link> |
     <span v-if="logged" ><router-link to="/entrainement">Entrainement</router-link> | </span>
     <span v-if="logged" ><router-link to="/selection">Selection</router-link> | </span>
+    <span v-if="logged" ><router-link to="/matchs">Matchs</router-link> | </span>
     <router-link to="/auth">
       <span v-if="logged" >Logout</span>
       <span v-else>Login</span>
@@ -42,7 +43,7 @@ export default {
 }
 
 nav {
-  padding: 30px;
+  padding: 10px;
 }
 
 nav a {

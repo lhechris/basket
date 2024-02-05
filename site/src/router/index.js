@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import SelectionView from '../views/SelectionView.vue'
 import AuthView from '../views/AuthView.vue'
 import EntrainementView from '../views/EntrainementView'
+import MatchsView from '../views/MatchsView'
 
 const routes = [
   {
@@ -19,6 +20,11 @@ const routes = [
     path: '/entrainement',
     name: 'entrainement',
     component: EntrainementView
+  },
+  {
+    path: '/matchs',
+    name: 'matchs',
+    component: MatchsView
   },
   {
     path: '/auth',

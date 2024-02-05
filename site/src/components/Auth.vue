@@ -11,12 +11,12 @@
             <CButton type="submit" color="primary" >Se déconnecter</CButton>
         </div>
         <div v-else>
-            <CRow class="mb-3">
+           <!-- <CRow class="mb-3">
             <CFormLabel for="staticEmail" class="col-sm-2 col-form-label">Email</CFormLabel>
             <div class="col-sm-8">
                 <CFormInput type="text" id="Email" v-model="email"/>
             </div>
-            </CRow>
+            </CRow>-->
             <CRow class="mb-3">
             <CFormLabel for="inputPassword" class="col-sm-2 col-form-label">Password</CFormLabel>
             <div class="col-sm-8">
@@ -50,7 +50,7 @@ export default {
   },    
     setup() {
 
-        const email=ref("")
+        const email=ref("coach")
         const passwd=ref("")
         const validatedCustom01=ref(null)
         const logged=ref(false)

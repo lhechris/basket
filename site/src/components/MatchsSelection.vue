@@ -1,61 +1,73 @@
 <template>
     <div class="main" >
-        <div v-for="(c,n) in matches" :key="n">
-            <table v-if="page==n">
-                <tr>
-                    <th colspan="2"></th>
-                    <th class="coldate" v-for="(m,i) in matches[n]" :key="i">{{ m.date }}<br/><span class="lieu">{{ m.lieu }}</span> </th>
-                </tr>
+        <table >
+            <tr>
+                <th></th>
+                <th></th>
+                <th v-for="(u,j) in users" :key="j" >{{ u.name }}<br/>{{ countMatchs(u.id) }}</th>                
+            </tr>
+            <tr v-for="(m,n) in matches" :key="n">
+                <th class="thmatch">{{ m.date }} - {{ m.lieu }} - {{ m.resultat }} </th>
+                <th>{{ countJoueuses(m.id) }}</th>
+                <td v-for="(u,j) in users" :key="j" >
+                    <Selection :pres="disponibilites[u.id][m.id]" 
+                               :sel="getSelection(u.id,m.id)" 
+                               @onUpdate="update(u.id,m.id,$event)"/>
+                </td>
+            
+            </tr>
+        </table>
+
+        <!--
+        <div v-for="(m,n) in matches" :key="n">
+            <div v-if="page==n">
+                <div class="descr">
+                    <span class="date">{{ m.date }}</span><br/>
+                    <span class="lieu">{{ m.lieu }}</span><br/>
+                    <span class="resultat">Nb joueuses: {{ countJoueuses(m.id) }}</span>
+                </div>
+                <table>
                 <tr v-for="(u,j) in users" :key="j">
                     <th>{{ u.name }}</th>
                     <td>{{ countMatchs(u.id) }}</td>
-                    <td v-for="(m,k) in matches[n]" :key="k">
+                    <td>
                         <Selection :pres="disponibilites[u.id][m.id]" :sel="getSelection(u.id,m.id)" @onUpdate="update(u.id,m.id,$event)"/>
                     </td>
                 </tr>
-                <tr>
-                    <th colspan="2"></th>
-                    <td v-for="(m,k) in matches[n]" :key="k">
-                        {{ countJoueuses(m.id) }}
-                    </td>
-                </tr>
-            </table> 
-        </div>
+                </table>
+            </div>
+        </div>-->
 
-        <c-pagination>
+        <!--<c-pagination>
             <c-pagination-item 
+                    href="#/selection"
                     @click="pagemoins()" 
                     :disabled="page<=0"
-                >&laquo;
+                >Précédent
             </c-pagination-item>
-            <c-pagination-item 
-                    :active="page==n"
-                    @click="pageselect(n)" 
-                    v-for="(c,n) in matches" 
-                    :key="n" 
-                >{{ n }}
-            </c-pagination-item>
-            <c-pagination-item 
+
+            <c-pagination-item
+                    href="#/selection" 
                     @click="pageplus()" 
                     :disabled="page>=matches.length-1"
-                >&raquo;
+                >Suivant
             </c-pagination-item>
-        </c-pagination>
+        </c-pagination>-->
 
     </div>
 </template>
 
 <script>
 import {getMatches, getUsers, getDisponibilites,getSelections,setSelection} from '@/js/api.js'
-import Selection from '@/components/Selection.vue'
+import Selection from '@/components/Selection2.vue'
 import {ref} from 'vue'
-import {CPagination,CPaginationItem} from "@coreui/vue"
+//import {CPagination,CPaginationItem} from "@coreui/vue"
 
 import '@coreui/coreui/dist/css/coreui.min.css'
 export default {
 
     components: {
-        Selection,CPagination,CPaginationItem
+        Selection/*,CPagination,CPaginationItem*/
         
   },    
     setup() {
@@ -64,6 +76,7 @@ export default {
         const disponibilites = ref([])
         const selections = ref([])
         const page = ref(0)
+        const value = ref(true)
 
         getUsers().then( u => {
             users.value = u;
@@ -80,6 +93,16 @@ export default {
 
         getMatches().then( m => {
             matches.value = m
+            //selectionne la page courante
+            let d1=new Date()
+            for (let i in m) {
+                let s=m[i].date.split("/")
+                let d2=new Date(s[2]+"-"+s[1]+"-"+s[0])
+                if (d2 > d1)  {
+                    page.value=i
+                    break
+                }                
+            }            
         })
 
         function getSelection(uid,mid) {
@@ -138,7 +161,7 @@ export default {
             return nb
         }
 
-        return {users,matches,disponibilites,selections,page,getSelection,update,pageplus,pagemoins,pageselect,countJoueuses,countMatchs}
+        return {value,users,matches,disponibilites,selections,page,getSelection,update,pageplus,pagemoins,pageselect,countJoueuses,countMatchs}
     }
 }
 </script>
@@ -147,23 +170,36 @@ export default {
     display:block;
     margin-left:auto;
     margin-right:auto;    
-    width: 600px;
-    height : 600px;
+    width: 1200px;
+    height : 800px;
     /*overflow : scroll;
     scrollbar-color: rebeccapurple green;
     scrollbar-width: thin;*/
 }
 
+.descr {
+    border-radius: 6px;
+    background-color: #70b6da;
+}
+
+
 .lieu {
     font-size: 0.8rem;
 }
+table {
+    width:100%;
+}
 tr,td, th  {
-    border : 2px solid grey;
+    border : 2px none grey;
+    
 }
 
 th {
     text-align: center;
 }
 
+.thmatch {
+    text-align:left
+}
 
 </style>

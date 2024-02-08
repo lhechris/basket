@@ -1,17 +1,17 @@
 <template>
     <div class="main" >
-        <div v-for="(m,n) in matches" :key="n">
-            <div v-if="page==n">
+        <div v-for="(dispo,i) in disponibilites" :key="i">
+            <div v-if="page==i">
                 <div class="descr">
-                    <span class="date">{{ m.date }}</span><br/>
-                    <span class="lieu">{{ m.lieu }}</span><br/>
-                    <span class="resultat">{{ m.resultat }}</span>
+                    <span class="date">{{ dispo.date }}</span><br/>
+                    <span class="lieu">{{ dispo.lieu }}</span><br/>
+                    <span class="resultat">{{ dispo.resultat }}</span>
                 </div>
                 <table>
-                <tr v-for="(u,j) in users" :key="j">
-                    <th>{{ u.name }}</th>
+                <tr v-for="(u,j) in dispo.users" :key="j">
+                    <th>{{ u.nom }}</th>
                     <td>
-                        <Presence :sel="disponibilites[u.id][m.id]" @onUpdate="update(u.id,m.id,$event)"/>
+                        <Presence :sel="u.dispo" @onUpdate="update(u.id,dispo.id,$event)"/>
                     </td>
                 </tr>
                 </table>
@@ -28,7 +28,7 @@
             <c-pagination-item 
                     href="#" 
                     @click="pageplus()" 
-                    :disabled="page>=matches.length-1"
+                    :disabled="page>=disponibilites.length-1"
                 >Match suivant
             </c-pagination-item>
         </c-pagination>
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import {getMatches, getUsers, getDisponibilites,setDisponibilite} from '@/js/api.js'
+import {getDisponibilites,setDisponibilite} from '@/js/api.js'
 import Presence from '@/components/Presence.vue'
 import {ref} from 'vue'
 import {CPagination,CPaginationItem} from "@coreui/vue"
@@ -49,25 +49,16 @@ export default {
         
   },    
     setup() {
-        const matches = ref([])
-        const users = ref([]);
         const disponibilites = ref([])
         const page = ref(0)
 
-        getUsers().then( u => {
-            users.value = u;
-        })
-
         getDisponibilites().then( p => {
             disponibilites.value = p
-        })
 
-        getMatches().then( m => {
-            matches.value = m
             //selectionne la page courante
             let d1=new Date()
-            for (let i in m) {
-                let s=m[i].date.split("/")
+            for (let i in p) {
+                let s=p[i].date.split("/")
                 let d2=new Date(s[2]+"-"+s[1]+"-"+s[0])
                 if (d2 > d1)  {
                     page.value=i
@@ -77,14 +68,14 @@ export default {
         })
 
 
-
-        function update(usr,match,val) {
-            disponibilites.value[usr][match]=val
-            setDisponibilite(usr,match,val)
+        function update(usr,match,val) {            
+            setDisponibilite(usr,match,val).then( p => {
+                disponibilites.value = p
+            })
         }
 
         function pageplus() {
-            if (page.value<(matches.value.length-1)) {
+            if (page.value<(disponibilites.value.length-1)) {
                 page.value++
             }
         }
@@ -100,7 +91,7 @@ export default {
         }
 
 
-        return {users,matches,disponibilites,page,update,pageplus,pagemoins,pageselect}
+        return {disponibilites,page,update,pageplus,pagemoins,pageselect}
     }
 }
 </script>

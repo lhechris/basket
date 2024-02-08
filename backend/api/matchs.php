@@ -2,16 +2,43 @@
 
 require_once("constantes.php");
 
-function getMatchsArray() {
+/** Initialise  */
+function initMatchs() {
+	$db = new SQLite3(DBLOCATION);
+	$db->query('DELETE FROM matchs');
+}
+
+/** Rempli la BD depuis un fichier json */
+function upgradeMatchsFromfiles() {
 	$fullpath = REPERTOIRE_DATA."matchs.json";
-	if (!file_exists($fullpath)) { 
-		return array();
-	}
+	if (!file_exists($fullpath)) { return;}
 
     //Recupere le fichier json
 	$json = json_decode(file_get_contents($fullpath),true);	
-	if (!is_array($json)) {			
-		return array();
+	if (!is_array($json)) {	return; }
+
+	$db = new SQLite3(DBLOCATION);
+
+	foreach($json as $m) {
+		$stmt = $db->prepare("INSERT INTO matchs(jour,titre,score) VALUES(:jour,:titre,:score)");
+		if ($stmt === false) {return;}
+		$stmt->bindValue(':jour', $m["date"], SQLITE3_TEXT);
+		$stmt->bindValue(':titre', $m["lieu"], SQLITE3_TEXT);
+		$stmt->bindValue(':score', $m["resultat"], SQLITE3_TEXT);
+		$stmt->execute();
+	}
+}
+
+function getMatchsArray() {
+	$db = new SQLite3(DBLOCATION);
+	$results = $db->query('select * from matchs');
+	$json = array();
+
+	while ($row = $results->fetchArray()) {
+		array_push($json,array( "id" => $row["id"],
+								"date"=>$row["jour"],
+								"lieu" =>$row["titre"],
+								"resultat" => $row["score"]));
 	}
 
 	return $json;
@@ -33,77 +60,130 @@ function getMatchs() {
 
 }
 
+/**
+ * Execute la requete UPDATE sur la table match
+ */
+function _updateMatch($db,$id,$titre,$score,$jour) {
+	
+	$stmt = $db->prepare('UPDATE matchs SET titre=:titre, score=:score, jour=:jour WHERE id=:id');
+	
+	if (
+		($stmt->bindValue(':id', $id, SQLITE3_INTEGER)) &&
+		($stmt->bindValue(':titre', $titre, SQLITE3_TEXT)) &&
+		($stmt->bindValue(':score', $score, SQLITE3_TEXT)) &&
+		($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) 
+	) {
+		loginfo($stmt->getSQL(true));
+		if ($stmt->execute()===false) {
+			loginfo("Erreur");
+		}
+		$stmt->reset();					
 
+	} else {
+		loginfo("Erreur query values");
+	}
+}
+
+/**
+ * Execute la requete INSERT INTO dans la table match
+ * Et ajoute un entree dans les tables disponibilites et selections
+ */
+function _ajouteMatch($db,$titre,$score,$jour) {
+	$stmt = $db->prepare('INSERT INTO matchs(titre,score,jour) VALUES(:titre,:score,:jour)');
+	if (
+		($stmt->bindValue(':titre', $titre, SQLITE3_TEXT)) &&
+		($stmt->bindValue(':score', $score, SQLITE3_TEXT)) &&
+		($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) 
+	) {
+		loginfo($stmt->getSQL(true));
+		if ($stmt->execute()===false) {loginfo("Erreur");}
+
+		$lastid=$db->lastInsertRowID();				
+
+		if ($lastid>0) {
+			$users = $db->query('SELECT id FROM users');
+			while ($u = $users->fetchArray()) {
+				$stmt = $db->prepare('INSERT INTO disponibilites(match,user) VALUES (:mid,:uid)');			
+				$stmt->bindValue(':uid', $u['id'], SQLITE3_INTEGER);
+				$stmt->bindValue(':mid', $lastid, SQLITE3_INTEGER);
+				loginfo($stmt->getSQL(true));
+				if ($stmt->execute()===false) {loginfo("Erreur");}
+				$stmt->reset();
+
+				$stmt = $db->prepare('INSERT INTO selections(match,user) VALUES (:mid,:uid)');			
+				$stmt->bindValue(':uid', $u['id'], SQLITE3_INTEGER);
+				$stmt->bindValue(':mid', $lastid, SQLITE3_INTEGER);
+				loginfo($stmt->getSQL(true));
+				if ($stmt->execute()===false) {loginfo("Erreur");}
+				$stmt->reset();
+			}
+		}
+
+	} else {
+		loginfo("Erreur query values");
+	}
+}
+
+/**
+ * Execute la requete DELETE dans la table match
+ * Supprime aussi les entrees dans disponibilites et selections
+ */
+function _supprimeMatch($db,$id) {
+	
+	$stmt = $db->prepare('DELETE FROM matchs WHERE id=:id');
+
+	if 	($stmt->bindValue(':id', $id, SQLITE3_INTEGER)) 
+	{
+		loginfo($stmt->getSQL(true));
+		if ($stmt->execute()===false) {loginfo("Erreur");}
+
+		$stmt = $db->prepare('DELETE FROM disponibilites WHERE match=:id');
+		$stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+		loginfo($stmt->getSQL(true));
+		if ($stmt->execute()===false) {loginfo("Erreur");}
+
+		$stmt = $db->prepare('DELETE FROM selections WHERE match=:id');
+		$stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+		loginfo($stmt->getSQL(true));
+		if ($stmt->execute()===false) {loginfo("Erreur");}
+
+	} else {
+		loginfo("Erreur query values");
+	}
+
+}
+
+
+
+/**
+ * Modifie/Ajoute/Supprime des matchs 
+ * En entree un fichier JSON contenant la liste des matchs
+ * Si pas d'ID on ajoute et si param todelete on supprime sinon on modifie
+ */
 function setMatchs($json) {
-	$oldJson = getMatchsArray();
+	$db = new SQLite3(DBLOCATION);
 
 	foreach($json as $nm) {
 
 		if (is_array($nm) && array_key_exists("lieu",$nm) && array_key_exists("date",$nm) && array_key_exists("resultat",$nm)) {
 
 			if (array_key_exists("id",$nm)) {
-				//Met à jour tous les matchs avec qui on un id
-				foreach($oldJson as $key => &$om) {
-					if ($om["id"] === $nm["id"]) {
-						$om["lieu"] = $nm["lieu"];
-						$om["date"] = $nm["date"];
-						$om["resultat"] = $nm["resultat"];
-						if (array_key_exists("todelete",$nm) && ($nm["todelete"]==true)) {
-							//Supprime le match
-							unset($oldJson[$key]);
-						}
-					}
+				if (array_key_exists("todelete",$nm)) {
+					_supprimeMatch($db,$nm["id"]);
+
+				} else {
+					_updateMatch($db,$nm["id"],$nm["lieu"],$nm["resultat"],$nm["date"]);
 				}
-				unset($om);
 
 			} else {
-				//Il n'y a pas d'ID c'est donc un ajout.
-				//recherche l'ID max pour en creer un nouveau
-				$maxid=-1;
-				foreach($oldJson as $om) {
-					if ($om["id"]>$maxid) {$maxid=$om["id"];}
-				}
-				$maxid+=1;
-
-				array_push($oldJson, [
-					"id" => $maxid,
-					"lieu" => $nm["lieu"],
-					"date" => $nm["date"],
-					"resultat" => $nm["resultat"]
-				]
-				);
-				
+				/**
+				 * Il n'y a pas d'id pour ce match c'est donc un ajout 
+				 */
+				_ajouteMatch($db,$nm["lieu"],$nm["resultat"],$nm["date"]);
 			}
 		}
 	}
-
-	//Sauve le fichier
-	if (writeMatchsFile($oldJson)) {
-		getMatchs();
-	}
-	
+	getMatchs();	
 }
-
-
-function writeMatchsFile($json) {
-	$fullpath=REPERTOIRE_DATA."matchs.json";
-	
-	if (!$fp = fopen($fullpath, 'w')) {
-		responseError("Impossible d'ouvrir le fichier");
-		return false;
-   }
-
-   if (fwrite($fp, json_encode($json,JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)) === FALSE) {
-	   responseError("Impossible d'écrire dans le fichier");
-	   fclose($fp);  
-	   return false;
-   }
-
-	fclose($fp);	
-	return true;
-}
-
-
-
 
 ?>

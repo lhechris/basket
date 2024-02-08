@@ -1,7 +1,8 @@
 <?php
 
 define("REPERTOIRE_DATA","../../data/");
-define("ACTIVELOG",false);
+define("ACTIVELOG",true);
+define("DBLOCATION","../../data/basketu11.db");
 
 function responseError($msg) {
     header("Content-Type:text/html");

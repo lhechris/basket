@@ -1,16 +1,17 @@
 <template>
     <div class="main" >
-        <div v-for="(m,n) in entrainements" :key="n">
+        <div v-for="(e,n) in presences" :key="n">
             <div v-if="page==n">
                 <div class="descr" >
-                    <span class="date">{{ m.date }}</span><br/>
+                    <span class="date">{{ e.date }}</span><br/>
+                    <span>{{ countJoueuses(e.id) }}</span>
                     
                 </div>
                 <table>
-                <tr v-for="(u,j) in users" :key="j">
-                    <th>{{ u.name }}</th>
+                <tr v-for="(u,j) in e.users" :key="j">
+                    <th>{{ u.nom }}</th>
                     <td>
-                        <Presence :sel="presences[u.id][m.id]" @onUpdate="update(u.id,m.id,$event)"/>
+                        <Presence :sel="u.pres" @onUpdate="update(u.id,e.id,$event)"/>
                     </td>
                 </tr>
                 </table>
@@ -26,7 +27,7 @@
             <c-pagination-item 
                     href="#/entrainement" 
                     @click="pageplus()" 
-                    :disabled="page>=entrainements.length-1"
+                    :disabled="page>=presences.length-1"
                 >Suivant
             </c-pagination-item>
         </c-pagination>
@@ -34,7 +35,7 @@
 </template>
 
 <script>
-import {getEntrainements, getUsers, getPresences,setPresence} from '@/js/api.js'
+import {getPresences,setPresence} from '@/js/api.js'
 import Presence from '@/components/Presence.vue'
 import {ref} from 'vue'
 import {CPagination,CPaginationItem} from "@coreui/vue"
@@ -47,50 +48,46 @@ export default {
         
   },    
     setup() {
-        const entrainements = ref([])
-        const users = ref([]);
         const presences = ref([])
         const page = ref(0)
 
-        getUsers().then( u => {
-            users.value = u;
-        })
-
         getPresences().then( p => {
             presences.value = p
-        })
-
-        getEntrainements().then( m => {
-            entrainements.value = m
-            //selectionne la page courante
             let d1=new Date()
-            for (let i in m) {
-                let s=m[i].date.split("/")
+            for (let i in p) {
+                let s=p[i].date.split("/")
                 let d2=new Date(s[2]+"-"+s[1]+"-"+s[0]+1)
                 if (d2 > d1)  {
                     page.value=i
                     break
                 }                
             }            
+
         })
 
         function countJoueuses(mid) {
             let nb=0
-            for (let s in presences.value) {
-                if (presences.value[s][mid]==1) {
-                    nb=nb+1
+            for (let p of presences.value) {
+                if (p.id == mid) {
+                    for (let u of p.users) {
+                        if (u.pres == 1) {
+                            nb=nb+1
+                        }
+                    }
                 }
             }
             return nb
         }
 
         function update(usr,match,val) {
-            presences.value[usr][match]=val
-            setPresence(usr,match,val)
+            
+            setPresence(usr,match,val).then( p => {
+                presences.value = p    
+            })
         }
 
         function pageplus() {
-            if (page.value<(entrainements.value.length-1)) {
+            if (page.value<(presences.value.length-1)) {
                 page.value++
             }
         }
@@ -106,7 +103,7 @@ export default {
         }
 
 
-        return {users,entrainements,presences,page,countJoueuses,update,pageplus,pagemoins,pageselect}
+        return {presences,page,countJoueuses,update,pageplus,pagemoins,pageselect}
     }
 }
 </script>

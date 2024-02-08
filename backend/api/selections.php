@@ -4,40 +4,85 @@ require_once("constantes.php");
 require_once("matchs.php");
 require_once("users.php");
 
+/** Initialise selection */
+function initSelections() {
+	$db = new SQLite3(DBLOCATION);
+	$db->query('DELETE FROM selections');
+
+	$users=getUsersArray();
+	$matchs=getMatchsArray();
+	foreach($matchs as $m) {
+		foreach($users as $u) {
+			$stmt = $db->prepare("INSERT INTO selections(match,user,val) VALUES(:match,:user,0)");
+			$stmt->bindValue(':match', $m["id"], SQLITE3_INTEGER);
+			$stmt->bindValue(':user', $u["id"], SQLITE3_INTEGER);
+			$stmt->execute();
+		}
+	}
+}
+
+function upgradeSelectionsFromFile() {
+	$fullpath = REPERTOIRE_DATA."selections.json";
+	if (!file_exists($fullpath)) { return;}
+
+    //Recupere le fichier json
+	$json = json_decode(file_get_contents($fullpath),true);	
+	if (!is_array($json)) {	return; }
+
+	$db = new SQLite3(DBLOCATION);
+
+	foreach($json as $uid=>$u) {
+		foreach($u as $mid=>$v) {
+			$stmt = $db->prepare("UPDATE selections ".
+			                     "SET val=:val ".
+								 "WHERE match=:mid AND user=:uid");
+			if ($stmt === false) {return;}
+			$stmt->bindValue(':mid', $mid+1, SQLITE3_INTEGER);
+			$stmt->bindValue(':uid', $uid+1, SQLITE3_INTEGER);
+			$stmt->bindValue(':val', $v, SQLITE3_TEXT);
+			$stmt->execute();
+		}
+	}
+}
+
+
 /**
  * retourne le fichier json
  */
 function getSelectionsArray() {
+	$db = new SQLite3(DBLOCATION);
 
-	$fullpath = REPERTOIRE_DATA."selections.json";
-	if (!file_exists($fullpath)) { 
-		$users=getUsersArray();
-		$matchs=getMatchsArray();
-		
-		//cherche l'identifiant max pour user
-		$mu=0;
-		foreach($users as $u) {
-			if ($mu<$u["id"]) { $mu=$u["id"];}
-		}	
-		
-		//cherche l'identifiant max pour match
-		$mm=0;
-		foreach($matchs as $m) {
-			if ($mm<$m["id"]) { $mm=$m["id"];}
+	$results = $db->query('SELECT A.titre as titre,A.jour as jour,A.score as score,B.nom as user,C.val as dispo,A.id as mid,B.id as uid, D.val as selection '.
+						'FROM matchs A, users B, disponibilites C, selections D '.
+						'WHERE C.match=A.id AND C.user=B.id AND D.match=A.id AND D.user=B.id '.
+						'ORDER BY C.match,C.user');
+	$json = array();
+
+	while ($row = $results->fetchArray()) {
+		$id=-1;
+		foreach($json as $k => $r ) {
+			if ($r["id"]==$row["mid"]) {
+				$id = $k;
+			}
 		}
-		$mat=array_pad(array(),$mm+1,0);
-		$sel=array_pad(array(),$mu+1,$mat);
-		writeSelectionFile($sel);
-		return $sel;
-	}
-
-    //Recupere le fichier json
-	$json = json_decode(file_get_contents($fullpath),true);	
-	if (!is_array($json)) {			
-		return array();
+		
+		if ($id==-1) {
+			array_push($json, array( "id"    => $row["mid"],
+									 "lieu"  => $row["titre"], 
+									 "date"  => $row["jour"],
+									 "resultat"  => $row["score"],
+									 "users" => array()));
+			$id = count($json)-1;
+		}
+		
+		array_push($json[$id]["users"],array("nom"   => $row["user"], 
+													 "dispo" => $row["dispo"],
+													 "selection" => $row["selection"],
+													 "id"    => $row["uid"]));
 	}
 
 	return $json;
+
 }
 
 /**
@@ -50,66 +95,42 @@ function getSelections() {
 }
 
 /**
- * Met à jour le fichier json
+ * Met à jour et retourne les nouvelles valeurs 
  */
 function setSelection($json) {
-
-	if ( is_int($json['usr']) && is_int($json['match']) && is_int($json['selection'])) {
-		
-		$users=getUsersArray();
-		$matchs=getMatchsArray();
-		$select=getSelectionsArray();
-		
-		$idu=-1;
-		$idm=-1;
-
-		foreach($users as $u) {
-			if ($u["id"]==$json['usr']) {
-				$idu=$json['usr'];
-			}
-		}
-
-		foreach($matchs as $m) {
-			if ($m["id"]==$json['match']) {
-				$idm=$json['match'];
-			}
-		}
-		$msg="idu=".$idu." idm=".$idm;
-		$select[$idu][$idm] = $json['selection'];
-
-		if (($idu==-1) || ($idm==-1)) {
-			responseError("Bad input");
-			return;
-		}
-
-		if (writeSelectionFile($select)) {
-			responseText("success");
-		}
-
-	} else {
-		responseError("Bad input");
-	}
-
+	_updateSelection($json);
+	getSelections();
 }
 
 
-function writeSelectionFile($json) {
-	$fullpath=REPERTOIRE_DATA."selections.json";
+/**
+ * Met à jour la BDD
+ */
+function _updateSelection($json) {
+		
+	if ( is_int($json['usr']) && is_int($json['match']) && is_int($json['selection'])) {
+
+		$db = new SQLite3(DBLOCATION);
+		$query='UPDATE selections SET val=:val WHERE match=:match AND user=:user';
 	
-	if (!$fp = fopen($fullpath, 'w')) {
-		responseError("Impossible d'ouvrir le fichier");
-		return false;
-   }
+		$stmt = $db->prepare($query);
 
-   if (fwrite($fp, json_encode($json,JSON_UNESCAPED_SLASHES)) === FALSE) {
-	   responseError("Impossible d'écrire dans le fichier");
-	   fclose($fp);  
-	   return false;
-   }
+		if (($stmt->bindValue(':match', $json['match'], SQLITE3_INTEGER)) &&
+			($stmt->bindValue(':user', $json['usr'], SQLITE3_INTEGER)) &&
+			($stmt->bindValue(':val', $json['selection'], SQLITE3_INTEGER)) ) {
 
-	fclose($fp);
-	return true;
+			loginfo($stmt->getSQL(true));
+			if ($stmt->execute()===false) {
+				loginfo("Erreur");
+			}
+			$stmt->reset();					
 
+		} else {
+			loginfo("Erreur query values");
+		}
+	} else {
+		loginfo("bad input values");
+	}
 }
 
 ?>

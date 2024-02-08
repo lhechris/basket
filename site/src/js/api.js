@@ -67,11 +67,20 @@ export function getPresences() {
 export function setPresence(usr,match,val) {
     var baseurl = "/api/";
 
-    axios.post(baseurl, {
-        usr:usr,
-        entrainement:match,
-        pres:val
-    })
+    return new Promise((successClbk,failClbk) => {
+
+            axios.post(baseurl, {
+            usr:usr,
+            entrainement:match,
+            pres:val
+        }).then(response =>{
+            var r=response.data;        
+            successClbk(r);
+
+        }).catch(errmsg => {
+            failClbk(errmsg);
+        })
+    });
 }
 export function getDisponibilites() {
     return new Promise( (successClbk,failClbk) => {
@@ -82,11 +91,24 @@ export function getDisponibilites() {
 export function setDisponibilite(usr,match,val) {
     var baseurl = "/api/";
 
-    axios.post(baseurl, {
-        usr:usr,
-        match:match,
-        value:val
-    })
+    return new Promise((successClbk,failClbk) => {
+
+        axios.post(baseurl, {
+            usr:usr,
+            match:match,
+            value:val
+        }).then(response =>{
+            var r=response.data;        
+            successClbk(r);
+
+        }).catch(errmsg => {
+            failClbk(errmsg);
+        })
+
+    });
+
+
+
 }
 export function getSelections() {
     return new Promise( (successClbk,failClbk) => {
@@ -97,11 +119,21 @@ export function getSelections() {
 export function setSelection(usr,match,val) {
     var baseurl = "/api/";
 
+    return new Promise((successClbk,failClbk) => {
+
     axios.post(baseurl, {
         usr:usr,
         match:match,
         selection:val
+    }).then(response =>{
+        var r=response.data;        
+        successClbk(r);
+
+    }).catch(errmsg => {
+        failClbk(errmsg);
     })
+
+});
 }
 
 export function login(login,passwd) {

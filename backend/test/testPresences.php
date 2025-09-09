@@ -31,7 +31,7 @@ function test_updatePresence() {
 
 
 //initPresences();
-//test_getPresences();
-test_updatePresence();
+test_getPresences();
+//test_updatePresence();
 
 ?>

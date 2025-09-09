@@ -3,9 +3,29 @@
 require_once("constantes.php");
 
 /** Initialise  */
-function initEntrainements() {
+function initEntrainements($first,$second,$nbsemaine) {
 	$db = new SQLite3(DBLOCATION);
 	$db->query('DELETE FROM entrainements');
+
+	$dfirst=new Datetime($first);
+	$dsecond=new Datetime($second);
+	
+	for ($i=0;$i<$nbsemaine;$i++) {
+		echo(round($i*100/$nbsemaine)."%\r");
+		$stmt = $db->prepare("INSERT INTO entrainements(jour) VALUES(:jour)");
+		$stmt->bindValue(':jour', $dfirst->format('Y-m-d'), SQLITE3_TEXT);
+		$stmt->execute();
+
+		$stmt = $db->prepare("INSERT INTO entrainements(jour) VALUES(:jour)");
+		$stmt->bindValue(':jour', $dsecond->format('Y-m-d'), SQLITE3_TEXT);
+		$stmt->execute();
+
+		$dfirst->add(new DateInterval('P7D') );
+		$dsecond->add(new DateInterval('P7D') );
+
+	}
+
+
 }
 
 function upgradeEntrainementsFromfiles() {

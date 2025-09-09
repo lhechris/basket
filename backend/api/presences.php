@@ -12,7 +12,10 @@ function initPresences() {
 
 	$users=getUsersArray();
 	$entrainements=getEntrainementsArray();
+	$n=0;
 	foreach($entrainements as $e) {
+		echo(round(($n*100)/count($entrainements))."%\r");
+		$n=$n+1;
 		foreach($users as $u) {
 			$stmt = $db->prepare("INSERT INTO presences(entrainement,user,val) VALUES(:entrainement,:user,0)");
 			$stmt->bindValue(':entrainement', $e["id"], SQLITE3_INTEGER);
@@ -21,6 +24,29 @@ function initPresences() {
 		}
 	}
 }
+
+function initUserInPresence($username) {
+	$db = new SQLite3(DBLOCATION);
+	$db->query('DELETE FROM presences');
+
+	$users=getUsersArray();
+	$entrainements=getEntrainementsArray();
+	$n=0;
+	foreach($entrainements as $e) {
+		echo(round(($n*100)/count($entrainements))."%\r");
+		$n=$n+1;
+		foreach($users as $u) {
+			$stmt = $db->prepare("INSERT INTO presences(entrainement,user,val) VALUES(:entrainement,:user,0)");
+			$stmt->bindValue(':entrainement', $e["id"], SQLITE3_INTEGER);
+			$stmt->bindValue(':user', $u["id"], SQLITE3_INTEGER);
+			$stmt->execute();
+		}
+	}
+
+
+}
+
+
 
 function upgradePresencesFromFile() {
 	$fullpath = REPERTOIRE_DATA."presences.json";
@@ -56,7 +82,8 @@ function getPresencesArray() {
 
 	$results = $db->query('SELECT A.jour as jour,B.nom as user,C.val as val,A.id as eid,B.id as uid '. 
 	                      'FROM entrainements A, users B, presences C '.
-						  'WHERE C.entrainement=A.id AND C.user=B.id ORDER BY C.entrainement,C.user');
+						  'LEFT JOIN ON C.user=B.id '.
+						  'WHERE C.entrainement=A.id ORDER BY C.entrainement,B.nom');
 	$json = array();
 
 	while ($row = $results->fetchArray()) {

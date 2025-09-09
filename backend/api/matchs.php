@@ -20,8 +20,9 @@ function upgradeMatchsFromfiles() {
 	$db = new SQLite3(DBLOCATION);
 
 	foreach($json as $m) {
-		$stmt = $db->prepare("INSERT INTO matchs(jour,titre,score) VALUES(:jour,:titre,:score)");
+		$stmt = $db->prepare("INSERT INTO matchs(equipe,jour,titre,score) VALUES(:equipe,:jour,:titre,:score)");
 		if ($stmt === false) {return;}
+		$stmt->bindValue(':equipe', $m["equipe"], SQLITE3_INTEGER);
 		$stmt->bindValue(':jour', $m["date"], SQLITE3_TEXT);
 		$stmt->bindValue(':titre', $m["lieu"], SQLITE3_TEXT);
 		$stmt->bindValue(':score', $m["resultat"], SQLITE3_TEXT);
@@ -36,6 +37,7 @@ function getMatchsArray() {
 
 	while ($row = $results->fetchArray()) {
 		array_push($json,array( "id" => $row["id"],
+								"equipe" => $row['equipe'],
 								"date"=>$row["jour"],
 								"lieu" =>$row["titre"],
 								"resultat" => $row["score"]));
@@ -63,12 +65,13 @@ function getMatchs() {
 /**
  * Execute la requete UPDATE sur la table match
  */
-function _updateMatch($db,$id,$titre,$score,$jour) {
+function _updateMatch($db,$id,$equipe,$titre,$score,$jour) {
 	
-	$stmt = $db->prepare('UPDATE matchs SET titre=:titre, score=:score, jour=:jour WHERE id=:id');
+	$stmt = $db->prepare('UPDATE matchs SET equipe=:equipe, titre=:titre, score=:score, jour=:jour WHERE id=:id');
 	
 	if (
 		($stmt->bindValue(':id', $id, SQLITE3_INTEGER)) &&
+		($stmt->bindValue(':equipe', $id, SQLITE3_INTEGER)) &&
 		($stmt->bindValue(':titre', $titre, SQLITE3_TEXT)) &&
 		($stmt->bindValue(':score', $score, SQLITE3_TEXT)) &&
 		($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) 
@@ -88,12 +91,13 @@ function _updateMatch($db,$id,$titre,$score,$jour) {
  * Execute la requete INSERT INTO dans la table match
  * Et ajoute un entree dans les tables disponibilites et selections
  */
-function _ajouteMatch($db,$titre,$score,$jour) {
-	$stmt = $db->prepare('INSERT INTO matchs(titre,score,jour) VALUES(:titre,:score,:jour)');
+function _ajouteMatch($db,$equipe,$titre,$score,$jour) {
+	$stmt = $db->prepare('INSERT INTO matchs(titre,score,jour,equipe) VALUES(:titre,:score,:jour,:equipe)');
 	if (
 		($stmt->bindValue(':titre', $titre, SQLITE3_TEXT)) &&
 		($stmt->bindValue(':score', $score, SQLITE3_TEXT)) &&
-		($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) 
+		($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) &&
+		($stmt->bindValue(':equipe', $jour, SQLITE3_INTEGER)) 
 	) {
 		loginfo($stmt->getSQL(true));
 		if ($stmt->execute()===false) {loginfo("Erreur");}
@@ -101,7 +105,10 @@ function _ajouteMatch($db,$titre,$score,$jour) {
 		$lastid=$db->lastInsertRowID();				
 
 		if ($lastid>0) {
-			$users = $db->query('SELECT id FROM users');
+			$stmt = $db->prepare('SELECT id FROM users WHERE equipe=:equipe');
+			$stmt->bindValue(':equipe', $equipe, SQLITE3_INTEGER);
+			$users = $stmt->execute();
+
 			while ($u = $users->fetchArray()) {
 				$stmt = $db->prepare('INSERT INTO disponibilites(match,user) VALUES (:mid,:uid)');			
 				$stmt->bindValue(':uid', $u['id'], SQLITE3_INTEGER);
@@ -165,21 +172,21 @@ function setMatchs($json) {
 
 	foreach($json as $nm) {
 
-		if (is_array($nm) && array_key_exists("lieu",$nm) && array_key_exists("date",$nm) && array_key_exists("resultat",$nm)) {
+		if (is_array($nm) && array_key_exists("lieu",$nm) && array_key_exists("date",$nm) && array_key_exists("resultat",$nm) && array_key_exists("equipe",$nm) ) {
 
 			if (array_key_exists("id",$nm)) {
 				if (array_key_exists("todelete",$nm)) {
 					_supprimeMatch($db,$nm["id"]);
 
 				} else {
-					_updateMatch($db,$nm["id"],$nm["lieu"],$nm["resultat"],$nm["date"]);
+					_updateMatch($db,$nm["id"],$nm["equipe"],$nm["lieu"],$nm["resultat"],$nm["date"]);
 				}
 
 			} else {
 				/**
 				 * Il n'y a pas d'id pour ce match c'est donc un ajout 
 				 */
-				_ajouteMatch($db,$nm["lieu"],$nm["resultat"],$nm["date"]);
+				_ajouteMatch($db,$nm["equipe"],$nm["lieu"],$nm["resultat"],$nm["date"]);
 			}
 		}
 	}

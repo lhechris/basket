@@ -1,10 +1,14 @@
 <template>
     <div class="main">
         <table>
-            <tr><th>Rencontre</th><th>Date</th><th>Resultat</th><th></th></tr>
+            <thead>
+                <tr><th>Rencontre</th><th>Date</th><th>Equipe</th><th>Resultat</th><th></th></tr>
+            </thead>
+            <tbody>
             <tr v-for="(m,i) in matches" :key="i" >
             <td><input v-model="m.lieu" :class="m.todelete==true ? 'disabled' : ''"/></td>
             <td><input v-model="m.date" class="inputdate" :class="m.todelete==true ? 'disabled' : ''"/></td>
+            <td><input v-model="m.equipe" class="inputdate" :class="m.todelete==true ? 'disabled' : ''"/></td>
             <td><input v-model="m.resultat" class="inputresultat" :class="m.todelete==true ? 'disabled' : ''"/></td>
             <td>
                 <button class="btndelete" @click="supprime(m.id)">
@@ -12,6 +16,7 @@
                 </button>
             </td>
             </tr>
+            </tbody>
         </table>
         <button class="btnnew" @click="ajoute()">Nouveau</button>
         <button class="btnenreg" @click="enregistrer()">Enregistrer</button>
@@ -41,7 +46,7 @@ export default {
         }
 
         function ajoute() {
-            matches.value.push({lieu:"lieu", date:"xx/xx", resultat:""})
+            matches.value.push({lieu:"lieu", date:"xx/xx",equipe:"1", resultat:""})
         }
 
         function enregistrer() {

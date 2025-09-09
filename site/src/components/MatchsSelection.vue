@@ -1,11 +1,14 @@
 <template>
     <div class="main" >
         <table >
+            <thead>
             <tr>
                 <th></th>
                 <th></th>
                 <th v-for="(u,j) in users" :key="j" >{{ u.nom }}<br/>{{ countMatchs(u.id) }}</th>
             </tr>
+            </thead>
+            <tbody>
             <tr v-for="(s,n) in selections" :key="n">
                 <th class="thmatch">{{ s.date }} - {{ s.lieu }} - {{ s.resultat }} </th>
                 <th>{{ countJoueuses(s.id) }}</th>
@@ -16,6 +19,7 @@
                 </td>
             
             </tr>
+            </tbody>
         </table>
     </div>
 </template>

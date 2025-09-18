@@ -3,13 +3,26 @@
         <div v-for="(e,n) in presences" :key="n">
             <div v-if="page==n">
                 <div class="descr" >
-                    <span class="date">{{ e.date }}</span><br/>
+                    <span class="date">{{displaydate(e.date) }}</span>
+                    <span><c-pagination>
+                        <c-pagination-item 
+                                href="#/entrainement" 
+                                @click="pagemoins()" 
+                                :disabled="page<=0"
+                            >Précédent
+                        </c-pagination-item>
+                        <c-pagination-item 
+                                href="#/entrainement" 
+                                @click="pageplus()" 
+                                :disabled="page>=presences.length-1"
+                            >Suivant
+                        </c-pagination-item>
+                    </c-pagination>  </span>          
                     <span>{{ countJoueuses(e.id) }}</span>
-                    
                 </div>
                 <table>
                 <tr v-for="(u,j) in e.users" :key="j">
-                    <th>{{ u.nom }}</th>
+                    <th>{{ u.prenom }}</th>
                     <td>
                         <Presence :sel="u.pres" @onUpdate="update(u.id,e.id,$event)"/>
                     </td>
@@ -35,7 +48,7 @@
 </template>
 
 <script>
-import {getPresences,setPresence} from '@/js/api.js'
+import {getPresences,setPresence,displaydate} from '@/js/api.js'
 import Presence from '@/components/Presence.vue'
 import {ref} from 'vue'
 import {CPagination,CPaginationItem} from "@coreui/vue"
@@ -55,8 +68,10 @@ export default {
             presences.value = p
             let d1=new Date()
             for (let i in p) {
-                let s=p[i].date.split("/")
-                let d2=new Date(s[2]+"-"+s[1]+"-"+s[0]+1)
+                //let s=p[i].date.split("/")
+                //let d2=new Date(s[2]+"-"+s[1]+"-"+s[0]+1)
+                let d2=new Date(p[i].date)
+                d2.setDate(d2.getDate()+1)
                 if (d2 > d1)  {
                     page.value=i
                     break
@@ -103,21 +118,11 @@ export default {
         }
 
 
-        return {presences,page,countJoueuses,update,pageplus,pagemoins,pageselect}
+        return {presences,page,countJoueuses,update,pageplus,pagemoins,pageselect,displaydate}
     }
 }
 </script>
 <style scoped>
-.main {
-    display:block;
-    margin-left:auto;
-    margin-right:auto;    
-    width: 400px;
-    height : 500px;
-    /*overflow : scroll;
-    scrollbar-color: rebeccapurple green;
-    scrollbar-width: thin;*/
-}
 
 .date {
     font-weight:600;

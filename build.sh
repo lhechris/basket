@@ -11,5 +11,5 @@ yarn run build
 cp -r dist/* ../dist
 cp -r ../backend/api ../dist
 cd ..
-sed -i 's|../../data|../data|g' dist/api/constantes.php
+sed -i 's|../../data|../data|g' dist/api/.env
 

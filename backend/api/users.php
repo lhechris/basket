@@ -1,50 +1,164 @@
 <?php 
 
-require_once("constantes.php");
+require_once("utils.php");
 
-/** Initialise  */
-function initUsers() {
-	$db = new SQLite3(DBLOCATION);
-	$db->query('DELETE FROM users');
-}
+class Users {
+	private $db;
 
-/** Rempli la BD depuis un fichier json */
-function upgradeUsersFromfiles() {
-	$fullpath = REPERTOIRE_DATA."users.json";
-	if (!file_exists($fullpath)) { return;}
-
-    //Recupere le fichier json
-	$json = json_decode(file_get_contents($fullpath),true);	
-	if (!is_array($json)) {	return; }
-
-	$db = new SQLite3(DBLOCATION);
-
-	foreach($json as $u) {
-		$stmt = $db->prepare("INSERT INTO users(nom) VALUES(:nom)");
-		if ($stmt === false) {return;}
-		$stmt->bindValue(':nom', $u["name"], SQLITE3_TEXT);
-		$stmt->execute();
-	}
-}
-
-function getUsersArray() {
-	$db = new SQLite3(DBLOCATION);
-	$results = $db->query('select * from users');
-	$json = array();
-
-	while ($row = $results->fetchArray()) {
-		array_push($json,array( "id" => $row["id"],
-								"name"=>$row["nom"]));
+	public function __construct($donnees) {
+		$this->db = $donnees->db;
 	}
 
-	return $json;
+
+	public function getArray() {	
+		$results = $this->db->query('select id,nom,prenom,equipe,licence,otm,charte from users order by prenom');
+		$json = array();
+
+		while ($row = $results->fetchArray()) {
+			array_push($json,array( "id" => $row["id"],
+									"prenom"=>$row["prenom"],
+									"nom"=>$row["nom"],
+									"equipe"=>$row["equipe"],
+									"licence" =>$row["licence"],
+									"otm" =>$row["otm"],
+									"charte" =>$row["charte"]));
+		}
+		return $json;
+	}
+
+	public function get() {
+		responseJson($this->getArray());
+	}
 
 
-}
+	/**
+	 * Modifie/Ajoute/Supprime des users 
+	 * En entree un fichier JSON contenant la liste des matchs
+	 * Si pas d'ID on ajoute et si param todelete on supprime sinon on modifie
+	 */
+	public function set($json) {
 
-function getUsers() {
+		foreach($json as $nm) {
 
-	responseJson(getUsersArray());
+			if (is_array($nm) && 
+				array_key_exists("prenom",$nm) && 
+				array_key_exists("nom",$nm) &&
+				array_key_exists("equipe",$nm) && 
+				array_key_exists("licence",$nm) &&
+				array_key_exists("charte",$nm) &&
+				array_key_exists("otm",$nm) ) {
+
+				if (array_key_exists("id",$nm)) {
+					if (array_key_exists("todelete",$nm)) {
+						$this->supprime($nm["id"]);
+
+					} else {
+						$this->update($nm["id"],$nm["prenom"],$nm["nom"],$nm["equipe"],$nm["licence"],$nm["otm"],$nm["charte"]);
+					}
+
+				} else {
+					/**
+					 * Il n'y a pas d'id pour ce match c'est donc un ajout 
+					 */
+					$this->ajoute($nm["prenom"],$nm["equipe"]);
+				}
+			}
+		}
+		$this->get();	
+	}
+
+	/**
+	 * Execute la requete UPDATE sur la table match
+	 */
+	protected function update($id,$prenom,$nom,$equipe,$licence,$otm,$charte) {
+		
+		$stmt = $this->db->prepare(
+			'UPDATE users '.
+			'SET equipe=:equipe, prenom=:prenom, nom=:nom, licence=:licence, otm=:otm, charte=:charte '.
+			'WHERE id=:id');
+		
+		if (
+			($stmt->bindValue(':id', $id, SQLITE3_INTEGER)) &&
+			($stmt->bindValue(':equipe', $equipe, SQLITE3_INTEGER)) &&
+			($stmt->bindValue(':prenom', $prenom, SQLITE3_TEXT)) &&
+			($stmt->bindValue(':nom', $nom, SQLITE3_TEXT)) && 
+			($stmt->bindValue(':licence', $licence, SQLITE3_TEXT)) &&
+			($stmt->bindValue(':otm', $otm, SQLITE3_INTEGER)) &&
+			($stmt->bindValue(':charte', $charte, SQLITE3_INTEGER)) 
+		) {
+			loginfo($stmt->getSQL(true));
+			if ($stmt->execute()===false) {
+				loginfo("Erreur");
+			}
+			$stmt->reset();					
+
+		} else {
+			loginfo("Erreur query values");
+		}
+	}
+
+	/**
+	 * Execute la requete INSERT INTO dans la table match
+	 * Et ajoute un entree dans les tables disponibilites et selections
+	 */
+	protected function ajoute($prenom,$equipe) {
+		$stmt = $this->db->prepare('INSERT INTO users(prenom,equipe) VALUES(:prenom,:equipe)');
+		if (
+			($stmt->bindValue(':prenom', $prenom, SQLITE3_TEXT)) &&
+			($stmt->bindValue(':equipe', $equipe, SQLITE3_INTEGER)) 
+		) {
+			loginfo($stmt->getSQL(true));
+			if ($stmt->execute()===false) {loginfo("Erreur");}
+
+			//$lastid=$db->lastInsertRowID();				
+
+		} else {
+			loginfo("Erreur query values");
+		}
+	}
+
+	/**
+	 * Execute la requete DELETE dans la table match
+	 * Supprime aussi les entrees dans disponibilites et selections
+	 */
+	protected function supprime($id) {
+		
+		$stmt = $this->db->prepare('DELETE FROM matchs WHERE id=:id');
+
+		if 	($stmt->bindValue(':id', $id, SQLITE3_INTEGER)) 
+		{
+			loginfo($stmt->getSQL(true));
+			if ($stmt->execute()===false) {loginfo("Erreur");}
+
+			//suppression dans disponibilites, presences et selections
+			$stmt = $this->db->prepare('DELETE FROM disponibilites WHERE user=:id');
+			$stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+			
+			if ($stmt->execute()===false) {
+				loginfo($stmt->getSQL(true));
+				loginfo("Erreur");
+			}
+
+			$stmt = $db->prepare('DELETE FROM selections WHERE user=:id');
+			$stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+			
+			if ($stmt->execute()===false) {
+				loginfo($stmt->getSQL(true));
+				loginfo("Erreur");
+			}
+
+			$stmt = $db->prepare('DELETE FROM presences WHERE user=:id');
+			$stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+			
+			if ($stmt->execute()===false) {
+				loginfo($stmt->getSQL(true));
+				loginfo("Erreur");
+			}
+		} else {
+			loginfo("Erreur query values");
+		}
+
+	}
 
 }
 

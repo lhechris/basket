@@ -1,183 +1,173 @@
 <?php 
 
-require_once("constantes.php");
+require_once("utils.php");
 require_once("entrainements.php");
-require_once("users.php");
 require_once("auth.php");
 
-/** Initialise dispo */
-function initPresences() {
-	$db = new SQLite3(DBLOCATION);
-	$db->query('DELETE FROM presences');
+class Presences {
+	private $db;
+	private $users;
+	private $entrainements;
 
-	$users=getUsersArray();
-	$entrainements=getEntrainementsArray();
-	$n=0;
-	foreach($entrainements as $e) {
-		echo(round(($n*100)/count($entrainements))."%\r");
-		$n=$n+1;
-		foreach($users as $u) {
-			$stmt = $db->prepare("INSERT INTO presences(entrainement,user,val) VALUES(:entrainement,:user,0)");
-			$stmt->bindValue(':entrainement', $e["id"], SQLITE3_INTEGER);
-			$stmt->bindValue(':user', $u["id"], SQLITE3_INTEGER);
-			$stmt->execute();
-		}
-	}
-}
-
-function initUserInPresence($username) {
-	$db = new SQLite3(DBLOCATION);
-	$db->query('DELETE FROM presences');
-
-	$users=getUsersArray();
-	$entrainements=getEntrainementsArray();
-	$n=0;
-	foreach($entrainements as $e) {
-		echo(round(($n*100)/count($entrainements))."%\r");
-		$n=$n+1;
-		foreach($users as $u) {
-			$stmt = $db->prepare("INSERT INTO presences(entrainement,user,val) VALUES(:entrainement,:user,0)");
-			$stmt->bindValue(':entrainement', $e["id"], SQLITE3_INTEGER);
-			$stmt->bindValue(':user', $u["id"], SQLITE3_INTEGER);
-			$stmt->execute();
-		}
+	public function __construct($donnees,$users,$entrainements) {
+		$this->db = $donnees->db;
+		$this->users = $users;
+		$this->entrainements = $entrainements;
 	}
 
+	/**
+	 * 
+	 */
+	public function getArray() {
+		
+		$entrainements=$this->entrainements->getArray();
+		$myusers=$this->users->getArray();
+		if ($myusers == null) {
+			loginfo("Il n'y a pas d'utilisateurs!");
+			return array();
+		}		
 
-}
-
-
-
-function upgradePresencesFromFile() {
-	$fullpath = REPERTOIRE_DATA."presences.json";
-	if (!file_exists($fullpath)) { return;}
-
-    //Recupere le fichier json
-	$json = json_decode(file_get_contents($fullpath),true);	
-	if (!is_array($json)) {	return; }
-
-	$db = new SQLite3(DBLOCATION);
-
-	foreach($json as $uid=>$u) {
-		foreach($u as $mid=>$v) {
-			$stmt = $db->prepare("UPDATE presences ".
-			                     "SET val=:val ".
-								 "WHERE entrainement=:mid AND user=:uid");
-			if ($stmt === false) {return;}
-			$stmt->bindValue(':mid', $mid+1, SQLITE3_INTEGER);
-			$stmt->bindValue(':uid', $uid+1, SQLITE3_INTEGER);
-			$stmt->bindValue(':val', $v, SQLITE3_TEXT);
-			$stmt->execute();
-		}
-	}
-}
-
-/**
- * retourne le fichier json
- */
-function getPresencesArray() {
-	
-	$db = new SQLite3(DBLOCATION);
-/**select A.titre,B.nom,C.val from matchs A, users B, disponibilites C WHERE C.match=A.id AND C.user=B.id; */
-
-	$results = $db->query('SELECT A.jour as jour,B.nom as user,C.val as val,A.id as eid,B.id as uid '. 
-	                      'FROM entrainements A, users B, presences C '.
-						  'LEFT JOIN ON C.user=B.id '.
-						  'WHERE C.entrainement=A.id ORDER BY C.entrainement,B.nom');
-	$json = array();
-
-	while ($row = $results->fetchArray()) {
-
-		$id=-1;
-		foreach($json as $k => $r ) {
-			if ($r["id"]==$row["eid"]) {
-				$id = $k;
+		$results = $this->db->query('SELECT A.entrainement,A.user,A.val FROM presences A, users B WHERE A.user=B.id ORDER BY A.entrainement,B.prenom');
+		$presences= array();
+		while ($row = $results->fetchArray()) {
+			if (!array_key_exists($row['entrainement'],$presences)) {
+				$presences[$row['entrainement']]=array();
 			}
+			array_push($presences[$row['entrainement']],array( "user"=>$row['user'],"val"=>$row['val']));
 		}
-		
-		if ($id==-1) {
-			array_push($json, array( "id"    => $row["eid"],
-									 "date"  => $row["jour"],
-									 "users" => array()));
-			$id = count($json)-1;
+
+		$json = array();
+
+		foreach ($entrainements as $e) {
+
+			$currententrainement=array( "id"    => $e["id"],
+										"date"  => $e["jour"],
+										"users" => array());
+
+			foreach($myusers as $u) {
+				$val=0;
+				if (array_key_exists($e["id"],$presences)) {
+					foreach($presences[$e["id"]] as $p) {
+						if ($p["user"] == $u["id"]) {
+							$val=$p["val"];
+							break;
+						}
+					}
+				}
+
+				array_push($currententrainement["users"],array(
+					"id" => $u["id"],
+					"pres" => $val,
+					"prenom" => $u["prenom"]
+				));
+			}
+			
+			array_push($json,$currententrainement);
 		}
-		
-		array_push($json[$id]["users"],array("nom"   => $row["user"], 
-													 "pres" => $row["val"],
-													 "id"    => $row["uid"]));
+
+		return $json;
 	}
 
-	return $json;
-}
+	/**
+	 * Retourne toutes les présence sur la console au format json
+	 */
+	public function get() {
+		responseJson($this->getArray());
+	}
 
-/**
- * 
- */
-function getPresences() {
+	/**
+	 * Met à jour et retourne les nouvelles valeurs 
+	 */
+	public function set($json) {
+		$this->update($json);
+		$this->get();
+	}
 
-	responseJson(getPresencesArray());
+	/**
+	 * Comme son nom l'indique retourne true si l'enregistrement existe
+	 * db doit etre instancié
+	 */
+	protected function exists($entrainement,$usr) {
+		$query = 'SELECT count(*) FROM presences WHERE entrainement=:entrainement AND user=:user';
+		$stmt = $this->db->prepare($query);
 
-}
-
-/**
- * Met à jour et retourne les nouvelles valeurs 
- */
-function setPresence($json) {
-	_updatePresence($json);
-	getPresences();
-}
-
-
-/**
- * Met à jour la BDD
- */
-function _updatePresence($json) {
+		if (($stmt->bindValue(':entrainement', $entrainement, SQLITE3_INTEGER)) &&
+			($stmt->bindValue(':user', $usr, SQLITE3_INTEGER))) {	
 		
-
-	if ( is_int($json['usr']) && is_int($json['entrainement']) && is_int($json['pres'])) {
-		$db = new SQLite3(DBLOCATION);
-		$query='UPDATE presences SET val=:val WHERE entrainement=:entrainement AND user=:user';
-	
-		$stmt = $db->prepare($query);
-
-		if (($stmt->bindValue(':entrainement', $json['entrainement'], SQLITE3_INTEGER)) &&
-			($stmt->bindValue(':user', $json['usr'], SQLITE3_INTEGER)) &&
-			($stmt->bindValue(':val', $json['pres'], SQLITE3_INTEGER)) ) {
-
-			loginfo($stmt->getSQL(true));
-			if ($stmt->execute()===false) {
-				loginfo("Erreur");
+			$result = $stmt->execute();
+			if ($result===false) {
+				loginfo($stmt->getSQL(true));
+				loginfo("Erreur");	
+				return false;
 			}
-			$stmt->reset();					
-
+			while ($row = $result->fetchArray()) {
+				return ($row[0] >= 1);
+			}
+			
 		} else {
-			loginfo("Erreur query values");
+			loginfo("Erreur bindValue");	
+			return false;
 		}
-	} else {
-		responseError("Bad input");
 	}
 
+
+	/** Cree l'enregistrement s'il n'existe pas.
+	 * db doit etre instancié
+	*/
+	protected function createIfNotExists($entrainement,$usr) {
+
+		if ($this->exists($entrainement,$usr)==false) {
+			$query = 'INSERT INTO presences(entrainement,user,val) VALUES (:entrainement,:user,0)';
+			$stmt = $this->db->prepare($query);
+
+			if (($stmt->bindValue(':entrainement', $entrainement, SQLITE3_INTEGER)) &&
+				($stmt->bindValue(':user', $usr, SQLITE3_INTEGER))) {
+			
+				$result = $stmt->execute();
+				if ($result===false) {
+					loginfo($stmt->getSQL(true));
+					loginfo("Erreur");	
+					return false;
+				}
+			}	
+		}
+		return true;
+	}
+
+	/**
+	 * Verifie s'il y a déjà un enregistrement sinon le cree
+	 * Ensuite met à jour la valeur de la presence
+	 * Attend en entree un json : { entrainement : id, "usr" : id, "pres": int}
+	 */
+	protected function update($json) {
+			
+
+		if ( is_int($json['usr']) && is_int($json['entrainement']) && is_int($json['pres'])) {
+
+			$this->createIfNotExists($json['entrainement'],$json['usr']);
+			
+			$query='UPDATE presences SET val=:val WHERE entrainement=:entrainement AND user=:user';
+		
+			$stmt = $this->db->prepare($query);
+
+			if (($stmt->bindValue(':entrainement', $json['entrainement'], SQLITE3_INTEGER)) &&
+				($stmt->bindValue(':user', $json['usr'], SQLITE3_INTEGER)) &&
+				($stmt->bindValue(':val', $json['pres'], SQLITE3_INTEGER)) ) {
+
+				if ($stmt->execute()===false) {
+					loginfo($stmt->getSQL(true));
+					loginfo("Erreur");
+				}
+				$stmt->reset();					
+
+			} else {
+				loginfo("Erreur query values");
+			}
+		} else {
+			responseError("Bad input");
+		}
+
+	}
 }
-
-
-function writePresenceFile($json) {
-	$fullpath=REPERTOIRE_DATA."presences.json";
-	
-	if (!$fp = fopen($fullpath, 'w')) {
-		responseError("Impossible d'ouvrir le fichier");
-		return false;
-   }
-
-   if (fwrite($fp, json_encode($json,JSON_UNESCAPED_SLASHES)) === FALSE) {
-	   responseError("Impossible d'écrire dans le fichier");
-	   fclose($fp);  
-	   return false;
-   }
-
-	fclose($fp);	
-	return true;
-}
-
-
 
 ?>

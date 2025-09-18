@@ -1,0 +1,146 @@
+/* Réinitialisation des marges et padding */
+* {
+    margin: 0;
+    padding: 1;
+    box-sizing: border-box;
+}
+
+/* Style pour le menu en haut */
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Permet aux éléments de passer à la ligne */
+    justify-content: center;
+    background-color: #333;
+}
+.menu li {
+    margin: 5px 10px;
+}
+
+.menu a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.menu a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+/* Media query pour les écrans plus petits */
+/*@media (max-width: 600px) {
+    .menu ul {
+        flex-direction: row;
+        flex-wrap: wrap; 
+    }
+    .menu li {
+        flex: 1 1 100%;
+        text-align: center;
+    }
+}*/
+
+/* Optionnel : Pour forcer 2 lignes sur des écrans intermédiaires */
+/*@media (max-width: 800px) and (min-width: 601px) {
+    .menu li {
+        flex: 1 1 45%; 
+    }
+}*/
+
+
+
+
+.conteneur {    
+    padding: 2px;
+    text-align: center;
+    /*max-width: 800px;*/
+    margin: 20px auto;
+    font-size:12px;
+    /*background-color: aqua;*/
+}
+
+.main {
+    display:block;
+    margin-left:auto;
+    margin-right:auto;    
+    width: 400px;
+    height : 500px;
+    /*overflow : scroll;
+    scrollbar-color: rebeccapurple green;
+    scrollbar-width: thin;*/
+    /*background-color:chocolate;*/
+}
+
+.selection {
+    display:block;
+    margin-left:auto;
+    margin-right:auto;    
+    width: 1200px;
+    height : 800px;
+    /*background-color:darkcyan;*/
+}
+
+
+/* Style pour le contenu centré */
+/*.contenu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+    margin: 0;
+    font-family: Arial, sans-serif;
+    font-size:0.9em;
+}
+
+.boite-centree {
+    width: 80%;
+    max-width: 900px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}*/
+
+.disabled {
+    background-color: grey;
+}
+
+.inputnom {
+    width:100px;
+}
+.inputbool {
+    width:20px;
+}
+
+
+button {
+border-radius: 20%;
+background-color: coral;
+}
+
+.btndelete {
+    border-radius: 4px;
+    margin : 0;
+    padding : 2px;   
+    background-color:  white;
+}
+
+table {
+    width:100%;
+}
+tr,td, th  {
+    border : 2px none grey;
+    
+}
+th {
+    text-align: center;
+}
+
+

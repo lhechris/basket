@@ -1,9 +1,11 @@
 <?php
 
-
 ini_set("display_errors", 1);
 
-include_once("constantes.php");
+include_once("env.php");
+loadEnv(".env");
+
+include_once("utils.php");
 include_once("users.php");
 include_once("matchs.php");
 include_once("entrainements.php");
@@ -11,37 +13,46 @@ include_once("auth.php");
 include_once("presences.php");
 include_once("disponibilites.php");
 include_once("selections.php");
+include_once("donnees.php");
+
+$donnees = new Donnees();
+$users = new Users($donnees);
+$matchs = new Matchs($donnees);
+$entrainements=new Entrainements($donnees);
+$presences = new Presences($donnees,$users,$entrainements);
+$disponibilites = new Disponibilites($donnees,$users,$matchs);
+$selections = new Selections($donnees,$users,$matchs,$disponibilites);
 
 
 if ($_SERVER["REQUEST_METHOD"]=="GET") { 
 	//Gestion du GET
 
  	if (array_key_exists('users',$_GET)) {
-		getUsers();
+		$users->get();
 
 	} else 	if (array_key_exists('matchs',$_GET)) {
-		getMatchs();
+		$matchs->get();
 
 	} else 	if (array_key_exists('entrainements',$_GET)) {
 		if (islogged()) {
-			getEntrainements();
+			$entrainements->get();
 		} else {
 			responseJson(array());
 		}
 
 	} else 	if (array_key_exists('presences',$_GET)) {
 		if (islogged()) {
-			getPresences();
+			$presences->get();
 		} else {
 			responseJson(array());
 		}
 
 	} else 	if (array_key_exists('disponibilites',$_GET)) {
-		getDisponibilites();
+		$disponibilites->get();
 
 	} else 	if (array_key_exists('selections',$_GET)) {
 		if (islogged()) {
-			getSelections();
+			$selections->get();
 		} else {
 			responseJson(array());
 		}
@@ -69,25 +80,38 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 		retourneErreur("incorrect entry");
 		return;
 
-	} else if (array_key_exists("usr",$json) && array_key_exists("match",$json) && array_key_exists("value",$json)) {
+	} else if (array_key_exists("usr",$json) && array_key_exists("jour",$json) && array_key_exists("value",$json)) {
 		//DISPO
-		return setDisponibilite($json);
+		return $disponibilites->set($json);
 
 	} else if (array_key_exists("usr",$json) && array_key_exists("entrainement",$json) && array_key_exists("pres",$json)) {
 		//PRESENCE
 		if (islogged()) {
-			return setPresence($json);
+			return $presences->set($json);
 		}
 
 	} else if (array_key_exists("usr",$json) && array_key_exists("match",$json) && array_key_exists("selection",$json)) {
 		//SELECTION
 		if (islogged()) {
-			return setSelection($json);
+			return $selections->set($json);
 		}
 	
+	} else if (array_key_exists("type",$json) && (array_key_exists("tab",$json))) {
+		if ($json["type"]=="matchs") {
+			//MATCHS
+			$matchs->set($json["tab"]);
+		
+		} else if ($json["type"]=="users") {
+			//USERS
+			$users->set($json["tab"]);
+
+		} else {
+			retourneErreur("Invalid Request");	
+		}
+
 	} else {
-		setMatchs($json);
-		//retourneErreur("Invalid Request");	
+		retourneErreur("Invalid Request");	
+
 	}
 }
 else 

@@ -4,6 +4,7 @@ import SelectionView from '../views/SelectionView.vue'
 import AuthView from '../views/AuthView.vue'
 import EntrainementView from '../views/EntrainementView'
 import MatchsView from '../views/MatchsView'
+import JoueusesView from '../views/JoueusesView'
 
 const routes = [
   {
@@ -25,6 +26,11 @@ const routes = [
     path: '/matchs',
     name: 'matchs',
     component: MatchsView
+  },
+  {
+    path: '/joueuses',
+    name: 'joueuses',
+    component: JoueusesView
   },
   {
     path: '/auth',

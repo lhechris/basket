@@ -1,26 +1,32 @@
 <template>
-    <div class="main" >
-        <table >
-            <thead>
-            <tr>
-                <th></th>
-                <th></th>
-                <th v-for="(u,j) in users" :key="j" >{{ u.nom }}<br/>{{ countMatchs(u.id) }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(s,n) in selections" :key="n">
-                <th class="thmatch">{{ s.date }} - {{ s.lieu }} - {{ s.resultat }} </th>
-                <th>{{ countJoueuses(s.id) }}</th>
-                <td v-for="(u,j) in s.users" :key="j" >
-                    <Selection :pres="u.dispo" 
-                               :sel="u.selection" 
-                               @onUpdate="update(u.id,s.id,$event)"/>
-                </td>
-            
-            </tr>
-            </tbody>
-        </table>
+    <div class="selection"  >
+        <div><select @change="changeEquipe($event)">
+                <option v-for="e in listeequipes" :key="e.id" :value="e">Equipe {{ e }}</option>
+            </select>
+        </div>
+        <div v-for="(equipe,ie) in equipes" :key="ie">
+            <table  v-if="equipe.equipe == equipeselected">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th v-for="(u,j) in equipe['joueurs']" :key="j" >{{ u.prenom }}<br/>{{ u.nb }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(s,n) in equipe.matchs" :key="n">                
+                    <th class="thmatch">{{ s.jour }} - {{ s.lieu }} </th>
+                    <th>{{ s.nb }}</th>
+                    <td v-for="(u,j) in s.users" :key="j" >
+                        <!--{{u.prenom}} {{ u.selection }}--><Selection :pres="u.dispo" 
+                                :sel="u.selection" 
+                                @onUpdate="update(u.id,s.id,$event)"/>
+                    </td>
+                
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -37,63 +43,37 @@ export default {
         
   },    
     setup() {
-        const selections = ref([])
-        const users = ref([])
+        const equipes = ref([])
+        const listeequipes = ref([])
+        const equipeselected = ref(0)
 
         getSelections().then( p => {
-            selections.value = p
-            for (let s of p) {
-                users.value = s.users
-                break;
+            equipes.value = p
+           
+            listeequipes.value=[]
+            for (let e in p) {
+                listeequipes.value.push(p[e]["equipe"])
             }
+            equipeselected.value=p[0]['equipe']
         })
 
         function update(usr,match,val) {
                 setSelection(usr,match,val).then( p => {
-                    selections.value = p
+                    equipes.value = p
             })
         }
 
-        function countJoueuses(mid) {
-            let nb=0
-            for (let match of selections.value) {
-                if (match.id == mid) {
-                    for (let u of match.users) {
-                        if (u.selection == 1) {
-                            nb=nb+1
-                        }
-                    }
-                }
-            }
-            return nb
-        }
-        function countMatchs(uid) {
-            let nb=0
-            for (let match of selections.value) {
-                for (let u of match.users) {
-                    if ((u.id == uid) && (u.selection == 1)) {
-                        nb=nb+1
-                    }
-                }
-            }
-            return nb
+        function changeEquipe(event) {
+            equipeselected.value=event.target.value;
+            
+           
         }
 
-        return {selections,users,update,countJoueuses,countMatchs}
+        return {equipes,equipeselected,update,changeEquipe,listeequipes}
     }
 }
 </script>
 <style scoped>
-.main {
-    display:block;
-    margin-left:auto;
-    margin-right:auto;    
-    width: 1200px;
-    height : 800px;
-    /*overflow : scroll;
-    scrollbar-color: rebeccapurple green;
-    scrollbar-width: thin;*/
-}
 
 .descr {
     border-radius: 6px;

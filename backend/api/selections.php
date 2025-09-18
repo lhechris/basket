@@ -1,136 +1,296 @@
 <?php 
 
-require_once("constantes.php");
+require_once("utils.php");
 require_once("matchs.php");
 require_once("users.php");
 
-/** Initialise selection */
-function initSelections() {
-	$db = new SQLite3(DBLOCATION);
-	$db->query('DELETE FROM selections');
+class Selections {
+	private $db;
+	private $users;	
+	private $matchs;
+	private $disponibilites;
 
-	$users=getUsersArray();
-	$matchs=getMatchsArray();
-	foreach($matchs as $m) {
-		foreach($users as $u) {
-			$stmt = $db->prepare("INSERT INTO selections(match,user,val) VALUES(:match,:user,0)");
-			$stmt->bindValue(':match', $m["id"], SQLITE3_INTEGER);
-			$stmt->bindValue(':user', $u["id"], SQLITE3_INTEGER);
-			$stmt->execute();
-		}
-	}
-}
-
-function upgradeSelectionsFromFile() {
-	$fullpath = REPERTOIRE_DATA."selections.json";
-	if (!file_exists($fullpath)) { return;}
-
-    //Recupere le fichier json
-	$json = json_decode(file_get_contents($fullpath),true);	
-	if (!is_array($json)) {	return; }
-
-	$db = new SQLite3(DBLOCATION);
-
-	foreach($json as $uid=>$u) {
-		foreach($u as $mid=>$v) {
-			$stmt = $db->prepare("UPDATE selections ".
-			                     "SET val=:val ".
-								 "WHERE match=:mid AND user=:uid");
-			if ($stmt === false) {return;}
-			$stmt->bindValue(':mid', $mid+1, SQLITE3_INTEGER);
-			$stmt->bindValue(':uid', $uid+1, SQLITE3_INTEGER);
-			$stmt->bindValue(':val', $v, SQLITE3_TEXT);
-			$stmt->execute();
-		}
-	}
-}
+	public function __construct($donnees,$users,$matchs,$disponibilites) {
+		$this->db = $donnees->db;
+		$this->users = $users;
+		$this->matchs = $matchs;
+		$this->disponibilites = $disponibilites;
+	}	
 
 
-/**
- * retourne le fichier json
- */
-function getSelectionsArray() {
-	$db = new SQLite3(DBLOCATION);
 
-	$results = $db->query('SELECT A.titre as titre,A.jour as jour,A.score as score,B.nom as user,C.val as dispo,A.id as mid,B.id as uid, D.val as selection '.
-						'FROM matchs A, users B, disponibilites C, selections D '.
-						'WHERE C.match=A.id AND C.user=B.id AND D.match=A.id AND D.user=B.id '.
-						'ORDER BY C.match,C.user');
-	$json = array();
+	/**
+	 * retourne le fichier json
+	 */
+	public function getArray() {
 
-	while ($row = $results->fetchArray()) {
-		$id=-1;
-		foreach($json as $k => $r ) {
-			if ($r["id"]==$row["mid"]) {
-				$id = $k;
+		$users = $this->users->getArray();
+		$matchs = $this->matchs->getArray();
+		$disponibilites = $this->disponibilites->getArray();
+
+		$results = $this->db->query('SELECT A.match,A.user,A.val, B.jour, B.titre,B.equipe, C.prenom '.
+									'FROM selections A, matchs B, users C '.
+									'WHERE A.match=B.id AND A.user=C.id '.
+									'ORDER BY B.jour,B.equipe,C.prenom');
+
+		$selections = array();
+		while ($row = $results->fetchArray()) {
+			if (!array_key_exists($row['match'],$selections)) {
+				$selections[$row['match']]=array();
 			}
+			array_push($selections[$row['match']],array( "user"=>$row['user'],"val"=>$row['val']));
+
 		}
 		
-		if ($id==-1) {
-			array_push($json, array( "id"    => $row["mid"],
-									 "lieu"  => $row["titre"], 
-									 "date"  => $row["jour"],
-									 "resultat"  => $row["score"],
-									 "users" => array()));
-			$id = count($json)-1;
+		$json = array();
+
+		foreach ($matchs as $m) {
+
+			$currentmatch=array( "id" => $m["id"],
+								 "jour"  => $m["date"],
+								 "users" => array(),
+								 "equipe" => $m["equipe"],
+								 "lieu" => $m['lieu'],
+								 "nb" => 0);
+			
+			$nbselected=0;					 
+			//on ajoute chaque joueurs
+			foreach($users as $u) {
+				$selected=0;
+				//si ce joueur à une selection pour ce match on garde sa valeur
+				if (array_key_exists($m["id"],$selections)) {					
+					foreach($selections[$m["id"]] as $p) {
+						if ($p["user"] == $u["id"]) {
+							$selected=$p["val"];
+							if ($selected == 1) {$nbselected++;}
+							break;
+						}
+					}
+				}
+
+				if (($selected == 0) && ($u["equipe"]!=$m["equipe"])) {
+					//on ne met pas le joueur parce qu'il ne fait pas partie de l'equipe
+					//et qu'il n'a pas de selection (ça peut arriver si on l'a changé d'équipe)
+				} else {
+					//on recherche sa disponibilité
+					$dispo=0;
+					foreach ($disponibilites as $disponibilite) {
+						if ($disponibilite["jour"]==$m["date"]) {
+							foreach($disponibilite["users"] as $du) {
+								if ($du["id"] == $u["id"]) {
+									$dispo=$du["dispo"];
+									break;
+								}
+							}
+							break;
+						}
+					}
+					array_push($currentmatch["users"],array(
+						"id" => $u["id"],
+						"selection" => $selected,
+						"dispo" => $dispo,
+						"prenom" => $u["prenom"]
+					));
+				}
+			}
+			$currentmatch["nb"] = $nbselected;
+			
+			$this->addmatch($json,$currentmatch);
 		}
-		
-		array_push($json[$id]["users"],array("nom"   => $row["user"], 
-													 "dispo" => $row["dispo"],
-													 "selection" => $row["selection"],
-													 "id"    => $row["uid"]));
+		$this->majcompteurs($json);
+		return $json;
+
 	}
 
-	return $json;
+	/**
+	 * 
+	 */
+	public function get() {
 
-}
+		responseJson($this->getArray());
 
-/**
- * 
- */
-function getSelections() {
+	}
 
-	responseJson(getSelectionsArray());
-
-}
-
-/**
- * Met à jour et retourne les nouvelles valeurs 
- */
-function setSelection($json) {
-	_updateSelection($json);
-	getSelections();
-}
+	/**
+	 * Met à jour et retourne les nouvelles valeurs 
+	 */
+	public function set($json) {
+		$this->update($json);
+		$this->get();
+	}
 
 
-/**
- * Met à jour la BDD
- */
-function _updateSelection($json) {
-		
-	if ( is_int($json['usr']) && is_int($json['match']) && is_int($json['selection'])) {
+	/**
+	 * Met à jour la BDD
+	 */
+	protected function update($json) {
+		if ( is_int($json['usr']) && is_int($json['match']) && is_int($json['selection'])) {
 
-		$db = new SQLite3(DBLOCATION);
-		$query='UPDATE selections SET val=:val WHERE match=:match AND user=:user';
-	
-		$stmt = $db->prepare($query);
+			$this->createIfNotExists($json['match'],$json['usr']);
 
-		if (($stmt->bindValue(':match', $json['match'], SQLITE3_INTEGER)) &&
-			($stmt->bindValue(':user', $json['usr'], SQLITE3_INTEGER)) &&
-			($stmt->bindValue(':val', $json['selection'], SQLITE3_INTEGER)) ) {
+			$query='UPDATE selections SET val=:val WHERE match=:match AND user=:user';
+			$stmt = $this->db->prepare($query);
 
-			loginfo($stmt->getSQL(true));
-			if ($stmt->execute()===false) {
-				loginfo("Erreur");
+			if (($stmt->bindValue(':match', $json['match'], SQLITE3_INTEGER)) &&
+				($stmt->bindValue(':user', $json['usr'], SQLITE3_INTEGER)) &&
+				($stmt->bindValue(':val', $json['selection'], SQLITE3_INTEGER)) ) {
+
+				if ($stmt->execute()===false) {
+					loginfo($stmt->getSQL(true));
+					loginfo("Erreur");
+				}
+				$stmt->reset();					
+
+			} else {
+				loginfo("Erreur query values");
 			}
-			$stmt->reset();					
-
 		} else {
-			loginfo("Erreur query values");
+			loginfo("bad input values");
 		}
-	} else {
-		loginfo("bad input values");
+	}
+
+	/**
+	 * Comme son nom l'indique retourne true si l'enregistrement existe
+	 * db doit etre instancié
+	 */
+	protected function exists($match,$usr) {
+		$query = 'SELECT count(*) FROM selections WHERE match=:match AND user=:user';
+		$stmt = $this->db->prepare($query);
+
+		if (($stmt->bindValue(':match', $match, SQLITE3_INTEGER)) &&
+			($stmt->bindValue(':user', $usr, SQLITE3_INTEGER))) {	
+		
+			$result = $stmt->execute();
+			if ($result===false) {
+				loginfo($stmt->getSQL(true));
+				loginfo("Erreur");	
+				return false;
+			}
+			while ($row = $result->fetchArray()) {
+				loginfo($row[0]);
+				return ($row[0] >= 1);
+			}
+			
+		} else {
+			loginfo("Erreur bindValue");	
+			return false;
+		}
+	}
+
+
+	/** Cree l'enregistrement s'il n'existe pas.
+	 * db doit etre instancié
+	*/
+	protected function createIfNotExists($match,$usr) {
+
+		if ($this->exists($match,$usr)==false) {
+			$query = 'INSERT INTO selections(match,user,val) VALUES (:match,:user,0)';
+			$stmt = $this->db->prepare($query);
+
+			if (($stmt->bindValue(':match', $match, SQLITE3_INTEGER)) &&
+				($stmt->bindValue(':user', $usr, SQLITE3_INTEGER))) {
+			
+				$result = $stmt->execute();
+				if ($result===false) {
+					loginfo($stmt->getSQL(true));
+					loginfo("Erreur");	
+					return false;
+				}
+			}	
+		}
+		return true;
+	}
+
+	/**
+	 * Si l'equipe du match n'est pas dans le tableau on cree un
+	 * nouveau enregistrement sinon on ajoute le match.
+	 */
+	private function addmatch(&$json,$match) {
+		
+		//recherche si cette equipe est déjà dans le json
+		$key=-1;
+		foreach ($json as $k=>$j) {
+			if ($j["equipe"] == $match["equipe"]) { $key=$k;}
+		}
+		if ($key < 0) {
+			$joueurs = array();
+			//on cree la liste des joueurs de l'equipe
+			$query = "SELECT prenom FROM users WHERE equipe=:equipe ORDER BY prenom";
+			$stmt = $this->db->prepare($query);
+			
+			if ($stmt->bindValue(':equipe', $match["equipe"], SQLITE3_INTEGER)) {
+				$result = $stmt->execute();
+				if ($result===false) {
+					loginfo($stmt->getSQL(true));
+					loginfo("Erreur");	
+					return false;
+				}
+
+				while ($row = $result->fetchArray()) {
+					array_push($joueurs,array("prenom"=>$row['prenom'],"nb"=>0));
+				}		
+			}			
+
+			//on ajoute les joueurs qui ne font pas partie de l'equipe
+			//mais qui ont participe aux matchs
+			$query = "SELECT C.prenom FROM selections A, matchs B, users C ".
+					 "WHERE A.match=B.id AND B.equipe=:equipe AND C.id=A.user AND C.equipe!=:equipe ".
+					 "GROUP BY (C.id) ORDER BY C.prenom";
+			$stmt = $this->db->prepare($query);
+
+			if ($stmt->bindValue(':equipe', $match["equipe"], SQLITE3_INTEGER)) {
+				$result = $stmt->execute();
+				if ($result===false) {
+					loginfo($stmt->getSQL(true));
+					loginfo("Erreur");	
+					return false;
+				}
+
+				while ($row = $result->fetchArray()) {
+					array_push($joueurs,$row['prenom']);
+				}		
+			}
+
+			array_push($json,array(
+						"equipe" => $match["equipe"],
+						"joueurs" => $joueurs,
+						"matchs" => array($match)
+			));
+		} else {
+			//l'equipe existe dejà on ajoute juste le match
+			array_push($json[$key]["matchs"],$match);
+		}
+	}
+
+	/**
+	 * Met à jour les compteurs du nombre de match selectionne par joueur
+	 */
+	private function majcompteurs(&$json) {
+		foreach ($json as &$equipe) {
+			$query = 'SELECT A.prenom ,count(*) '.
+					  'FROM users A,selections B, matchs C '.
+					  'WHERE A.id=B.user AND B.val=1 AND C.id=B.match AND C.equipe=:equipe '.
+					  'GROUP BY A.prenom ORDER BY A.prenom';
+			$stmt = $this->db->prepare($query);
+
+			if (($stmt->bindValue(':equipe', $equipe["equipe"], SQLITE3_INTEGER)) ) {		
+				$result = $stmt->execute();
+				if ($result===false) {
+					loginfo($stmt->getSQL(true));
+					loginfo("Erreur");	
+					return false;
+				}
+
+				while ($row = $result->fetchArray()) {
+					foreach ($equipe["joueurs"] as &$joueur){ 
+						if ($joueur["prenom"] == $row["prenom"]) {
+							$joueur["nb"] = $row["count(*)"];
+							break;
+						}
+					}
+				}				
+			}
+		}
 	}
 }
-
 ?>

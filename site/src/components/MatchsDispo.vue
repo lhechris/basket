@@ -3,15 +3,27 @@
         <div v-for="(dispo,i) in disponibilites" :key="i">
             <div v-if="page==i">
                 <div class="descr">
-                    <span class="date">{{ dispo.date }}</span><br/>
-                    <span class="lieu">{{ dispo.lieu }}</span><br/>
-                    <span class="resultat">{{ dispo.resultat }}</span>
+                    <span class="date">{{ displaydate(dispo.jour) }}</span><br/>
+                        <c-pagination>
+                            <c-pagination-item 
+                                    href="#" 
+                                    @click="pagemoins()" 
+                                    :disabled="page<=0"
+                                >Match précédent
+                            </c-pagination-item>
+                            <c-pagination-item 
+                                    href="#" 
+                                    @click="pageplus()" 
+                                    :disabled="page>=disponibilites.length-1"
+                                >Match suivant
+                            </c-pagination-item>
+                        </c-pagination>
                 </div>
                 <table>
                 <tr v-for="(u,j) in dispo.users" :key="j">
-                    <th>{{ u.nom }}</th>
+                    <th>{{ u.prenom }}</th>
                     <td>
-                        <Presence :sel="u.dispo" @onUpdate="update(u.id,dispo.id,$event)"/>
+                        <Presence :sel="u.dispo" @onUpdate="update(u.id,dispo.jour,$event)"/>
                     </td>
                 </tr>
                 </table>
@@ -36,7 +48,7 @@
 </template>
 
 <script>
-import {getDisponibilites,setDisponibilite} from '@/js/api.js'
+import {getDisponibilites,setDisponibilite,displaydate} from '@/js/api.js'
 import Presence from '@/components/Presence.vue'
 import {ref} from 'vue'
 import {CPagination,CPaginationItem} from "@coreui/vue"
@@ -58,8 +70,9 @@ export default {
             //selectionne la page courante
             let d1=new Date()
             for (let i in p) {
-                let s=p[i].date.split("/")
-                let d2=new Date(s[2]+"-"+s[1]+"-"+s[0])
+                //let s=p[i].date.split("/")
+                //let d2=new Date(s[2]+"-"+s[1]+"-"+s[0])
+                let d2=new Date(p[i].jour)
                 if (d2 > d1)  {
                     page.value=i
                     break
@@ -67,9 +80,8 @@ export default {
             }
         })
 
-
-        function update(usr,match,val) {            
-            setDisponibilite(usr,match,val).then( p => {
+        function update(usr,jour,val) {            
+            setDisponibilite(usr,jour,val).then( p => {
                 disponibilites.value = p
             })
         }
@@ -91,7 +103,7 @@ export default {
         }
 
 
-        return {disponibilites,page,update,pageplus,pagemoins,pageselect}
+        return {disponibilites,page,update,pageplus,pagemoins,pageselect,displaydate}
     }
 }
 </script>

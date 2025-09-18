@@ -1,15 +1,20 @@
 <template>
-  <nav>
-    <router-link to="/">Disponibilité</router-link> |
-    <span v-if="logged" ><router-link to="/entrainement">Entrainement</router-link> | </span>
-    <span v-if="logged" ><router-link to="/selection">Selection</router-link> | </span>
-    <span v-if="logged" ><router-link to="/matchs">Matchs</router-link> | </span>
-    <router-link to="/auth">
+  <nav class="menu">
+    <ul>
+    <li><router-link to="/">Disponibilité</router-link></li>
+    <li v-if="logged" ><router-link to="/entrainement">Entrainement</router-link> | </li>
+    <li v-if="logged" ><router-link to="/selection">Selection</router-link> | </li>
+    <li v-if="logged" ><router-link to="/matchs">Matchs</router-link> | </li>
+    <li v-if="logged" ><router-link to="/joueuses">Joueuses</router-link> | </li>
+    <li><router-link to="/auth">
       <span v-if="logged" >Logout</span>
       <span v-else>Login</span>
-    </router-link>
+    </router-link></li>
+    </ul>
   </nav>
-  <router-view/>
+  <div class="conteneur">
+      <router-view/>
+  </div>
 </template>
 
 <script>

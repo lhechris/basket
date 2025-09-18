@@ -29,8 +29,8 @@ export function setMatches(matchs) {
 
     
     return new Promise((successClbk,failClbk) => {
-
-        axios.post(baseurl, matchs).then(response =>{
+        var data={"type":"matchs", tab:matchs}
+        axios.post(baseurl, data).then(response =>{
         var r=response.data;        
         successClbk(r);
 
@@ -39,8 +39,6 @@ export function setMatches(matchs) {
         })
 
     });
-
-
 
 }
 
@@ -57,6 +55,24 @@ export function getUsers() {
         getResource('users').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
     });
 }
+
+export function setUsers(users) {
+    var baseurl = "/api/";
+    
+    return new Promise((successClbk,failClbk) => {
+        var data={"type":"users", tab:users}
+        axios.post(baseurl, data).then(response =>{
+        var r=response.data;        
+        successClbk(r);
+
+        }).catch(errmsg => {
+            failClbk(errmsg);
+        })
+
+    });
+
+}
+
 
 export function getPresences() {
     return new Promise( (successClbk,failClbk) => {
@@ -88,14 +104,14 @@ export function getDisponibilites() {
     });
 }
 
-export function setDisponibilite(usr,match,val) {
+export function setDisponibilite(usr,jour,val) {
     var baseurl = "/api/";
 
     return new Promise((successClbk,failClbk) => {
 
         axios.post(baseurl, {
             usr:usr,
-            match:match,
+            jour:jour,
             value:val
         }).then(response =>{
             var r=response.data;        
@@ -179,4 +195,10 @@ export function logout() {
         }) 
     })  
 
+}
+
+import moment from 'moment'
+export function displaydate(d) {
+    
+    return moment(d).locale("fr").format("dddd Do MMMM")
 }

@@ -20,8 +20,8 @@ class Users {
 									"nom"=>$row["nom"],
 									"equipe"=>$row["equipe"],
 									"licence" =>$row["licence"],
-									"otm" =>$row["otm"],
-									"charte" =>$row["charte"]));
+									"otm" => $row["otm"] == 1 ? true : false,
+									"charte" =>$row["charte"]== 1 ? true : false));
 		}
 		return $json;
 	}

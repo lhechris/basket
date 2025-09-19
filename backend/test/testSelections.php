@@ -26,11 +26,14 @@ $donnees->db->exec("INSERT INTO users(prenom,equipe) VALUES('daisy',2)");
 $donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(1,'2025-09-01','sans titre','0/0')");
 $donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(2,'2025-09-01','sans titre','0/0')");
 $donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(2,'2025-09-08','sans titre','0/0')");
+$donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(1,'2025-09-09','sans titre','0/0')");
+
 
 $donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(1,'2025-09-01',1)");
 $donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(2,'2025-09-01',1)");
 
 $donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(1,1,1)");
+$donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(3,1,1)");
 
 
 class SSelections extends Selections{
@@ -69,19 +72,38 @@ function test_getSelections() {
     
     //Tableau par equipe liste des match, où dans chaque match liste des joueuses
     $s = '[ { "equipe" : 1,
-              "joueurs" : [{"prenom" : "fifi", "nb" : 0},{"prenom" : "riri","nb" : 1}],
+              "joueurs" : [
+                {"prenom" : "fifi", "nb" : 0},
+                {"prenom" : "riri" ,"nb" : 1}],
+              "autrejoueurs" : [  
+                {"prenom" : "loulou", "nb":1}],
               "matchs" : [{
                     "id" : 1,
                     "jour": "2025-09-01",
                     "users": [{"id": 2,"dispo": 1, "selection":0,"prenom": "fifi"},
-                            {"id": 1,"dispo": 1, "selection":1,"prenom": "riri"}],
+                              {"id": 3,"dispo": 0, "selection":1,"prenom": "loulou"},
+                              {"id": 1,"dispo": 1, "selection":1,"prenom": "riri"}
+                              ],
                     "equipe" : 1,
                     "lieu": "sans titre",
-                    "nb" : 1
+                    "nb" : 2
+                },
+                {
+                    "id" : 4,
+                    "jour": "2025-09-09",
+                    "users": [{"id": 2,"dispo": 0, "selection":0,"prenom": "fifi"},
+                              {"id": 1,"dispo": 0, "selection":0,"prenom": "riri"}
+                              ],
+                    "equipe" : 1,
+                    "lieu": "sans titre",
+                    "nb" : 0
                 }]
             },
             { "equipe" : 2,
-               "joueurs" : [{"prenom" : "daisy", "nb" : 0},{"prenom" : "loulou","nb" : 0}], 
+               "joueurs" : [
+                   {"prenom" : "daisy",  "nb" : 0},
+                   {"prenom" : "loulou", "nb" : 0}], 
+               "autrejoueurs" : [],
                "matchs" : [{
                     "id" : 2,
                     "jour": "2025-09-01",
@@ -184,11 +206,11 @@ function test_SelectionCreateIfNotExists() {
     
     $selections->createIfNotExists(1,1);
     $json1=SelectionsGet();
-    assertEgal(count($json1),1,__FUNCTION__,"exists");
+    assertEgal(count($json1),2,__FUNCTION__,"exists");
 
     $selections->createIfNotExists(3,1);
     $json2 = SelectionsGet();
-    assertEgal(count($json2),2,__FUNCTION__,"not exists");
+    assertEgal(count($json2),3,__FUNCTION__,"not exists");
 }
 
 

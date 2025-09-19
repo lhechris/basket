@@ -125,19 +125,19 @@ export default {
 
 .lieu {
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 1em;
 }
 .date {
     font-weight:600;
-    font-size : 1.2rem;
+    font-size : 1.2em;
 }
 
 .resultat {
-    font-size : 0.8rem;
+    font-size : 0.8em;
 }
 
 table {
-    margin-top : 1rem;
+    margin-top : 1em;
     width : 100%;
 
 }
@@ -148,7 +148,7 @@ tr,td, th  {
 
 th {
     text-align: right;
-    font-size : 0.9rem;
+    font-size : 1em;
     
 }
 

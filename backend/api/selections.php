@@ -49,6 +49,7 @@ class Selections {
 			$currentmatch=array( "id" => $m["id"],
 								 "jour"  => $m["date"],
 								 "users" => array(),
+								 "autres" => array(),
 								 "equipe" => $m["equipe"],
 								 "lieu" => $m['lieu'],
 								 "nb" => 0);
@@ -85,12 +86,18 @@ class Selections {
 							break;
 						}
 					}
-					array_push($currentmatch["users"],array(
+					$joueur=array(
 						"id" => $u["id"],
 						"selection" => $selected,
 						"dispo" => $dispo,
 						"prenom" => $u["prenom"]
-					));
+					);
+					//en fonction de l'equipe on ne le met pas dans la meme liste
+					if ($u["equipe"]==$m["equipe"]) {
+						array_push($currentmatch["users"],$joueur);
+					} else {
+						array_push($currentmatch["autres"],$joueur);
+					}
 				}
 			}
 			$currentmatch["nb"] = $nbselected;
@@ -214,8 +221,9 @@ class Selections {
 		}
 		if ($key < 0) {
 			$joueurs = array();
+			$autrejoueurs=array();
 			//on cree la liste des joueurs de l'equipe
-			$query = "SELECT prenom FROM users WHERE equipe=:equipe ORDER BY prenom";
+			$query = "SELECT prenom,equipe FROM users WHERE equipe=:equipe ORDER BY prenom";
 			$stmt = $this->db->prepare($query);
 			
 			if ($stmt->bindValue(':equipe', $match["equipe"], SQLITE3_INTEGER)) {
@@ -232,9 +240,9 @@ class Selections {
 			}			
 
 			//on ajoute les joueurs qui ne font pas partie de l'equipe
-			//mais qui ont participe aux matchs
-			$query = "SELECT C.prenom FROM selections A, matchs B, users C ".
-					 "WHERE A.match=B.id AND B.equipe=:equipe AND C.id=A.user AND C.equipe!=:equipe ".
+			//mais qui ont participes aux matchs
+			$query = "SELECT C.prenom,C.equipe FROM selections A, matchs B, users C ".
+					 "WHERE A.match=B.id AND B.equipe=:equipe AND C.id=A.user AND C.equipe!=:equipe AND A.val=1 ".
 					 "GROUP BY (C.id) ORDER BY C.prenom";
 			$stmt = $this->db->prepare($query);
 
@@ -247,13 +255,14 @@ class Selections {
 				}
 
 				while ($row = $result->fetchArray()) {
-					array_push($joueurs,$row['prenom']);
+					array_push($autrejoueurs,array("prenom"=>$row['prenom'],"nb"=>0));
 				}		
 			}
 
 			array_push($json,array(
 						"equipe" => $match["equipe"],
 						"joueurs" => $joueurs,
+						"autrejoueurs" =>$autrejoueurs,
 						"matchs" => array($match)
 			));
 		} else {
@@ -283,6 +292,12 @@ class Selections {
 
 				while ($row = $result->fetchArray()) {
 					foreach ($equipe["joueurs"] as &$joueur){ 
+						if ($joueur["prenom"] == $row["prenom"]) {
+							$joueur["nb"] = $row["count(*)"];
+							break;
+						}
+					}
+					foreach ($equipe["autrejoueurs"] as &$joueur){ 
 						if ($joueur["prenom"] == $row["prenom"]) {
 							$joueur["nb"] = $row["count(*)"];
 							break;

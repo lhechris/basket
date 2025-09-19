@@ -4,6 +4,7 @@
             <div v-if="page==n">
                 <div class="descr" >
                     <span class="date">{{displaydate(e.date) }}</span>
+                    <span class="date">&nbsp; &nbsp;[{{ countJoueuses(e.id) }}]</span>
                     <span><c-pagination>
                         <c-pagination-item 
                                 href="#/entrainement" 
@@ -17,8 +18,7 @@
                                 :disabled="page>=presences.length-1"
                             >Suivant
                         </c-pagination-item>
-                    </c-pagination>  </span>          
-                    <span>{{ countJoueuses(e.id) }}</span>
+                    </c-pagination>  </span>                    
                 </div>
                 <table>
                 <tr v-for="(u,j) in e.users" :key="j">

@@ -10,18 +10,28 @@
             <td><input v-model="u.nom" class="inputnom" :class="u.todelete==true ? 'disabled' : ''"/></td>
             <td><input v-model="u.equipe"  class="inputbool" :class="u.todelete==true ? 'disabled' : ''"/></td>
             <td><input v-model="u.licence" class="inputnom" :class="u.todelete==true ? 'disabled' : ''"/></td>
-            <td><input v-model="u.charte" class="inputbool" :class="u.todelete==true ? 'disabled' : ''"/></td>
-            <td><input v-model="u.otm" class="inputbool" :class="u.todelete==true ? 'disabled' : ''"/></td>
             <td>
-                <button class="btndelete" @click="supprime(u.id)">
+                <label class="custom-checkbox" :class="u.todelete==true ? 'disabled' : ''">
+                    <input type="checkbox" v-model="u.charte" >
+                    <span class="checkmark"></span>                    
+                </label>
+            </td>
+            <td>
+                <label class="custom-checkbox" :class="u.todelete==true ? 'disabled' : ''">
+                    <input type="checkbox" v-model="u.otm" >
+                    <span class="checkmark"></span>                    
+                </label>
+            </td>
+            <td>
+                <button class="btn btn-delete" @click="supprime(u.id)">
                     <img src= "@/assets/annuler.png" width="16"/>
                 </button>
             </td>
             </tr>
             </tbody>
         </table>
-        <button class="btnnew" @click="ajoute()">Nouveau</button>
-        <button class="btnenreg" @click="enregistrer()">Enregistrer</button>
+        <button class="btn btn-primary" @click="ajoute()">Nouveau</button>
+        <button class="btn btn-secondary" @click="enregistrer()">Enregistrer</button>
     
     </div>
 

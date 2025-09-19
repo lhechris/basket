@@ -19,7 +19,10 @@ class Matchs {
 									"equipe" => $row['equipe'],
 									"date"=>$row["jour"],
 									"lieu" =>$row["titre"],
-									"resultat" => $row["score"]));
+									"resultat" => $row["score"],
+									"collation" => $row["collation"],
+									"otm"=> $row["otm"],
+									"maillots" => $row["maillots"]));
 		}
 
 		return $json;
@@ -44,16 +47,21 @@ class Matchs {
 	/**
 	 * Execute la requete UPDATE sur la table match
 	 */
-	protected function update($id,$equipe,$titre,$score,$jour) {
+	protected function update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots) {
 		
-		$stmt = $this->db->prepare('UPDATE matchs SET equipe=:equipe, titre=:titre, score=:score, jour=:jour WHERE id=:id');
+		$stmt = $this->db->prepare('UPDATE matchs '.
+								   'SET equipe=:equipe, titre=:titre, score=:score, jour=:jour, collation=:collation, otm=:otm, maillots=:maillots '.
+								   'WHERE id=:id');
 		
 		if (
 			($stmt->bindValue(':id', $id, SQLITE3_INTEGER)) &&
 			($stmt->bindValue(':equipe', $equipe, SQLITE3_INTEGER)) &&
 			($stmt->bindValue(':titre', $titre, SQLITE3_TEXT)) &&
 			($stmt->bindValue(':score', $score, SQLITE3_TEXT)) &&
-			($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) 
+			($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) &&
+			($stmt->bindValue(':collation', $collation, SQLITE3_TEXT)) &&
+			($stmt->bindValue(':otm', $otm, SQLITE3_TEXT)) &&
+			($stmt->bindValue(':maillots', $maillots, SQLITE3_TEXT)) 
 		) {
 			loginfo($stmt->getSQL(true));
 			if ($stmt->execute()===false) {
@@ -69,13 +77,18 @@ class Matchs {
 	/**
 	 * Execute la requete INSERT INTO dans la table match
 	 */
-	protected function ajoute($equipe,$titre,$score,$jour) {
-		$stmt = $this->db->prepare('INSERT INTO matchs(titre,score,jour,equipe) VALUES(:titre,:score,:jour,:equipe)');
+	protected function ajoute($equipe,$titre,$score,$jour,$collation,$otm,$maillots) {
+		$stmt = $this->db->prepare('INSERT INTO matchs(titre,score,jour,equipe,collation,otm,maillots) '.
+								   'VALUES(:titre,:score,:jour,:equipe,:collation,:otm,:maillots)');
 		if (
 			($stmt->bindValue(':titre', $titre, SQLITE3_TEXT)) &&
 			($stmt->bindValue(':score', $score, SQLITE3_TEXT)) &&
 			($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) &&
-			($stmt->bindValue(':equipe', $jour, SQLITE3_INTEGER)) 
+			($stmt->bindValue(':equipe', $equipe, SQLITE3_INTEGER)) &&
+			($stmt->bindValue(':collation', $collation, SQLITE3_TEXT)) &&
+			($stmt->bindValue(':otm', $otm, SQLITE3_TEXT)) &&
+			($stmt->bindValue(':maillots', $maillots, SQLITE3_TEXT)) 
+ 
 		) {
 			loginfo($stmt->getSQL(true));
 			if ($stmt->execute()===false) {loginfo("Erreur");}
@@ -100,10 +113,12 @@ class Matchs {
 			loginfo($stmt->getSQL(true));
 			if ($stmt->execute()===false) {loginfo("Erreur");}
 
-			$stmt = $this->db->prepare('DELETE FROM disponibilites WHERE match=:id');
+			//TODO supprime dans la table disponibilite uniquement s'il n'y a plus de match ce jour ci
+
+			/*$stmt = $this->db->prepare('DELETE FROM disponibilites WHERE match=:id');
 			$stmt->bindValue(':id', $id, SQLITE3_INTEGER);
 			loginfo($stmt->getSQL(true));
-			if ($stmt->execute()===false) {loginfo("Erreur");}
+			if ($stmt->execute()===false) {loginfo("Erreur");}*/
 
 			$stmt = $this->db->prepare('DELETE FROM selections WHERE match=:id');
 			$stmt->bindValue(':id', $id, SQLITE3_INTEGER);
@@ -127,21 +142,29 @@ class Matchs {
 
 		foreach($json as $nm) {
 
-			if (is_array($nm) && array_key_exists("lieu",$nm) && array_key_exists("date",$nm) && array_key_exists("resultat",$nm) && array_key_exists("equipe",$nm) ) {
+			if (is_array($nm) && 
+			    array_key_exists("lieu",$nm) && 
+				array_key_exists("date",$nm) && 
+				array_key_exists("resultat",$nm) && 
+				array_key_exists("equipe",$nm)  && 
+				array_key_exists("collation",$nm) && 
+				array_key_exists("otm",$nm) &&
+				array_key_exists("maillots",$nm)
+				) {
 
 				if (array_key_exists("id",$nm)) {
 					if (array_key_exists("todelete",$nm)) {
 						$this->supprime($nm["id"]);
 
 					} else {
-						$this->update($nm["id"],$nm["equipe"],$nm["lieu"],$nm["resultat"],$nm["date"]);
+						$this->update($nm["id"],$nm["equipe"],$nm["lieu"],$nm["resultat"],$nm["date"],$nm['collation'],$nm['otm'],$nm['maillots']);
 					}
 
 				} else {
 					/**
 					 * Il n'y a pas d'id pour ce match c'est donc un ajout 
 					 */
-					$this->ajoute($nm["equipe"],$nm["lieu"],$nm["resultat"],$nm["date"]);
+					$this->ajoute($nm["equipe"],$nm["lieu"],$nm["resultat"],$nm["date"],$nm['collation'],$nm['otm'],$nm['maillots']);
 				}
 			}
 		}

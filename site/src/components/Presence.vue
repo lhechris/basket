@@ -52,7 +52,7 @@ span {
   cursor: pointer;
   display: inline-block;
   font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
   line-height: 20px;
   padding: 3px 12px;

@@ -14,8 +14,8 @@ $donnees->db->exec($sql);
 
 //ajout donnees de test
 $donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('riri',1,  'duck','BC011001',1,1)");
-$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('fifi',1,  'duck','BC011002',1,1)");
-$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('loulou',2,'duck','BC011003',1,1)");
+$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('fifi',1,  'duck','BC011002',0,1)");
+$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('loulou',2,'duck','BC011003',1,0)");
 
 $donnees->db->exec("INSERT INTO presences(user,entrainement,val) VALUES(1,1,1)");
 $donnees->db->exec("INSERT INTO presences(user,entrainement,val) VALUES(2,1,1)");
@@ -43,9 +43,9 @@ function test_getArrayUsers() {
 
     $json = $users->getArray();
     
-    $s = '[{ "id": 2, "prenom": "fifi", "nom" : "duck", "equipe": 1, "licence": "BC011002", "otm": 1, "charte": 1 },
-           { "id": 3, "prenom": "loulou", "nom" : "duck", "equipe":2, "licence": "BC011003", "otm": 1, "charte": 1 },
-           { "id": 1, "prenom": "riri", "nom" : "duck", "equipe": 1, "licence": "BC011001", "otm": 1, "charte": 1 }
+    $s = '[{ "id": 2, "prenom": "fifi", "nom" : "duck", "equipe": 1, "licence": "BC011002", "otm": false, "charte": true },
+           { "id": 3, "prenom": "loulou", "nom" : "duck", "equipe":2, "licence": "BC011003", "otm": true, "charte": false },
+           { "id": 1, "prenom": "riri", "nom" : "duck", "equipe": 1, "licence": "BC011001", "otm": true, "charte": true }
     ]';
 
     $expected = json_decode($s,true);

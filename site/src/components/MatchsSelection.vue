@@ -1,6 +1,6 @@
 <template>
     <div class="selection"  >
-        <div><select @change="changeEquipe($event)">
+        <div class="select-container"><select class="styled-select" @change="changeEquipe($event)">
                 <option v-for="e in listeequipes" :key="e.id" :value="e">Equipe {{ e }}</option>
             </select>
         </div>
@@ -10,7 +10,8 @@
                 <tr>
                     <th></th>
                     <th></th>
-                    <th v-for="(u,j) in equipe['joueurs']" :key="j" >{{ u.prenom }}<br/>{{ u.nb }}</th>
+                    <th v-for="(u,j) in equipe['joueurs']" :key="j">{{ u.prenom }}<br/>{{ u.nb }}</th>
+                    <th v-for="(u,j) in equipe['autrejoueurs']" :key="j">{{ u.prenom }}<br/>{{ u.nb }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -18,11 +19,15 @@
                     <th class="thmatch">{{ s.jour }} - {{ s.lieu }} </th>
                     <th>{{ s.nb }}</th>
                     <td v-for="(u,j) in s.users" :key="j" >
-                        <!--{{u.prenom}} {{ u.selection }}--><Selection :pres="u.dispo" 
+                        <Selection :pres="u.dispo" 
                                 :sel="u.selection" 
                                 @onUpdate="update(u.id,s.id,$event)"/>
                     </td>
-                
+                    <td v-for="(u,j) in s.autres" :key="j" >
+                        <Selection :pres="u.dispo" 
+                                :sel="u.selection" 
+                                @onUpdate="update(u.id,s.id,$event)"/>
+                    </td>                
                 </tr>
                 </tbody>
             </table>

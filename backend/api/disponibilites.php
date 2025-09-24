@@ -61,21 +61,21 @@ class Disponibilites {
 
 		foreach ($matchs as $e) {
 			
-			if (($prevmatch!=null) && ($e["date"]==$prevmatch["jour"])) {
+			if (($prevmatch!=null) && ($e->jour==$prevmatch["jour"])) {
 				//On ne retourne qu'un seul match par jour
 				continue;				
 			}
 
-			$currentmatch=array( "jour"  => $e["date"],
+			$currentmatch=array( "jour"  => $e->jour,
 								 "users" => array(),
-								 "lieu" => $e['lieu']);
+								 "titre" => $e->titre);
 
 			$prevmatch=$currentmatch;
 
 			foreach($users as $u) {
 				$val=0;
-				if (array_key_exists($e["date"],$dispo)) {
-					foreach($dispo[$e["date"]] as $p) {
+				if (array_key_exists($e->jour,$dispo)) {
+					foreach($dispo[$e->jour] as $p) {
 						if ($p["user"] == $u["id"]) {
 							$val=$p["val"];
 							break;

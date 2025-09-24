@@ -18,6 +18,12 @@ function getResource(url) {
 
 }
 
+export function getMatch(id) {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('match='+id).then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+}
+
 export function getMatches() {
     return new Promise( (successClbk,failClbk) => {
         getResource('matchs').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
@@ -39,9 +45,26 @@ export function setMatches(matchs) {
         })
 
     });
-
 }
 
+export function setOpposition(matchid,userid,val) {
+    var baseurl = "/api/";
+
+    return new Promise((successClbk,failClbk) => {
+        axios.post(baseurl, {
+            usr:userid,
+            match:matchid,
+            opposition:val
+        }).then(response =>{
+            var r=response.data;        
+            successClbk(r);
+
+        }).catch(errmsg => {
+            failClbk(errmsg);
+        })
+
+    });
+}
 
 export function getEntrainements() {
     return new Promise( (successClbk,failClbk) => {

@@ -81,11 +81,11 @@ function test_getSelections() {
                     "id" : 1,
                     "jour": "2025-09-01",
                     "users": [{"id": 2,"dispo": 1, "selection":0,"prenom": "fifi"},
-                              {"id": 3,"dispo": 0, "selection":1,"prenom": "loulou"},
                               {"id": 1,"dispo": 1, "selection":1,"prenom": "riri"}
                               ],
+                    "autres" : [{"id": 3,"dispo": 0, "selection":1,"prenom": "loulou"}],
                     "equipe" : 1,
-                    "lieu": "sans titre",
+                    "titre": "sans titre",
                     "nb" : 2
                 },
                 {
@@ -94,8 +94,9 @@ function test_getSelections() {
                     "users": [{"id": 2,"dispo": 0, "selection":0,"prenom": "fifi"},
                               {"id": 1,"dispo": 0, "selection":0,"prenom": "riri"}
                               ],
+                    "autres": [],
                     "equipe" : 1,
-                    "lieu": "sans titre",
+                    "titre": "sans titre",
                     "nb" : 0
                 }]
             },
@@ -109,8 +110,9 @@ function test_getSelections() {
                     "jour": "2025-09-01",
                     "users": [{"id": 4,"dispo": 0, "selection":0,"prenom": "daisy"},
                             {"id": 3,"dispo": 0, "selection":0,"prenom": "loulou"}],
+                    "autres": [],
                     "equipe" : 2,
-                    "lieu": "sans titre",
+                    "titre": "sans titre",
                     "nb" : 0
                 },
                 {
@@ -118,8 +120,9 @@ function test_getSelections() {
                     "jour": "2025-09-08",
                     "users": [{"id": 4,"dispo": 0, "selection":0,"prenom": "daisy"},
                             {"id": 3,"dispo": 0, "selection":0,"prenom": "loulou"}],
+                    "autres": [],
                     "equipe" : 2,
-                    "lieu": "sans titre",
+                    "titre": "sans titre",
                     "nb" : 0
                 }]
           }]';     

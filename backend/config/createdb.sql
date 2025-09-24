@@ -4,4 +4,4 @@ CREATE TABLE disponibilites(jour integer,user integer,val integer);
 CREATE TABLE selections(match integer,user integer,val integer);
 CREATE TABLE entrainements(id integer primary key,jour text,titre text);
 CREATE TABLE presences(entrainement integer, user integer,val integer);
-CREATE TABLE opositions(user integer,match integer,val text);
+CREATE TABLE oppositions(user integer,match integer,val text);

@@ -2,22 +2,25 @@
     <div class="matchs">
         <table>
             <thead>
-                <tr><th>Rencontre</th><th>Date</th><th>Equipe</th><th>Resultat</th><th>Collation</th><th>OTM</th><th>Maillots</th><th></th></tr>
+                <tr><th></th><th>Rencontre</th><th>Date</th><th>Equipe</th><th>Resultat</th><th>Collation</th><th>OTM</th><th>Maillots</th><th></th></tr>
             </thead>
-            <tbody>
+            <tbody>                
             <tr v-for="(m,i) in matches" :key="i" >
-            <td><input v-model="m.lieu" :class="m.todelete==true ? 'disabled' : ''"/></td>
-            <td><input v-model="m.date" class="inputdate" :class="m.todelete==true ? 'disabled' : ''"/></td>
-            <td><input v-model="m.equipe" class="inputdate" :class="m.todelete==true ? 'disabled' : ''"/></td>
-            <td><input v-model="m.resultat" class="inputresultat" :class="m.todelete==true ? 'disabled' : ''"/></td>
-            <td><input v-model="m.collation" :class="m.todelete==true ? 'disabled' : ''"/></td>
-            <td><input v-model="m.otm" :class="m.todelete==true ? 'disabled' : ''"/></td>
-            <td><input v-model="m.maillots" :class="m.todelete==true ? 'disabled' : ''"/></td>
-            <td>
-                <button class="btn btn-delete" @click="supprime(m.id)">
-                    <img src= "@/assets/annuler.png" width="16"/>
-                </button>
-            </td>
+                <td>
+                    <router-link :to="'/match/'+m.id"><img src= "@/assets/eye.png" width="20"/></router-link>
+                </td>
+                <td><input v-model="m.titre" :class="m.todelete==true ? 'disabled' : ''"/></td>
+                <td><input v-model="m.jour" class="inputdate" :class="m.todelete==true ? 'disabled' : ''"/></td>
+                <td><input v-model="m.equipe" class="inputdate" :class="m.todelete==true ? 'disabled' : ''"/></td>
+                <td><input v-model="m.score" class="inputresultat" :class="m.todelete==true ? 'disabled' : ''"/></td>
+                <td><input v-model="m.collation" :class="m.todelete==true ? 'disabled' : ''"/></td>
+                <td><input v-model="m.otm" :class="m.todelete==true ? 'disabled' : ''"/></td>
+                <td><input v-model="m.maillots" :class="m.todelete==true ? 'disabled' : ''"/></td>
+                <td>
+                    <button class="btn btn-delete" @click="supprime(m.id)">
+                        <img src= "@/assets/annuler.png" width="16"/>
+                    </button>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -49,7 +52,7 @@ export default {
         }
 
         function ajoute() {
-            matches.value.push({lieu:"lieu", date:"xx/xx",equipe:"1", resultat:""})
+            matches.value.push({titre:"lieu", jour:"xx/xx",equipe:"1", resultat:""})
         }
 
         function enregistrer() {

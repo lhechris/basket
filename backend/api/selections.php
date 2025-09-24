@@ -35,7 +35,7 @@ class Selections {
 
 		$selections = array();
 		while ($row = $results->fetchArray()) {
-			if (!array_key_exists($row['match'],$selections)) {
+			if (!array_key_exists($row['match'],$selections)) {				
 				$selections[$row['match']]=array();
 			}
 			array_push($selections[$row['match']],array( "user"=>$row['user'],"val"=>$row['val']));
@@ -46,21 +46,21 @@ class Selections {
 
 		foreach ($matchs as $m) {
 
-			$currentmatch=array( "id" => $m["id"],
-								 "jour"  => $m["date"],
+			$currentmatch=array( "id" => $m->id,
+								 "jour"  => $m->jour,
 								 "users" => array(),
 								 "autres" => array(),
-								 "equipe" => $m["equipe"],
-								 "lieu" => $m['lieu'],
+								 "equipe" => $m->equipe,
+								 "titre" => $m->titre,
 								 "nb" => 0);
 			
 			$nbselected=0;					 
 			//on ajoute chaque joueurs
 			foreach($users as $u) {
 				$selected=0;
-				//si ce joueur à une selection pour ce match on garde sa valeur
-				if (array_key_exists($m["id"],$selections)) {					
-					foreach($selections[$m["id"]] as $p) {
+				//si ce joueur à une selection pour ce match on garde sa valeur				
+				if (array_key_exists($m->id,$selections)) {					
+					foreach($selections[$m->id] as $p) {
 						if ($p["user"] == $u["id"]) {
 							$selected=$p["val"];
 							if ($selected == 1) {$nbselected++;}
@@ -69,14 +69,14 @@ class Selections {
 					}
 				}
 
-				if (($selected == 0) && ($u["equipe"]!=$m["equipe"])) {
+				if (($selected == 0) && ($u["equipe"]!=$m->equipe)) {
 					//on ne met pas le joueur parce qu'il ne fait pas partie de l'equipe
 					//et qu'il n'a pas de selection (ça peut arriver si on l'a changé d'équipe)
 				} else {
 					//on recherche sa disponibilité
 					$dispo=0;
 					foreach ($disponibilites as $disponibilite) {
-						if ($disponibilite["jour"]==$m["date"]) {
+						if ($disponibilite["jour"]==$m->jour) {
 							foreach($disponibilite["users"] as $du) {
 								if ($du["id"] == $u["id"]) {
 									$dispo=$du["dispo"];
@@ -93,7 +93,7 @@ class Selections {
 						"prenom" => $u["prenom"]
 					);
 					//en fonction de l'equipe on ne le met pas dans la meme liste
-					if ($u["equipe"]==$m["equipe"]) {
+					if ($u["equipe"]==$m->equipe) {
 						array_push($currentmatch["users"],$joueur);
 					} else {
 						array_push($currentmatch["autres"],$joueur);

@@ -30,4 +30,83 @@ function loginfo($msg) {
 	fclose($fp);
 }
 
+
+
+class CommonCtrl {
+    protected $db;
+
+    public function __construct($donnees) {
+        $this->db = $donnees->db;
+    }
+
+	protected function query(string $sql,array $binds,string $classname=null) {
+		
+		$stmt = $this->db->prepare($sql);
+		if ($stmt===false) {
+			loginfo("Erreur prepare");
+			return;
+		}
+
+		$bindingok=true;
+
+		foreach ($binds as $bind) {
+			if (! $stmt->bindValue($bind[0],$bind[1],$bind[2])) {
+				$bindingok = false;
+			}
+		}
+
+        if ($bindingok ) {
+
+            $results = $stmt->execute();
+            if ($results===false) {
+                loginfo($stmt->getSQL(true));
+                loginfo("Erreur");
+            } else {				
+				$datas = array();
+				if ($classname !== null) {
+					while ($row = $results->fetchArray()) {
+						$obj = new $classname();
+						$obj->from_array($row);
+						array_push($datas,$obj);
+					}
+				}
+				$stmt->reset();        
+				return $datas;
+			}
+        } 
+		$stmt->reset(); 
+		return false;
+	}
+
+
+	// parcours recursif
+	public function to_array($array) {
+		$ret = array();		
+		foreach($array as $item) {
+			array_push($ret,$item->to_array());
+		}
+		return $ret;
+	}
+}
+
+
+class CommonModel {
+	protected function nullifnotexists($array, $key) {
+		if (array_key_exists($key,$array)) {
+			return $array[$key];
+		} else {
+			return null;
+		}
+	}
+}
+
+class CommonModelCount extends CommonModel{
+	public $count;
+
+	public function from_array(array $data) {
+		$this->count =  $this->nullifnotexists($data, "count(*)");
+	}	
+}
+
+
 ?>

@@ -2,6 +2,34 @@
 
 require_once("utils.php");
 
+class Joueur extends CommonModel{
+	public $id, $prenom, $nom,$equipe,$licence,$otm,$charte;
+
+	public function to_array() : array {
+		return [
+			"id" => $this->$id,
+			"prenom" => $this->prenom,
+			"nom" => $this->nom ,
+			"equipe" => $this->equipe ,
+			"licence" => $this->licence ,
+			"otm" => $this->otm ,
+			"charte" => $this->charte
+		];
+	}
+
+	public function from_array(array $datas) {
+		$this->id = $this->nullifnotexists($datas,"id");
+		if ($this->id == null) { $this->id = $this->nullifnotexists($datas,"user");}
+		$this->prenom = $this->nullifnotexists($datas,"prenom");
+		$this->nom = $this->nullifnotexists($datas,"nom");
+		$this->equipe = $this->nullifnotexists($datas,"equipe");
+		$this->licence = $this->nullifnotexists($datas,"licence");
+		$this->otm = $this->nullifnotexists($datas,"otm");
+		$this->charte = $this->nullifnotexists($datas,"charte");
+	}
+}
+
+
 class Users {
 	private $db;
 

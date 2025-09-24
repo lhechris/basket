@@ -72,7 +72,7 @@ function test_getDisponibilites() {
                   {"id": 2,"dispo": 1,"prenom": "fifi"},
                   {"id": 3,"dispo": 0,"prenom": "loulou"},
                   {"id": 1,"dispo": 1,"prenom": "riri"}],
-        "lieu": "sans titre"
+        "titre": "sans titre"
     },
     {
         "jour": "2025-09-08",
@@ -80,7 +80,7 @@ function test_getDisponibilites() {
                   {"id": 2,"dispo": 0,"prenom": "fifi"},
                   {"id": 3,"dispo": 0,"prenom": "loulou"},
                   {"id": 1,"dispo": 0,"prenom": "riri"}],
-        "lieu": "sans titre"
+        "titre": "sans titre"
     }]';
     $expected = json_decode($s,true);
     assertArray($json,$expected,__FUNCTION__,"retour");    

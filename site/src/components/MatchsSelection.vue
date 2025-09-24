@@ -16,7 +16,7 @@
                 </thead>
                 <tbody>
                 <tr v-for="(s,n) in equipe.matchs" :key="n">                
-                    <th class="thmatch">{{ s.jour }} - {{ s.lieu }} </th>
+                    <th class="thmatch"><RouterLink :to="'/match/'+s.id">{{ s.jour }} - {{ s.titre }}</RouterLink></th>
                     <th>{{ s.nb }}</th>
                     <td v-for="(u,j) in s.users" :key="j" >
                         <Selection :pres="u.dispo" 

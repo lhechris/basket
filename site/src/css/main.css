@@ -94,6 +94,11 @@
     /*background-color:chocolate;*/
 }
 
+.descr {
+    border-radius: 6px;
+    background-color: #70b6da;
+}
+
 .selection {
     display:block;
     margin-left:auto;
@@ -108,6 +113,11 @@
     margin-left:auto;
     margin-right:auto;    
     width: 800px;
+}
+
+.titre {
+    font-weight:600;
+    font-size : 1.2em;
 }
 
 

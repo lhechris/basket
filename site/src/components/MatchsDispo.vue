@@ -118,10 +118,7 @@ export default {
     scrollbar-color: rebeccapurple green;
     scrollbar-width: thin;*/
 }
-.descr {
-    border-radius: 6px;
-    background-color: #70b6da;
-}
+
 
 .lieu {
     font-weight: 600;

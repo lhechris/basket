@@ -80,12 +80,6 @@ export default {
 </script>
 <style scoped>
 
-.descr {
-    border-radius: 6px;
-    background-color: #70b6da;
-}
-
-
 .lieu {
     font-size: 0.8rem;
 }

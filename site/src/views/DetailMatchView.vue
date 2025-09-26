@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-      <DetailMatch :matchdetail="match" @changeOpp="updateOpp"/> 
+      <DetailMatch :matchdetail="match" @changeOpp="updateOpp" @change-match="updateMatch"/> 
   
     </div>
   </template>
@@ -29,6 +29,9 @@
           })
         }
 
+        function updateMatch(newmatch) {
+          console.log("Update match ",newmatch)
+        }
 
         function updateOpp(matchid,userid,val) {
             setOpposition(matchid,userid,val);
@@ -38,7 +41,7 @@
 
         refreshMatch();
 
-        return {match,updateOpp}
+        return {match,updateOpp,updateMatch}
     }
   }
   </script>

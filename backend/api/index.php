@@ -121,6 +121,10 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 			//MATCHS
 			$matchs->set($json["tab"]);
 		
+		} else if ($json["type"]=="match") {
+			//MATCH
+			$matchs->set($json["tab"]);
+		
 		} else if ($json["type"]=="users") {
 			//USERS
 			$users->set($json["tab"]);

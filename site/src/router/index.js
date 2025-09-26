@@ -2,10 +2,10 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import SelectionView from '../views/SelectionView.vue'
 import AuthView from '../views/AuthView.vue'
-import EntrainementView from '../views/EntrainementView'
-import MatchsView from '../views/MatchsView'
-import JoueusesView from '../views/JoueusesView'
-import DetailMatchView from '@/views/DetailMatchView.vue'
+import EntrainementView from '../views/EntrainementView.vue'
+import MatchsView from '../views/MatchsView.vue'
+import JoueusesView from '../views/JoueusesView.vue'
+import DetailMatchView from '../views/DetailMatchView.vue'
 
 const routes = [
   {

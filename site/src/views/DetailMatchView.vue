@@ -5,44 +5,32 @@
     </div>
   </template>
   
-  <script>
+  <script setup>
   // @ is an alias to /src
   import DetailMatch from '@/components/DetailMatch.vue'
-  import {getMatch,setOpposition} from '@/js/api.js'
-   import {ref} from "vue"
+  import {getMatch,setOpposition,setMatch} from '@/js/api.js'
+  import {ref} from "vue"
   
-  export default {
-    name: 'DetailMatchsView',
-    components: {
-      DetailMatch
-    },
-    props : ['id'],
+  const props = defineProps(['id'])
+  const match = ref([])
 
-    setup(props) {
-
-
-        const match = ref([])
-
-        function refreshMatch() {
-          getMatch(props.id).then( m => {
+  function refreshMatch() {
+      getMatch(props.id).then( m => {
               match.value = m
-          })
-        }
-
-        function updateMatch(newmatch) {
-          console.log("Update match ",newmatch)
-        }
-
-        function updateOpp(matchid,userid,val) {
-            setOpposition(matchid,userid,val);
-            refreshMatch();      
-           
-        } 
-
-        refreshMatch();
-
-        return {match,updateOpp,updateMatch}
-    }
+      })
   }
-  </script>
+
+  function updateMatch(newmatch) {
+    setMatch(newmatch)
+  }
+
+  function updateOpp(matchid,userid,val) {
+      setOpposition(matchid,userid,val);
+      refreshMatch();      
+      
+  } 
+
+  refreshMatch();
+
+</script>
   

@@ -31,9 +31,7 @@ export function getMatches() {
 }
 
 export function setMatches(matchs) {
-    var baseurl = "/api/";
-
-    
+    var baseurl = "/api/";    
     return new Promise((successClbk,failClbk) => {
         var data={"type":"matchs", tab:matchs}
         axios.post(baseurl, data).then(response =>{
@@ -46,6 +44,22 @@ export function setMatches(matchs) {
 
     });
 }
+
+export function setMatch(onematch) {
+    var baseurl = "/api/";    
+    return new Promise((successClbk,failClbk) => {
+        var data={"type":"match", tab:onematch}
+        axios.post(baseurl, data).then(response =>{
+        var r=response.data;        
+        successClbk(r);
+
+        }).catch(errmsg => {
+            failClbk(errmsg);
+        })
+
+    });
+}
+
 
 export function setOpposition(matchid,userid,val) {
     var baseurl = "/api/";

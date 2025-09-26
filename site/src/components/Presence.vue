@@ -8,26 +8,21 @@
 
 </template>
 
-<script>
+<script setup>
 
-import {ref} from "vue"
+  import {ref} from "vue"
 
-export default ({    
-
-    emits: ['onUpdate'],
-    props : ['sel'],
+  const emits= defineEmits(['onUpdate'])
+  const props= defineProps(['sel'])
     
-    setup(props,ctx) {
-        const selected = ref(props.sel)
-        function toggle(clicked) {
-            if (selected.value!=clicked) {
-                ctx.emit('onUpdate',clicked)
-            }
-            selected.value = clicked
-        }
-        return {selected,toggle}
-    },
-})
+  const selected = ref(props.sel)
+  function toggle(clicked) {
+      if (selected.value!=clicked) {
+          emits('onUpdate',clicked)
+      }
+      selected.value = clicked
+  }
+
 </script>
 
 <style scoped>

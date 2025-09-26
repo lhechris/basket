@@ -62,13 +62,12 @@
 
 
     const props = defineProps (['matchdetail' ])
-    const emit = defineEmits('changeMatch')
+    const emit = defineEmits(['changeMatch','changeOpp'])
 
     const currentmatch = ref(props.matchdetail)
 
 
     const onChange = () => {
-        console.log('valeur après délai : ',  currentmatch.value)
         emit('changeMatch',currentmatch.value)
     }
         

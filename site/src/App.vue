@@ -19,7 +19,7 @@
 
 <script>
 
-import {islogged} from "@/js/api.js"
+import {islogged} from "./js/api.js"
 import {ref} from "vue"
 
 export default {

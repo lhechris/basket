@@ -7,31 +7,24 @@
     </div>
 </template>
 
-<script>
+<script setup>
 
-import {ref} from "vue"
-import Toggle from '@vueform/toggle'
+    import {ref} from "vue"
+    import Toggle from '@vueform/toggle'
 
-export default ({    
+    const emits=defineEmits(['onUpdate'])
+    const props=defineProps(['sel','pres'])
 
-    emits: ['onUpdate'],
-    props : ['sel','pres'],
-    components : { Toggle},
-    
-    setup(props,ctx) {
-        const btn = ref({
-                            value:props.sel,
-                            trueValue:1,
-                            falseValue:0,
-                        })
+    const btn = ref({
+                value:props.sel,
+                trueValue:1,
+                falseValue:0,
+            })
 
+    function montoggle() {
+        emits('onUpdate',btn.value.value)
+    }
 
-        function montoggle() {
-            ctx.emit('onUpdate',btn.value.value)
-        }
-        return {montoggle,btn}
-    },
-})
 </script>
 
 <style src="@vueform/toggle/themes/default.css" />

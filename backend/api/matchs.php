@@ -138,6 +138,34 @@ class Matchs extends CommonCtrl{
 	}
 
 
+	private function setOne($tab) {
+		if (is_array($tab) && 
+			array_key_exists("titre",$tab) && 
+			array_key_exists("jour",$tab) && 
+			array_key_exists("score",$tab) && 
+			array_key_exists("equipe",$tab)  && 
+			array_key_exists("collation",$tab) && 
+			array_key_exists("otm",$tab) &&
+			array_key_exists("maillots",$tab)
+			) {
+
+			if (array_key_exists("id",$tab)) {
+				if (array_key_exists("todelete",$tab)) {
+					$this->supprime($tab["id"]);
+
+				} else {
+					$this->update($tab["id"],$tab["equipe"],$tab["titre"],$tab["score"],$tab["jour"],$tab['collation'],$tab['otm'],$tab['maillots']);
+				}
+
+			} else {
+				/**
+				 * Il n'y a pas d'id pour ce match c'est donc un ajout 
+				 */
+				$this->ajoute($tab["equipe"],$tab["titre"],$tab["score"],$tab["jour"],$tab['collation'],$tab['otm'],$tab['maillots']);
+			}
+		}
+	}
+
 
 	/**
 	 * Modifie/Ajoute/Supprime des matchs 
@@ -146,37 +174,17 @@ class Matchs extends CommonCtrl{
 	 */
 	public function set($json) {
 
-		foreach($json as $nm) {
-
-			if (is_array($nm) && 
-			    array_key_exists("titre",$nm) && 
-				array_key_exists("jour",$nm) && 
-				array_key_exists("score",$nm) && 
-				array_key_exists("equipe",$nm)  && 
-				array_key_exists("collation",$nm) && 
-				array_key_exists("otm",$nm) &&
-				array_key_exists("maillots",$nm)
-				) {
-
-				if (array_key_exists("id",$nm)) {
-					if (array_key_exists("todelete",$nm)) {
-						$this->supprime($nm["id"]);
-
-					} else {
-						$this->update($nm["id"],$nm["equipe"],$nm["titre"],$nm["score"],$nm["jour"],$nm['collation'],$nm['otm'],$nm['maillots']);
-					}
-
-				} else {
-					/**
-					 * Il n'y a pas d'id pour ce match c'est donc un ajout 
-					 */
-					$this->ajoute($nm["equipe"],$nm["titre"],$nm["score"],$nm["jour"],$nm['collation'],$nm['otm'],$nm['maillots']);
-				}
+		if (is_array($json) && (array_key_exists("titre",$json))) {
+			$this->setOne($json);
+			$this->get($json["id"]);
+		
+		} else {		
+			foreach($json as $nm) {
+				$this->setOne($nm);
 			}
-		}
-		$this->get();	
+			$this->get();
+		}		
 	}
-
 }
 
 ?>

@@ -36,11 +36,11 @@ class SMatchs extends Matchs{
     public function supprime($id) {
         return parent::supprime($id);
     }
-    public function ajoute($equipe,$titre,$score,$jour,$collation,$otm,$maillots) {
-        return parent::ajoute($equipe,$titre,$score,$jour,$collation,$otm,$maillots);
+    public function ajoute($equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+        return parent::ajoute($equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);
     }
-    public function update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots) {        
-        return parent::update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots);
+    public function update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {        
+        return parent::update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);
     }
 }
 
@@ -55,15 +55,87 @@ function test_getArrayMatchs() {
 
     $json = $matchs->to_array($matchs->getArray());
     
-    $s = '[{ "id": 2, "equipe": 1, "jour" : "2025-09-20", "titre":"match1" , "score":"0/0" , "collation":"donald", "otm":"picsou", "maillots": "nobody", "oppositions" : null },
-           { "id": 1, "equipe": 1, "jour" : "2025-09-27", "titre":"match2" , "score":"24/8" , "collation":"gontran", "otm":"geo trouvetou", "maillots":"machine à laver","oppositions" : null },
-           { "id": 3, "equipe": 2, "jour" : "2025-10-05", "titre":"match3" , "score":"24/8" , "collation":"flagada", "otm":"flairsou", "maillots":"rapetou","oppositions" : null }
+    $s = '[{ "id": 2, "equipe": 1, "jour" : "2025-09-20", "titre":"match1" , "score":"0/0" , "collation":"donald", "otm":"picsou", "maillots": "nobody", "oppositions" : null, "selections" : null, "adresse":null,"horaire":null,"rendezvous":null },
+           { "id": 1, "equipe": 1, "jour" : "2025-09-27", "titre":"match2" , "score":"24/8" , "collation":"gontran", "otm":"geo trouvetou", "maillots":"machine à laver","oppositions" : null, "selections" : null, "adresse":null,"horaire":null,"rendezvous":null },
+           { "id": 3, "equipe": 2, "jour" : "2025-10-05", "titre":"match3" , "score":"24/8" , "collation":"flagada", "otm":"flairsou", "maillots":"rapetou","oppositions" : null, "selections" : null, "adresse":null,"horaire":null,"rendezvous":null }
     ]';
 
     $expected = json_decode($s,true);
 
     assertArray($json,$expected,__FUNCTION__,"retour");
 }
+
+function test_getMatchsAvecOppositionsArray() {
+
+    global $donnees,$oppositions;
+    $matchs = new Matchs($donnees,$oppositions);
+
+    $json = $matchs->to_array($matchs->getAvecOppositionsArray());
+    
+    //echo(json_encode($json,JSON_PRETTY_PRINT)."\n");
+
+
+    $s = '[ { "jour" :"2025-09-20", 
+    "matchs" : [{ "id": 2, 
+                "equipe": 1, 
+                "jour" : "2025-09-20", 
+                "titre":"match1" , 
+                "score":"0/0" , 
+                "collation":"donald", 
+                "otm":"picsou", 
+                "maillots": "nobody", 
+                "oppositions" : {"A" : [], "B" : [], "Autres" : [] },
+                "selections": null,
+                "adresse" : null,
+                "horaire" : null,
+                "rendezvous" : null
+
+ }]
+  },
+  { "jour" :"2025-09-27",
+    "matchs" :  [ { "id": 1, 
+                    "equipe": 1, 
+                    "jour" : "2025-09-27", 
+                    "titre":"match2" , 
+                    "score":"24/8" , 
+                    "collation":"gontran", 
+                    "otm":"geo trouvetou", 
+                    "maillots":"machine à laver",
+                    "selections" : null,
+                    "oppositions": {"A" : [] , 
+                                    "B" : [], 
+                                    "Autres" : [{"user": 2, "prenom" :"fifi", "licence" : "BC011002", "val":null},
+                                                {"user": 3, "prenom" :"loulou", "licence" : "BC011003", "val":null},
+                                                {"user": 1, "prenom" :"riri", "licence" : "BC011001", "val":null}]
+                                   },
+                    "adresse" : null,
+                    "horaire" : null,
+                    "rendezvous" : null
+ }]
+  },
+  { "jour" : "2025-10-05",
+       "matchs" : [ { "id": 3, 
+            "equipe": 2, 
+            "jour" : "2025-10-05", 
+            "titre":"match3" , 
+            "score":"24/8" , 
+            "collation":"flagada", 
+            "otm":"flairsou", 
+            "maillots":"rapetou",
+            "oppositions" : {"A" : [], "B" : [], "Autres" : [] },
+            "selections" : null,
+            "adresse" : null,
+            "horaire" : null,
+            "rendezvous" : null
+             } ]
+ }
+]';
+
+    $expected = json_decode($s,true);
+
+    assertArray($json,$expected,__FUNCTION__,"retour");
+}
+
 
 
 /**
@@ -76,7 +148,7 @@ function test_getArrayMatch() {
 
     $res = $matchs->getArray(1);
     $json = $matchs->to_array($res);
-    echo(json_encode($json,JSON_PRETTY_PRINT));
+    //echo(json_encode($json,JSON_PRETTY_PRINT));
     
     $s = '[{ "id": 1, 
              "equipe": 1, 
@@ -89,10 +161,14 @@ function test_getArrayMatch() {
              "oppositions": { "A" : [], 
                               "B" : [], 
                               "Autres": [
-                        {"user" : 2, "prenom" : "fifi", "val" : null },
-                        {"user" : 3, "prenom" : "loulou", "val" : null },
-                        {"user" : 1, "prenom" : "riri", "val" : null  } ]
-                            }
+                        {"user" : 2, "prenom" : "fifi", "val" : null,"licence": "BC011002"},
+                        {"user" : 3, "prenom" : "loulou", "val" : null,"licence": "BC011003" },
+                        {"user" : 1, "prenom" : "riri", "val" : null,"licence": "BC011001"  } ]
+                            },
+            "selections" : null,
+            "adresse" : null,
+            "horaire" : null,
+            "rendezvous" : null
            
             }]';
 
@@ -122,7 +198,7 @@ function test_updateMatchs() {
     assertEgal($initial[0]["jour"],"2025-09-20",__FUNCTION__,"jour initial correcte");
     assertEgal($initial[0]["score"],'0/0',__FUNCTION__,"score initial correcte");
 
-    $match->update(1,2,'match numero 1','8/9','2025-10-06',"germaine","personne","gigi");
+    $match->update(1,2,'match numero 1','8/9','2025-10-06',"germaine","personne","gigi","la bas","15h30", "Au gymnase");
     $json=$match->to_array($match->getArray());;
     foreach($json as $v) {
         if ($v["id"] == 1) {
@@ -133,6 +209,9 @@ function test_updateMatchs() {
             assertEgal($v["collation"],'germaine',__FUNCTION__,"collation correctement modifiée");
             assertEgal($v["otm"],'personne',__FUNCTION__,"otm correctement modifié");
             assertEgal($v["maillots"],'gigi',__FUNCTION__,"maillots correctement modifié");
+            assertEgal($v["adresse"],'la bas',__FUNCTION__,"adresse correctement modifié");
+            assertEgal($v["horaire"],'15h30',__FUNCTION__,"horaire correctement modifié");
+            assertEgal($v["rendezvous"],'Au gymnase',__FUNCTION__,"rendezvous correctement modifié");
         }
     }    
 }
@@ -143,7 +222,7 @@ function test_ajoutMatchs() {
     global $donnees,$oppositions;
     $match = new SMatchs($donnees,$oppositions);
 
-    $match->ajoute(2,'match numero 4','5/9','2025-11-08',"bubulle","jojo","coco");
+    $match->ajoute(2,'match numero 4','5/9','2025-11-08',"bubulle","jojo","coco","ici","11h","quelquepart");
     $json=$match->to_array($match->getArray());;
     $notfound=true;
     foreach($json as $v) {
@@ -155,6 +234,9 @@ function test_ajoutMatchs() {
             assertEgal($v["collation"],'bubulle',__FUNCTION__,"collation correctement ajouté");
             assertEgal($v["otm"],'jojo',__FUNCTION__,"otm correctement ajouté");
             assertEgal($v["maillots"],'coco',__FUNCTION__,"maillots correctement ajouté");
+            assertEgal($v["adresse"],'ici',__FUNCTION__,"adresse correctement ajouté");
+            assertEgal($v["horaire"],'11h',__FUNCTION__,"horaire correctement ajouté");
+            assertEgal($v["rendezvous"],'quelquepart',__FUNCTION__,"rendezvous correctement ajouté");
             $notfound=false;
         }
     }
@@ -187,6 +269,7 @@ function test_supprimeMatchs() {
 
 test_getArrayMatchs();
 test_getArrayMatch();
+test_getMatchsAvecOppositionsArray();
 test_updateMatchs();
 test_ajoutMatchs();
 test_supprimeMatchs();

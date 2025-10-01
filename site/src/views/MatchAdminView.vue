@@ -1,13 +1,13 @@
 <template>
     <div class="home">
-      <DetailMatch :matchdetail="match" @changeOpp="updateOpp" @change-match="updateMatch"/> 
+      <DetailMatchAdmin :matchdetail="match" @changeOpp="updateOpp" @change-match="updateMatch"/> 
   
     </div>
   </template>
   
   <script setup>
   // @ is an alias to /src
-  import DetailMatch from '@/components/DetailMatch.vue'
+  import DetailMatchAdmin from '@/components/DetailMatchAdmin.vue'
   import {getMatch,setOpposition,setMatch} from '@/js/api.js'
   import {ref} from "vue"
   

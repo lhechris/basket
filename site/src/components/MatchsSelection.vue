@@ -37,7 +37,7 @@
 
 <script>
 import {getSelections,setSelection} from '@/js/api.js'
-import Selection from '@/components/Selection2.vue'
+import Selection from '@/components/Selection.vue'
 import {ref} from 'vue'
 
 import '@coreui/coreui/dist/css/coreui.min.css'

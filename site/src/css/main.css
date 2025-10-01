@@ -94,9 +94,20 @@
     /*background-color:chocolate;*/
 }
 
+.bg-1 {
+    background-color: #70b6da;
+}
+
+.bg-2 {
+   background-color: #70da82;
+}
+
+
+
+
 .descr {
     border-radius: 6px;
-    background-color: #70b6da;
+    margin-top: 3px;
 }
 
 .selection {
@@ -106,6 +117,10 @@
     width: 1200px;
     height : 800px;
     /*background-color:darkcyan;*/
+}
+
+.gras {
+    font-weight: 600;
 }
 
 .matchs {
@@ -165,6 +180,13 @@
     text-decoration: none;
     display: inline-block;
     margin: 10px;
+}
+
+.btn-small {
+    padding:6px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin: 8px;
 }
 
 /* Bouton principal */

@@ -12,6 +12,7 @@ class Opposition extends CommonModel{
         $ret=[
             "user"   => $this->joueur->id,
             "prenom" => $this->joueur->prenom,
+            "licence" => $this->joueur->licence,
             "val"    => $this->val
         ];
         return $ret;
@@ -50,7 +51,7 @@ class Oppositions extends CommonCtrl {
     public function getArray($match) {     
 
         //On recupère les oppositions dans la table oppositions
-        $query = 'SELECT A.user,A.val, C.prenom '.
+        $query = 'SELECT A.user,A.val, C.prenom,C.licence '.
                  'FROM oppositions A, matchs B, users C '.
                  'WHERE A.match=B.id AND A.user=C.id AND A.match=:match '.
                  'ORDER BY C.prenom';
@@ -60,7 +61,7 @@ class Oppositions extends CommonCtrl {
 
         //on ajoute tous les joueurs sélectionnées pour le match et qui ne sont pas dans 
         //la table oppositions
-        $query = 'SELECT A.user, C.prenom '.
+        $query = 'SELECT A.user, C.prenom,C.licence '.
                  'FROM selections A, matchs B, users C '.
                  'WHERE A.match=B.id AND A.user=C.id AND A.match=:match AND A.val = 1 '.
                  'ORDER BY C.prenom';

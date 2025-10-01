@@ -33,10 +33,28 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 		$users->get();
 
 	} else 	if (array_key_exists('matchs',$_GET)) {
-		$matchs->get();
+		if (islogged()) {
+			$matchs->get(); 
+		} else {
+			responseJson(array());
+		}
 
 	} else 	if (array_key_exists('match',$_GET)) {
-		$matchs->get($_GET['match']);
+		if (islogged()) {
+			$matchs->get($_GET['match']);
+		} else {
+			responseJson(array());
+		}
+
+	} else 	if (array_key_exists('matchsavecopp',$_GET)) {
+		if (islogged()) {
+			$matchs->getAvecOppositions();
+		} else {
+			responseJson(array());
+		}
+
+	} else 	if (array_key_exists('matchsavecsel',$_GET)) {
+		$matchs->getAvecSelections();
 
 	} else 	if (array_key_exists('entrainements',$_GET)) {
 		if (islogged()) {
@@ -111,12 +129,11 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 
 	} else if (array_key_exists("usr",$json) && array_key_exists("match",$json) && array_key_exists("opposition",$json)) {
 		//SELECTION
-		loginfo("chuilà");
 		if (islogged()) {
 			return $oppositions->set($json);
 		}
 	
-	} else if (array_key_exists("type",$json) && (array_key_exists("tab",$json))) {
+	} else if (array_key_exists("type",$json) && (array_key_exists("tab",$json))&& (islogged())) {
 		if ($json["type"]=="matchs") {
 			//MATCHS
 			$matchs->set($json["tab"]);

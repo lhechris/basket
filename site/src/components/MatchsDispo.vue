@@ -1,23 +1,10 @@
 <template>
     <div class="main" >
         <div v-for="(dispo,i) in disponibilites" :key="i">
-            <div v-if="page==i">
-                <div class="descr">
+            <div v-if="page==i+1">
+                <div class="descr bg-1">
                     <span class="date">{{ displaydate(dispo.jour) }}</span><br/>
-                        <c-pagination>
-                            <c-pagination-item 
-                                    href="#" 
-                                    @click="pagemoins()" 
-                                    :disabled="page<=0"
-                                >Match précédent
-                            </c-pagination-item>
-                            <c-pagination-item 
-                                    href="#" 
-                                    @click="pageplus()" 
-                                    :disabled="page>=disponibilites.length-1"
-                                >Match suivant
-                            </c-pagination-item>
-                        </c-pagination>
+                    <cust-pagination message="Match" v-model="page" :nbpages="disponibilites.length" />
                 </div>
                 <table>
                 <tr v-for="(u,j) in dispo.users" :key="j">
@@ -29,21 +16,7 @@
                 </table>
             </div>
         </div>
-
-        <c-pagination>
-            <c-pagination-item 
-                    href="#" 
-                    @click="pagemoins()" 
-                    :disabled="page<=0"
-                >Match précédent
-            </c-pagination-item>
-            <c-pagination-item 
-                    href="#" 
-                    @click="pageplus()" 
-                    :disabled="page>=disponibilites.length-1"
-                >Match suivant
-            </c-pagination-item>
-        </c-pagination>
+        <cust-pagination message="Match" v-model="page" :nbpages="disponibilites.length" />
     </div>
 </template>
 
@@ -51,18 +24,18 @@
 import {getDisponibilites,setDisponibilite,displaydate} from '@/js/api.js'
 import Presence from '@/components/Presence.vue'
 import {ref} from 'vue'
-import {CPagination,CPaginationItem} from "@coreui/vue"
+import CustPagination from "@/components/CustPagination.vue"
 
 import '@coreui/coreui/dist/css/coreui.min.css'
 export default {
 
     components: {
-        Presence,CPagination,CPaginationItem
+        Presence,CustPagination
         
   },    
     setup() {
         const disponibilites = ref([])
-        const page = ref(0)
+        const page = ref(1)
 
         getDisponibilites().then( p => {
             disponibilites.value = p
@@ -70,11 +43,12 @@ export default {
             //selectionne la page courante
             let d1=new Date()
             for (let i in p) {
+                
                 //let s=p[i].date.split("/")
                 //let d2=new Date(s[2]+"-"+s[1]+"-"+s[0])
                 let d2=new Date(p[i].jour)
                 if (d2 > d1)  {
-                    page.value=i
+                    page.value= parseInt(i) + 1
                     break
                 }                
             }
@@ -86,24 +60,7 @@ export default {
             })
         }
 
-        function pageplus() {
-            if (page.value<(disponibilites.value.length-1)) {
-                page.value++
-            }
-        }
-
-        function pagemoins() {
-            if (page.value>0) {
-                page.value--
-            }
-        }
-
-        function pageselect(n) {
-            page.value=n
-        }
-
-
-        return {disponibilites,page,update,pageplus,pagemoins,pageselect,displaydate}
+        return {disponibilites,page,update,displaydate}
     }
 }
 </script>

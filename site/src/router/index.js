@@ -4,8 +4,10 @@ import SelectionView from '../views/SelectionView.vue'
 import AuthView from '../views/AuthView.vue'
 import EntrainementView from '../views/EntrainementView.vue'
 import MatchsView from '../views/MatchsView.vue'
+import MatchsAdminView from '../views/MatchsAdminView.vue'
 import JoueusesView from '../views/JoueusesView.vue'
-import DetailMatchView from '../views/DetailMatchView.vue'
+import MatchAdminView from '../views/MatchAdminView.vue'
+import CurrentMatchView from '../views/CurrentMatchView.vue'
 
 const routes = [
   {
@@ -28,11 +30,20 @@ const routes = [
     name: 'matchs',
     component: MatchsView
   },
-  {
+{
+    path: '/matchsadmin',
+    name: 'matchsadmin',
+    component: MatchsAdminView
+  },  {
     path: '/match/:id',
     name: 'match',
     props:true,
-    component: DetailMatchView
+    component: MatchAdminView
+  },
+  {
+    path: '/currentmatch',
+    name: 'currentmatch',
+    component: CurrentMatchView
   },
   {
     path: '/joueuses',

@@ -58,8 +58,9 @@ class CommonCtrl {
         if ($bindingok ) {
 
             $results = $stmt->execute();
+			
             if ($results===false) {
-                loginfo($stmt->getSQL(true));
+				loginfo($stmt->getSQL(true));
                 loginfo("Erreur");
             } else {				
 				$datas = array();
@@ -98,6 +99,20 @@ class CommonModel {
 			return null;
 		}
 	}
+
+	protected function toarrayrecursif($array) {
+		$results = null;
+		if (is_array($array)) {
+			$results=array();
+			foreach ($array as $item) {
+				array_push($results,$item->to_array());
+			}
+		}
+		return $results;
+
+	}
+
+
 }
 
 class CommonModelCount extends CommonModel{

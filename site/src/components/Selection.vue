@@ -1,36 +1,42 @@
 <template>
-    <div :class="pres==1 ? 'presok' : pres==2 ? 'prespasok' : 'presundef'" >
-    <!--<img height="16" :class="selected==0 ? '' : 'imgback'" src="@/assets/annuler.png" @click="toggle(0)"/>
-    <img height="16" :class="selected==1 ? '' : 'imgback'" src="@/assets/verifie.png" @click="toggle(1)"/>-->
-    <span><button class="button-3 absente" :class="selected==0 ? '': 'unselected'" @click="toggle(0)">non selectionnée</button></span>
-    <span><button class="button-3 presente" :class="selected==1 ? '': 'unselected'" @click="toggle(1)">selectionée</button></span>
 
+    <div :class="pres==1 ? 'presok' : pres==2 ? 'prespasok' : 'presundef'" >
+    <!--<span><button class="button-3 absente" :class="selected==0 ? '': 'unselected'" @click="toggle(0)">N</button></span>
+    <span><button class="button-3 presente" :class="selected==1 ? '': 'unselected'" @click="toggle(1)">S</button></span>-->
+    <Toggle v-model="btn.value" v-bind="btn" class="custombtn" @change="montoggle()"/>
     </div>
 </template>
 
-<script>
+<script setup>
 
-import {ref} from "vue"
+    import {ref} from "vue"
+    import Toggle from '@vueform/toggle'
 
-export default ({    
+    const emits=defineEmits(['onUpdate'])
+    const props=defineProps(['sel','pres'])
 
-    emits: ['onUpdate'],
-    props : ['sel','pres'],
-    
-    setup(props,ctx) {
-        const selected = ref(props.sel)
-        function toggle(clicked) {
-            if (selected.value!=clicked) {
-                ctx.emit('onUpdate',clicked)
-            }
-            selected.value = clicked
-        }
-        return {selected,toggle}
-    },
-})
+    const btn = ref({
+                value:props.sel,
+                trueValue:1,
+                falseValue:0,
+            })
+
+    function montoggle() {
+        emits('onUpdate',btn.value.value)
+    }
+
 </script>
 
+<style src="@vueform/toggle/themes/default.css" />
+
 <style scoped>
+.custombtn {
+    --toggle-border-off:rgba(153, 13, 13, 0.5);
+    --toggle-bg-off:rgba(153, 13, 13, 0.5);
+    --toggle-width:2rem;
+    --toggle-height:1rem;
+}
+
 .imgback {
     opacity : 0.3;
     filter:alpha(opacity=30)

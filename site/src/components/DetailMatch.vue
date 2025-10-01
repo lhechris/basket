@@ -1,56 +1,23 @@
 <template>
     <div class="matchs">
-        <div class="descr">
-            <span class="titre">{{matchdetail.titre}}</span><span>&nbsp;Equipe {{matchdetail.equipe }}</span>
-            <p>{{matchdetail.jour }}</p>
+        <div class="descr bg-1">
+            <span class="titre">{{matchdetail.titre}}</span><span v-if="currentmatch.horaire">({{currentmatch.horaire}})</span><span>&nbsp;Equipe {{matchdetail.equipe }}</span>
         </div>
         <div class="main">
             <table>
                 <thead>
                 </thead>
                 <tbody>
-                <tr> <td>Score</td><td><input type="text" v-model="currentmatch.score" @input="debouncedOnChange()"/></td></tr>
-                <tr> <td>Collation</td><td><input type="text" v-model="currentmatch.Collation" @input="debouncedOnChange()"/></td></tr>
-                <tr> <td>OTM</td><td><input type="text" v-model="currentmatch.otm" @input="debouncedOnChange()"/></td></tr>
-                <tr> <td>Maillots</td><td><input type="text" v-model="currentmatch.maillots" @input="debouncedOnChange()"/></td></tr>
+                <tr v-if="currentmatch.score!=''"> <td>Score</td><td>{{currentmatch.score}}</td></tr>
+                <tr v-if="currentmatch.collation!='N/A'"> <td>Collation</td><td> {{currentmatch.collation}}</td></tr>
+                <tr v-if="currentmatch.otm!='N/A'"> <td>OTM</td><td>{{currentmatch.otm}}</td></tr>
+                <tr> <td>Maillots</td><td>{{currentmatch.maillots}}</td></tr>
+                <tr> <td>Lieu</td><td>{{currentmatch.adresse}}</td></tr>
+                <tr> <td>Rendez-vous</td><td class="gras">{{currentmatch.rendezvous}}</td></tr>                
                 </tbody>
             </table>
-            <table v-if="matchdetail.oppositions">            
-                <thead><tr><th>Opposition A</th><th>Opposition B</th><th></th></tr></thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <p v-for="u in matchdetail.oppositions.A" :key="u.user">
-                                <span>{{ u.prenom }}</span>
-                                <select @change="$emit('changeOpp',matchdetail.id,u.user,$event.target.value)">
-                                    <option value=""> </option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                </select>
-                            </p>
-                        </td>
-                        <td>
-                            <p v-for="u in matchdetail.oppositions.B" :key="u.user">
-                                <span>{{ u.prenom }}</span>
-                                <select @change="$emit('changeOpp',matchdetail.id,u.user,$event.target.value)">
-                                    <option value=""> </option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                </select>
-                            </p>
-                        </td>
-                        <td>
-                            <p v-for="u in matchdetail.oppositions.Autres" :key="u.user">{{ u.prenom }}
-                                <select @change="$emit('changeOpp',matchdetail.id,u.user,$event.target.value)">
-                                    <option value=""> </option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                </select>
-                            </p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <span class="joueurs" v-for="u in matchdetail.selections" :key="u.user">{{ u.prenom }}</span>
+            
         </div>
     </div>
 </template>
@@ -93,4 +60,14 @@ table {
 td {
     text-align:left;
 }
+
+.joueurs {
+    margin-left : 10px;
+    width:100%;
+}
+
+.main {
+    height:auto;
+}
+
 </style>

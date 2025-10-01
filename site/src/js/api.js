@@ -30,6 +30,20 @@ export function getMatches() {
     });
 }
 
+export function getMatchsAvecOpp() {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('matchsavecopp').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+
+}
+
+
+export function getMatchsAvecSel() {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('matchsavecsel').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+}
+
 export function setMatches(matchs) {
     var baseurl = "/api/";    
     return new Promise((successClbk,failClbk) => {
@@ -235,7 +249,8 @@ export function logout() {
 }
 
 import moment from 'moment'
+import 'moment/dist/locale/fr';
+
 export function displaydate(d) {
-    
-    return moment(d).locale("fr").format("dddd Do MMMM")
+    return moment(d).local('fr').format("dddd Do MMMM")
 }

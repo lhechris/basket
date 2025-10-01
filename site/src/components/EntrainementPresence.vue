@@ -1,28 +1,15 @@
 <template>
     <div class="main" >
         <div v-for="(e,n) in presences" :key="n">
-            <div v-if="page==n">
-                <div class="descr" >
+            <div v-if="page==n+1">
+                <div class="descr bg-2" >
                     <span class="date">{{displaydate(e.date) }}</span>
                     <span class="date">&nbsp; &nbsp;[{{ countJoueuses(e.id) }}]</span>
-                    <span><c-pagination>
-                        <c-pagination-item 
-                                href="#/entrainement" 
-                                @click="pagemoins()" 
-                                :disabled="page<=0"
-                            >Précédent
-                        </c-pagination-item>
-                        <c-pagination-item 
-                                href="#/entrainement" 
-                                @click="pageplus()" 
-                                :disabled="page>=presences.length-1"
-                            >Suivant
-                        </c-pagination-item>
-                    </c-pagination>  </span>                    
+                    <span><cust-pagination message="" v-model="page" :nbpages="presences.length" /></span>
                 </div>
                 <table>
                 <tr v-for="(u,j) in e.users" :key="j">
-                    <th>{{ u.prenom }}</th>
+                    <th>{{ u.prenom }} ({{ u.nbent }})</th>
                     <td>
                         <Presence :sel="u.pres" @onUpdate="update(u.id,e.id,$event)"/>
                     </td>
@@ -30,97 +17,78 @@
                 </table>
             </div>
         </div>
-        <c-pagination>
-            <c-pagination-item 
-                    href="#/entrainement" 
-                    @click="pagemoins()" 
-                    :disabled="page<=0"
-                >Précédent
-            </c-pagination-item>
-            <c-pagination-item 
-                    href="#/entrainement" 
-                    @click="pageplus()" 
-                    :disabled="page>=presences.length-1"
-                >Suivant
-            </c-pagination-item>
-        </c-pagination>
+        <cust-pagination message="" v-model="page" :nbpages="presences.length" />
     </div>
 </template>
 
-<script>
+<script setup>
 import {getPresences,setPresence,displaydate} from '@/js/api.js'
 import Presence from '@/components/Presence.vue'
+import CustPagination from '@/components/CustPagination.vue'
 import {ref} from 'vue'
-import {CPagination,CPaginationItem} from "@coreui/vue"
 
 import '@coreui/coreui/dist/css/coreui.min.css'
-export default {
 
-    components: {
-        Presence,CPagination,CPaginationItem
-        
-  },    
-    setup() {
-        const presences = ref([])
-        const page = ref(0)
+const presences = ref([])
+const page = ref(1)
 
-        getPresences().then( p => {
-            presences.value = p
-            let d1=new Date()
-            for (let i in p) {
-                //let s=p[i].date.split("/")
-                //let d2=new Date(s[2]+"-"+s[1]+"-"+s[0]+1)
-                let d2=new Date(p[i].date)
-                d2.setDate(d2.getDate()+1)
-                if (d2 > d1)  {
-                    page.value=i
-                    break
-                }                
+getPresences().then( p => {
+    presences.value = p
+
+    //selectionne la prochaine page par rapport 
+    //au jour actuel
+    let d1=new Date()
+    for (let i in p) {
+        let d2=new Date(p[i].date)
+        d2.setDate(d2.getDate()+1)
+        if (d2 > d1)  {
+            page.value=parseInt(i) + 1
+            break
+        }                
+    }
+    countEntrainementParJoueuse()
+   
+})
+
+//compte le nombre d'entrainement par joueuses
+function countEntrainementParJoueuse() {
+    let tabjoueuses=[]
+    for (let p of presences.value) {
+        for (let u of p.users) { 
+            if (!tabjoueuses[u.prenom]) {
+                tabjoueuses[u.prenom]=0
+            }
+            if (u.pres == 1) {
+                tabjoueuses[u.prenom]++;                
             }            
-
-        })
-
-        function countJoueuses(mid) {
-            let nb=0
-            for (let p of presences.value) {
-                if (p.id == mid) {
-                    for (let u of p.users) {
-                        if (u.pres == 1) {
-                            nb=nb+1
-                        }
-                    }
-                }
-            }
-            return nb
+            u.nbent=tabjoueuses[u.prenom];            
         }
-
-        function update(usr,match,val) {
-            
-            setPresence(usr,match,val).then( p => {
-                presences.value = p    
-            })
-        }
-
-        function pageplus() {
-            if (page.value<(presences.value.length-1)) {
-                page.value++
-            }
-        }
-
-        function pagemoins() {
-            if (page.value>0) {
-                page.value--
-            }
-        }
-
-        function pageselect(n) {
-            page.value=n
-        }
-
-
-        return {presences,page,countJoueuses,update,pageplus,pagemoins,pageselect,displaydate}
     }
 }
+
+// Compte le nombre de joueuse par entrainement
+function countJoueuses(mid) {
+    let nb=0
+    for (let p of presences.value) {
+        if (p.id == mid) {
+            for (let u of p.users) {                
+                if (u.pres == 1) {
+                    nb=nb+1                   
+                }
+            }
+        }
+    }
+    return nb
+}
+
+
+function update(usr,match,val) {    
+    setPresence(usr,match,val).then( p => {
+        presences.value = p 
+        countEntrainementParJoueuse()   
+    })
+}
+
 </script>
 <style scoped>
 
@@ -129,10 +97,6 @@ export default {
     font-size : 1.2rem;
 }
 
-.descr {
-    border-radius: 6px;
-    background-color: #70da82;
-}
 .lieu {
     font-size: 0.8rem;
 }

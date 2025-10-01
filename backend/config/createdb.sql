@@ -1,7 +1,11 @@
-CREATE TABLE matchs(id integer primary key, equipe integer, jour text, titre text, score text,collation text, otm text,maillots text);
+CREATE TABLE matchs(id integer primary key, equipe integer, jour text, titre text, score text,collation text, otm text,maillots text,adresse text, horaire text, rendezvous text);
 CREATE TABLE users(id integer primary key, nom text,prenom text,equipe integer, licence text, charte integer,otm integer);
 CREATE TABLE disponibilites(jour integer,user integer,val integer);
 CREATE TABLE selections(match integer,user integer,val integer);
 CREATE TABLE entrainements(id integer primary key,jour text,titre text);
 CREATE TABLE presences(entrainement integer, user integer,val integer);
 CREATE TABLE oppositions(user integer,match integer,val text);
+
+--alter table matchs add column adresse text;
+--alter table matchs add column horaire text;
+--alter table matchs add column rendezvous text;

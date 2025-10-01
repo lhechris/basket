@@ -10,14 +10,12 @@ class Selections {
 	private $matchs;
 	private $disponibilites;
 
-	public function __construct($donnees,$users,$matchs,$disponibilites) {
+	public function __construct($donnees,$users,$matchs,$disponibilites) {		
 		$this->db = $donnees->db;
 		$this->users = $users;
 		$this->matchs = $matchs;
 		$this->disponibilites = $disponibilites;
 	}	
-
-
 
 	/**
 	 * retourne le fichier json

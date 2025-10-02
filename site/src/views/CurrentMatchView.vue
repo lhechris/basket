@@ -43,7 +43,7 @@
 
   function updateMatch(newmatch) {
     //setMatch(newmatch)
-    console.log("Update match ",newmatch)
+    console.log("Update match n'est pas encore disponible",newmatch)
   }
 
   refreshMatch();

@@ -13,9 +13,12 @@
     </router-link></li>
     </ul>
   </nav>
-  <div class="conteneur">
+  <div class="@container">
       <router-view/>
   </div>
+
+
+
 </template>
 
 <script setup>

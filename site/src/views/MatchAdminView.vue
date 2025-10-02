@@ -1,5 +1,5 @@
 <template>
-    <div class="home">
+    <div class="flex flex-col gap-1">
       <DetailMatchAdmin :matchdetail="match" @changeOpp="updateOpp" @change-match="updateMatch"/> 
   
     </div>

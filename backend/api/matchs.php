@@ -147,8 +147,8 @@ class Matchs extends CommonCtrl{
 
 		foreach($allmatchs as &$m) {			
 			$s = $this->query('SELECT A.user,C.prenom '.
-					 'FROM selections A, matchs B, users C '.
-					 'WHERE A.match=B.id AND A.user=C.id AND B.id=:id '.
+					 'FROM selections A, matchs B, users C,oppositions D '.
+					 'WHERE A.match=B.id AND A.user=C.id AND B.id=:id AND D.match=B.id AND D.user=C.id '.
 					 'ORDER BY C.prenom',[[':id',intval($m->id),SQLITE3_INTEGER]],'SelectionMatch');			
 			$m->selections = $s;
 			

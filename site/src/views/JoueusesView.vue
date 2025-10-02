@@ -70,8 +70,7 @@
             joueuses.value.push({prenom:"", equipe:"1"})
         }
 
-        function enregistrer() {
-            console.log(joueuses.value)
+        function enregistrer() {            
             setUsers(joueuses.value).then( u => {
                 joueuses.value = u
             })

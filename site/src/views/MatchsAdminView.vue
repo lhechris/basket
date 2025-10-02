@@ -1,21 +1,23 @@
 <template>
-    <div class="home">
-    <div>
+  <div class="flex flex-col gap-1">
+    <div class="grid grid-cols-6 ">
         <button class="btn btn-primary" @click="ajouteMatch()">Créer un match</button>
     </div>
-      <div class="detailmatch" v-for="(jour,i) of matchs" :key="i" >        
-        <div v-if="page==i+1" >
-          <div class="descr bg-2 titre" >
-              <span>{{displaydate(jour["jour"])}} </span>
-              <cust-pagination message="" v-model="page" :nbpages="matchs.length" />
+    <div class="flex md:grid md:grid-cols-6 flex-col gap-1">
+      <div class="md:col-span-4 md:col-start-2" v-for="(jour,i) of matchs" :key="i" >        
+          <div v-if="page==i+1" class="flex flex-col gap-2">
+            <div class="bg-yellow-400 rounded-md font-bold text-xl" >
+                <span>{{displaydate(jour["jour"])}}</span>
+                <cust-pagination message="" v-model="page" :nbpages="matchs.length" />
+            </div>
+            <div v-for="match of jour['matchs']" class="pr-4 pl-4" >              
+                <detail-match-admin :matchdetail="match" @change-match="updateMatch" @changeOpp="updateOpp" /> 
+            </div>
           </div>
-          <div v-for="match of jour['matchs']" >              
-              <detail-match-admin :matchdetail="match" @change-match="updateMatch" @changeOpp="updateOpp" /> 
-          </div>
-        </div>
-      </div>  
+      </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script setup>
   // @ is an alias to /src
@@ -45,7 +47,7 @@
                     break
                 }                
             }
-            console.log("refresh match",m,page.value)
+            //console.log("refresh match",m,page.value)
 
       })
   }
@@ -56,8 +58,9 @@
   }
 
   function updateOpp(matchid,userid,val) {
-      setOpposition(matchid,userid,val);
-      refreshMatch();      
+    let jour = matchs.value[parseInt(page.value)-1].jour  
+    setOpposition(matchid,userid,val);
+    refreshMatch(jour);      
       
   } 
 

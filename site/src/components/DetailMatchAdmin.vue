@@ -1,55 +1,54 @@
 <template>
-    <div class="matchs">
-        <div class="descr bg-1">
-            <span class="titre"><input v-model="currentmatch.titre"  @input="debouncedOnChange()"/></span>
-            <span>&nbsp;Equipe<input v-model="currentmatch.equipe"  @input="debouncedOnChange()"/></span>
-            <span><button class="btn btn-secondary btn-small" @click="supprime()">Supprimer</button></span>
-            <p><input v-model="currentmatch.jour" /></p>
+    <div class="flex flex-col gap-4">
+        <div class="bg-green-400 rounded-lg pt-2 pb-2">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pl-2">
+                <span class="font-bold"><input class="pl-2" v-model="currentmatch.titre"  @input="debouncedOnChange()"/></span>
+                <span>&nbsp;Equipe<input class="max-w-10" v-model="currentmatch.equipe"  @input="debouncedOnChange()"/></span>
+                <input class="max-w-30 p-1" v-model="currentmatch.jour" />
+                <span>
+                    <button class="middle none center mr-4 rounded-lg bg-red-500 py-1 px-2 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" 
+                            @click="supprime()">Supprimer
+                    </button>
+                </span>
+            </div>            
 
         </div>
-        <div class="main">
-            <table>
-                <thead>
-                </thead>
-                <tbody>
-                <tr><td>Score</td><td><input v-model="currentmatch.score"  @input="debouncedOnChange()"/></td></tr>
-                <tr><td>Collation</td><td><input v-model="currentmatch.collation"  @input="debouncedOnChange()"/></td></tr>
-                <tr><td>OTM</td><td><input v-model="currentmatch.otm"  @input="debouncedOnChange()"/></td></tr>
-                <tr><td>Maillots</td><td><input v-model="currentmatch.maillots"  @input="debouncedOnChange()"/></td></tr>
-                <tr><td>Adresse</td><td><input v-model="currentmatch.adresse"  @input="debouncedOnChange()"/></td></tr>
-                <tr><td>Horaire</td><td><input v-model="currentmatch.horaire"  @input="debouncedOnChange()"/></td></tr>
-                <tr><td>Rendez-vous</td><td><input v-model="currentmatch.rendezvous"  @input="debouncedOnChange()"/></td></tr>
-                </tbody>
-            </table>
-            <table v-if="matchdetail.oppositions">            
-                <thead><tr><th colspan="3">Opposition A</th><th colspan="3">Opposition B</th><th colspan="3"></th></tr></thead>
-                <tbody v-for="r,i in tabselections" :key="i">
-                    <tr>
-                        <td>{{r[0].prenom}}</td>
-                        <td>{{r[0].licence}}</td>
-                        <td><select v-if="r[0].user" @change="$emit('changeOpp',matchdetail.id,r[0].user,$event.target.value)">
-                                    <option value=""> </option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                </select></td>
-                        <td>{{r[1].prenom}}</td>
-                        <td>{{r[1].licence}}</td>
-                        <td><select v-if="r[1].user" @change="$emit('changeOpp',matchdetail.id,r[1].user,$event.target.value)">
-                                    <option value=""> </option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                </select></td>
-                        <td>{{r[2].prenom}}</td>
-                        <td></td>
-                        <td><select v-if="r[2].user" @change="$emit('changeOpp',matchdetail.id,r[2].user,$event.target.value)">
-                                    <option value=""> </option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                </select></td>
-                    </tr>
-                </tbody>
-            </table>            
-        </div>
+        <div class="flex flex-col gap-2">
+            <div class="flex gap-2"><div class="text-left w-30">Score</div><input  v-model="currentmatch.score"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-30">Collation</div><input v-model="currentmatch.collation"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-30">OTM</div><input v-model="currentmatch.otm"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-30">Maillots</div><input v-model="currentmatch.maillots"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-30">Adresse</div><input v-model="currentmatch.adresse"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-30">Horaire</div><input v-model="currentmatch.horaire"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-30">Rendez-vous</div><input v-model="currentmatch.rendezvous"  @input="debouncedOnChange()"/></div>
+            <div class="grid grid-cols-8">
+                <div class="font-bold text-left col-span-3">Opposition A</div><div class="font-bold text-left col-span-3">Opposition B</div><div class="font-bold col-span-2">-</div>
+                <div class="flex flex-col gap-2 col-span-3">
+                    <div class="grid grid-cols-12 gap-2 text-left" v-for="opp of currentmatch.oppositions.A">
+                        <span class="col-span-5">{{opp.prenom}}</span>
+                        <span class="col-span-5">{{ opp.licence }}</span>
+                        <button class="col-span-2" @click="$emit('changeOpp',currentmatch.id,opp.user,'B')">
+                            <img src= "@/assets/fleche_droite.png" width="16"/>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 col-span-3">
+                    <div class="grid grid-cols-12 text-left" v-for="opp of currentmatch.oppositions.B">
+                        <button class="col-span-2" @click="$emit('changeOpp',currentmatch.id,opp.user,'A')">
+                            <img width="16" src= "@/assets/fleche_gauche.png" />
+                        </button>
+                        <span class="col-span-5">{{opp.prenom}}</span>
+                        <span class="col-span-5">{{ opp.licence }}</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 col-span-2">
+                    <div class="grid grid-cols-3" v-for="opp of currentmatch.oppositions.Autres">
+                        <span>{{opp.prenom}}</span>
+                        <button2-choix val="0" texte1="A" texte2="B" val1="A" val2="B" @onUpdate="$emit('changeOpp',currentmatch.id,opp.user,$event)"></button2-choix>
+                    </div>
+                </div>
+            </div>        
+        </div>        
     </div>
 </template>
 
@@ -57,6 +56,8 @@
     import {ref,watch} from 'vue'
     import {onBeforeUnmount} from 'vue'
     import { debounce } from 'lodash';
+    //import tableauoppositions from './tableauoppositions.vue';
+    import Button2Choix from './Button2Choix.vue';
 
     const props = defineProps (['matchdetail' ])
     const emit = defineEmits(['changeMatch','changeOpp'])
@@ -100,8 +101,7 @@
                 }
                 tabselections.value.push([A,B,Autres])
             }
-        }
-        console.log("oppositions : ",tabselections.value)
+        }        
     }
 
 
@@ -120,6 +120,16 @@
 
 
 <style scoped>
+
+.radio input ~ label {
+  background-color: rgb(233, 225, 225);
+  color: rgb(158, 146, 146);
+}
+.radio input:checked ~ label {
+  background-color: rgb(70, 230, 22);
+  color: white;
+}
+
 table {
     width:100%;
 }

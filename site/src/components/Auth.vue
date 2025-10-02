@@ -67,8 +67,7 @@ export default {
                     window.location.reload()
                 })
             } else {
-                logout().then( r=> {
-                    console.log(r)
+                logout().then( r=> {                    
                     logged.value=r==1
                     window.location.reload()
                 })

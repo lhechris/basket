@@ -6,6 +6,3 @@ CREATE TABLE entrainements(id integer primary key,jour text,titre text);
 CREATE TABLE presences(entrainement integer, user integer,val integer);
 CREATE TABLE oppositions(user integer,match integer,val text);
 
---alter table matchs add column adresse text;
---alter table matchs add column horaire text;
---alter table matchs add column rendezvous text;

@@ -24,12 +24,6 @@ export function getMatch(id) {
     });
 }
 
-export function getMatches() {
-    return new Promise( (successClbk,failClbk) => {
-        getResource('matchs').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
-    });
-}
-
 export function getMatchsAvecOpp() {
     return new Promise( (successClbk,failClbk) => {
         getResource('matchsavecopp').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
@@ -41,21 +35,6 @@ export function getMatchsAvecOpp() {
 export function getMatchsAvecSel() {
     return new Promise( (successClbk,failClbk) => {
         getResource('matchsavecsel').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
-    });
-}
-
-export function setMatches(matchs) {
-    var baseurl = "/api/";    
-    return new Promise((successClbk,failClbk) => {
-        var data={"type":"matchs", tab:matchs}
-        axios.post(baseurl, data).then(response =>{
-        var r=response.data;        
-        successClbk(r);
-
-        }).catch(errmsg => {
-            failClbk(errmsg);
-        })
-
     });
 }
 

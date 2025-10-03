@@ -3,11 +3,10 @@ import HomeView from '../views/HomeView.vue'
 import SelectionView from '../views/SelectionView.vue'
 import AuthView from '../views/AuthView.vue'
 import EntrainementView from '../views/EntrainementView.vue'
-import MatchsView from '../views/MatchsView.vue'
 import MatchsAdminView from '../views/MatchsAdminView.vue'
 import JoueusesView from '../views/JoueusesView.vue'
 import MatchAdminView from '../views/MatchAdminView.vue'
-import CurrentMatchView from '../views/CurrentMatchView.vue'
+import MatchsView from '../views/MatchsView.vue'
 
 const routes = [
   {
@@ -25,11 +24,6 @@ const routes = [
     name: 'entrainement',
     component: EntrainementView
   },
-  {
-    path: '/matchs',
-    name: 'matchs',
-    component: MatchsView
-  },
 {
     path: '/matchsadmin',
     name: 'matchsadmin',
@@ -41,9 +35,9 @@ const routes = [
     component: MatchAdminView
   },
   {
-    path: '/currentmatch',
-    name: 'currentmatch',
-    component: CurrentMatchView
+    path: '/matchs',
+    name: 'matchs',
+    component: MatchsView
   },
   {
     path: '/joueuses',

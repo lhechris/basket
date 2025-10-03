@@ -3,7 +3,7 @@
     <div class="grid grid-cols-6 ">
         <button class="btn btn-primary" @click="ajouteMatch()">Créer un match</button>
     </div>
-    <div class="flex md:grid md:grid-cols-6 flex-col gap-1">
+    <div class="flex md:grid md:grid-cols-6 flex-col">
       <div class="md:col-span-4 md:col-start-2" v-for="(jour,i) of matchs" :key="i" >        
           <div v-if="page==i+1" class="flex flex-col gap-2">
             <div class="bg-amber-500 rounded-md font-bold text-xl" >

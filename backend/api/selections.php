@@ -276,32 +276,30 @@ class Selections {
 		foreach ($json as &$equipe) {
 			$query = 'SELECT A.prenom ,count(*) '.
 					  'FROM users A,selections B, matchs C '.
-					  'WHERE A.id=B.user AND B.val=1 AND C.id=B.match AND C.equipe=:equipe '.
+					  'WHERE A.id=B.user AND B.val=1 AND C.id=B.match '.
 					  'GROUP BY A.prenom ORDER BY A.prenom';
 			$stmt = $this->db->prepare($query);
 
-			if (($stmt->bindValue(':equipe', $equipe["equipe"], SQLITE3_INTEGER)) ) {		
-				$result = $stmt->execute();
-				if ($result===false) {
-					loginfo($stmt->getSQL(true));
-					loginfo("Erreur");	
-					return false;
-				}
+			$result = $stmt->execute();
+			if ($result===false) {
+				loginfo($stmt->getSQL(true));
+				loginfo("Erreur");	
+				return false;
+			}
 
-				while ($row = $result->fetchArray()) {
-					foreach ($equipe["joueurs"] as &$joueur){ 
-						if ($joueur["prenom"] == $row["prenom"]) {
-							$joueur["nb"] = $row["count(*)"];
-							break;
-						}
+			while ($row = $result->fetchArray()) {
+				foreach ($equipe["joueurs"] as &$joueur){ 
+					if ($joueur["prenom"] == $row["prenom"]) {
+						$joueur["nb"] = $row["count(*)"];
+						break;
 					}
-					foreach ($equipe["autrejoueurs"] as &$joueur){ 
-						if ($joueur["prenom"] == $row["prenom"]) {
-							$joueur["nb"] = $row["count(*)"];
-							break;
-						}
+				}
+				foreach ($equipe["autrejoueurs"] as &$joueur){ 
+					if ($joueur["prenom"] == $row["prenom"]) {
+						$joueur["nb"] = $row["count(*)"];
+						break;
 					}
-				}				
+				}
 			}
 		}
 	}

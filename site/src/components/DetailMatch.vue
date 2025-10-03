@@ -3,21 +3,35 @@
         <div class="bg-teal-500 rounded-lg pt-2 pb-2">
             <span class="titre">{{matchdetail.titre}}</span><span v-if="currentmatch.horaire">({{currentmatch.horaire}})</span><span>&nbsp;Equipe {{matchdetail.equipe }}</span>
         </div>
-        <div class="main text-xl">
-            <table>
-                <thead>
-                </thead>
-                <tbody>
-                <tr v-if="currentmatch.score!=''"> <td>Score</td><td>{{currentmatch.score}}</td></tr>
-                <tr v-if="currentmatch.collation!='N/A'"> <td>Collation</td><td> {{currentmatch.collation}}</td></tr>
-                <tr v-if="currentmatch.otm!='N/A'"> <td>OTM</td><td>{{currentmatch.otm}}</td></tr>
-                <tr> <td>Maillots</td><td>{{currentmatch.maillots}}</td></tr>
-                <tr> <td>Lieu</td><td>{{currentmatch.adresse}}</td></tr>
-                <tr> <td>Rendez-vous</td><td class="gras">{{currentmatch.rendezvous}}</td></tr>                
-                </tbody>
-            </table>
-            <span class="joueurs" v-for="u in matchdetail.selections" :key="u.user">{{ u.prenom }}</span>
+        <div class="text-xl flex flex-col gap-4">
+            <div class="flex gap-2" v-if="currentmatch.score!=''">
+                <div class="w-30 text-left">Score</div>
+                <div>{{currentmatch.score}}</div>
+            </div>
+            <div class="flex gap-2" v-if="currentmatch.collation!='N/A'">
+                <div class="w-30 text-left">Collation</div>
+                <div>{{currentmatch.collation}}</div>
+            </div>
+            <div class="flex gap-2" v-if="currentmatch.otm!='N/A'"> 
+                <div class="w-30 text-left">OTM</div>
+                <div>{{currentmatch.otm}}</div>
+            </div>
+            <div class="flex gap-2">
+                <div class="w-30 text-left">Maillots</div>
+                <div>{{currentmatch.maillots}}</div>
+            </div>
+            <div class="flex gap-2">
+                <div class="w-30 text-left">Lieu</div>
+                <div>{{currentmatch.adresse}}</div>
+            </div>
+            <div class="flex gap-2">
+                <div class="w-30 text-left">Rendez-vous</div>
+                <div class="gras">{{currentmatch.rendezvous}}</div>
+            </div>                
             
+            <div class="grid grid-cols-5 md:grid-cols-10 gap-1">
+                <div class="text-left" v-for="u in matchdetail.selections" :key="u.user">{{ u.prenom }}</div>
+            </div>
         </div>
     </div>
 </template>

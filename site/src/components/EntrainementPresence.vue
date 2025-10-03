@@ -9,7 +9,7 @@
                 </div>
                 <table>
                 <tr v-for="(u,j) in e.users" :key="j">
-                    <th>{{ u.prenom }} ({{ u.nbent }})</th>
+                    <th class="text-xl">{{ u.prenom }} ({{ u.nbent }})</th>
                     <td>
                         <Presence :sel="u.pres" @onUpdate="update(u.id,e.id,$event)"/>
                     </td>
@@ -109,10 +109,10 @@ tr,td, th  {
     border : 2px none grey;
 }
 
-th {
+/*th {
     font-size : 0.9rem;
     text-align: right;
-}
+}*/
 
 
 </style>

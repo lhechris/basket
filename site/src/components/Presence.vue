@@ -1,11 +1,9 @@
 <template>
-    <!--<img height="16" :class="selected==1 ? '' : 'imgback'" src="@/assets/verifie.png" @click="toggle(1)"/>
-    <img height="16" :class="selected==2 ? '' : 'imgback'" src="@/assets/annuler.png" @click="toggle(2)"/>
-    <img height="16" :class="selected==0 ? '' : 'imgback'" src="@/assets/warning.png" @click="toggle(0)"/>-->
+  <div class="flex">
     <span><button class="button-3 presente" :class="selected==1 ? '': 'unselected'" @click="toggle(1)">Présente</button></span>
     <span><button class="button-3 absente" :class="selected==2 ? '': 'unselected'" @click="toggle(2)">Absente</button></span>
     <span><button class="button-3 aucun" :class="selected==0 ? ' ': 'unselected'" @click="toggle(0)">Peut être</button></span>
-
+  </div>
 </template>
 
 <script setup>

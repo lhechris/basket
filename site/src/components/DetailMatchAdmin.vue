@@ -2,9 +2,9 @@
     <div class="flex flex-col gap-4 text-xl">
         <div class="bg-teal-500 rounded-lg pt-2 pb-2">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pl-2">
-                <span class="font-bold"><input class="pl-2" v-model="currentmatch.titre"  @input="debouncedOnChange()"/></span>
-                <span>&nbsp;Equipe<input class="max-w-10" v-model="currentmatch.equipe"  @input="debouncedOnChange()"/></span>
-                <input class="max-w-30 p-1" v-model="currentmatch.jour" />
+                <span class="font-bold"><input class="pl-2 bg-teal-300" v-model="currentmatch.titre"  @input="debouncedOnChange()"/></span>
+                <span>&nbsp;Equipe<input class="max-w-10 bg-teal-300" v-model="currentmatch.equipe"  @input="debouncedOnChange()"/></span>
+                <input class="max-w-30 p-1 bg-teal-300" v-model="currentmatch.jour" />
                 <span>
                     <button class="middle none center mr-4 rounded-lg bg-red-500 py-1 px-2 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" 
                             @click="supprime()">Supprimer
@@ -14,13 +14,13 @@
 
         </div>
         <div class="flex flex-col gap-2">
-            <div class="flex gap-2"><div class="text-left w-30">Score</div><input  v-model="currentmatch.score"  @input="debouncedOnChange()"/></div>
-            <div class="flex gap-2"><div class="text-left w-30">Collation</div><input v-model="currentmatch.collation"  @input="debouncedOnChange()"/></div>
-            <div class="flex gap-2"><div class="text-left w-30">OTM</div><input v-model="currentmatch.otm"  @input="debouncedOnChange()"/></div>
-            <div class="flex gap-2"><div class="text-left w-30">Maillots</div><input v-model="currentmatch.maillots"  @input="debouncedOnChange()"/></div>
-            <div class="flex gap-2"><div class="text-left w-30">Adresse</div><input v-model="currentmatch.adresse"  @input="debouncedOnChange()"/></div>
-            <div class="flex gap-2"><div class="text-left w-30">Horaire</div><input v-model="currentmatch.horaire"  @input="debouncedOnChange()"/></div>
-            <div class="flex gap-2"><div class="text-left w-30">Rendez-vous</div><input v-model="currentmatch.rendezvous"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-40">Score</div><input class="w-full bg-teal-300" v-model="currentmatch.score"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-40">Collation</div><input class="w-full bg-teal-300" v-model="currentmatch.collation"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-40">OTM</div><input class="w-full bg-teal-300" v-model="currentmatch.otm"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-40">Maillots</div><input class="w-full bg-teal-300" v-model="currentmatch.maillots"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-40">Adresse</div><textarea class="w-full bg-teal-300" v-model="currentmatch.adresse"  @input="debouncedOnChange()"></textarea></div>
+            <div class="flex gap-2"><div class="text-left w-40">Horaire</div><input class="w-full bg-teal-300" v-model="currentmatch.horaire"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2"><div class="text-left w-40">Rendez-vous</div><input class="w-full bg-teal-300" v-model="currentmatch.rendezvous"  @input="debouncedOnChange()"/></div>
             <div class="grid grid-cols-8 text-lg">
                 <div class="font-bold text-left col-span-3">Opposition A</div><div class="font-bold text-left col-span-3">Opposition B</div><div class="font-bold col-span-2">-</div>
                 <div class="flex flex-col gap-2 col-span-3">

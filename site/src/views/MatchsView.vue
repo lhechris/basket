@@ -1,17 +1,16 @@
 <template>
-    <div class="flex md:grid md:grid-cols-6 flex-col">
-      <div class="md:col-span-4 md:col-start-2" v-for="(jour,i) of matchs" :key="i" >
-        <div class="flex flex-col gap-1" v-if="page==i+1" >
-          <div class="bg-amber-500 rounded-md font-bold text-xl" >
-              <span>{{displaydate(jour["jour"])}} </span>
-              <cust-pagination message="" v-model="page" :nbpages="matchs.length" />
-          </div>
-          <div v-for="match of jour['matchs']" class="pr-4 pl-4">
-              <detail-match :matchdetail="match" @change-match="updateMatch"/> 
-          </div>
-        </div>
-      </div>  
-    </div>
+  <div class="flex flex-col">
+      <content  v-for="(jour,i) of matchs" :key="i" :index="i" couleur="bg-teal-600" :nbpages="matchs.length" v-model="page">        
+            <template #titre>
+                <span>{{displaydate(jour["jour"])}}</span>
+            </template>
+            <template #default>
+              <div v-for="match of jour['matchs']" class="pr-4 pl-4" >              
+                  <detail-match :matchdetail="match" /> 
+              </div>
+            </template>
+        </content>
+    </div>  
   </template>
   
 
@@ -20,7 +19,7 @@
   import DetailMatch from '@/components/DetailMatch.vue'
   import {getMatchsAvecSel,displaydate} from '@/js/api.js'
   import {ref} from "vue"
-  import CustPagination from '@/components/CustPagination.vue'
+  import Content from '@/components/Content.vue'
   
   const matchs = ref([])
   const page=ref(1)
@@ -40,11 +39,6 @@
             }
 
       })
-  }
-
-  function updateMatch(newmatch) {
-    //setMatch(newmatch)
-    console.log("Update match n'est pas encore disponible",newmatch)
   }
 
   refreshMatch();

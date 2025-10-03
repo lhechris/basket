@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-col gap-4">
-        <div class="bg-green-400 rounded-lg pt-2 pb-2">
+    <div class="flex flex-col gap-4 text-xl">
+        <div class="bg-teal-500 rounded-lg pt-2 pb-2">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pl-2">
                 <span class="font-bold"><input class="pl-2" v-model="currentmatch.titre"  @input="debouncedOnChange()"/></span>
                 <span>&nbsp;Equipe<input class="max-w-10" v-model="currentmatch.equipe"  @input="debouncedOnChange()"/></span>
@@ -21,20 +21,20 @@
             <div class="flex gap-2"><div class="text-left w-30">Adresse</div><input v-model="currentmatch.adresse"  @input="debouncedOnChange()"/></div>
             <div class="flex gap-2"><div class="text-left w-30">Horaire</div><input v-model="currentmatch.horaire"  @input="debouncedOnChange()"/></div>
             <div class="flex gap-2"><div class="text-left w-30">Rendez-vous</div><input v-model="currentmatch.rendezvous"  @input="debouncedOnChange()"/></div>
-            <div class="grid grid-cols-8">
+            <div class="grid grid-cols-8 text-lg">
                 <div class="font-bold text-left col-span-3">Opposition A</div><div class="font-bold text-left col-span-3">Opposition B</div><div class="font-bold col-span-2">-</div>
                 <div class="flex flex-col gap-2 col-span-3">
                     <div class="grid grid-cols-12 gap-2 text-left" v-for="opp of currentmatch.oppositions.A">
                         <span class="col-span-5">{{opp.prenom}}</span>
                         <span class="col-span-5">{{ opp.licence }}</span>
-                        <button class="col-span-2" @click="$emit('changeOpp',currentmatch.id,opp.user,'B')">
+                        <button class="col-span-2" @click="updateOpp(currentmatch.id,opp.user,'B','A')">
                             <img src= "@/assets/fleche_droite.png" width="16"/>
                         </button>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2 col-span-3">
                     <div class="grid grid-cols-12 text-left" v-for="opp of currentmatch.oppositions.B">
-                        <button class="col-span-2" @click="$emit('changeOpp',currentmatch.id,opp.user,'A')">
+                        <button class="col-span-2" @click="updateOpp(currentmatch.id,opp.user,'A','B')">
                             <img width="16" src= "@/assets/fleche_gauche.png" />
                         </button>
                         <span class="col-span-5">{{opp.prenom}}</span>
@@ -44,7 +44,7 @@
                 <div class="flex flex-col gap-2 col-span-2">
                     <div class="grid grid-cols-3" v-for="opp of currentmatch.oppositions.Autres">
                         <span>{{opp.prenom}}</span>
-                        <button2-choix val="0" texte1="A" texte2="B" val1="A" val2="B" @onUpdate="$emit('changeOpp',currentmatch.id,opp.user,$event)"></button2-choix>
+                        <button2-choix val="0" texte1="A" texte2="B" val1="A" val2="B" @onUpdate="updateOpp(currentmatch.id,opp.user,$event,'Autres')"></button2-choix>
                     </div>
                 </div>
             </div>        
@@ -63,8 +63,6 @@
     const emit = defineEmits(['changeMatch','changeOpp'])
 
     const currentmatch = ref(props.matchdetail)
-    const tabselections = ref([])
-    updatetabselections()
 
     function supprime() {
         const result = confirm("Voulez vous vraiment supprimer le match ?")
@@ -74,36 +72,56 @@
         }
     }
 
+    function updateOpp(matchid,userid,val,prev) {
+        let from = null
+        let arr = null
+        console.log(matchid,userid,val)
+        if (prev=='A') {
+            arr = currentmatch.value.oppositions.A.filter( (item) => {
+                    if (item.user==userid) {                    
+                        from=item
+                        return false
+                    }
+                    return true
+                })
+            currentmatch.value.oppositions.A = arr
+        }
+        if (prev=='B') {
+            arr = currentmatch.value.oppositions.B.filter( (item) => {
+                    if (item.user==userid) {                    
+                        from=item
+                        return false
+                    }
+                    return true
+                })
+            currentmatch.value.oppositions.B = arr
+        }
+        if (prev=='Autres') {
+            arr = currentmatch.value.oppositions.Autres.filter( (item) => {
+                    if (item.user==userid) {                    
+                        from=item
+                        return false
+                    }
+                    return true
+                })
+            currentmatch.value.oppositions.Autres = arr
+        }
+        if (val=='A') {currentmatch.value.oppositions.A.push(from)}
+        if (val=='B') {currentmatch.value.oppositions.B.push(from)}
+        if (val=='Autres') {currentmatch.value.oppositions.Autres.push(from)}
+
+        console.log("from:",from," newarray:",arr)
+
+        emit('changeOpp',matchid,userid,val)
+
+    }
+
 
     const onChange = () => {
         emit('changeMatch',currentmatch.value)
     }
         
-    const debouncedOnChange = debounce(onChange, 2000);
-
-    function updatetabselections() {
-        tabselections.value = []
-        if (currentmatch.value.oppositions) {
-            const maxrow = Math.max(currentmatch.value.oppositions.A.length,currentmatch.value.oppositions.B.length,currentmatch.value.oppositions.Autres.length) 
-            
-            for (let i=0;i<maxrow;i++) {
-                let A={"prenom":"","licence":"","user" : null}
-                let B={"prenom":"","licence":"", "user" :null}
-                let Autres={"prenom":"", "user":null}
-                if (i<currentmatch.value.oppositions.A.length) {
-                    A=currentmatch.value.oppositions.A[i]
-                }
-                if (i<currentmatch.value.oppositions.B.length) {
-                    B=currentmatch.value.oppositions.B[i]
-                }
-                if (i<currentmatch.value.oppositions.Autres.length) {
-                    Autres=currentmatch.value.oppositions.Autres[i]
-                }
-                tabselections.value.push([A,B,Autres])
-            }
-        }        
-    }
-
+    const debouncedOnChange = debounce(onChange, 1000);
 
     onBeforeUnmount(() => {
         debouncedOnChange.cancel();
@@ -111,7 +129,6 @@
 
     watch(() => props.matchdetail, (nouvelleValeur) => {
         currentmatch.value = nouvelleValeur
-        updatetabselections()
     });
 
 

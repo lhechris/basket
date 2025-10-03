@@ -12,13 +12,13 @@
     
   const selected = ref(props.val)
   function toggle(clicked) {
-      if (selected.value!=clicked) {
+      //if (selected.value!=clicked) {
         let value=null
         if (clicked == 1) { value=props.val1}
         if (clicked == 2) { value=props.val2}
         
         emits('onUpdate',value)
-      }
+      //}
       selected.value = clicked
   }
 

@@ -1,7 +1,7 @@
 <template>
-    <div class="home">
-      <div class="detailmatch" v-for="(jour,i) of matchs" :key="i" >
-        <div v-if="page==i+1" >
+    <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-1" v-for="(jour,i) of matchs" :key="i" >
+        <div class="flex flex-col gap-1" v-if="page==i+1" >
           <div class="descr bg-2 titre" >
               <span>{{displaydate(jour["jour"])}} </span>
               <cust-pagination message="" v-model="page" :nbpages="matchs.length" />

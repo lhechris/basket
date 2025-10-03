@@ -1,9 +1,9 @@
 <template>
-    <div class="matchs">
-        <div class="descr bg-1">
+    <div class="flex flex-col gap-4 ">
+        <div class="bg-teal-500 rounded-lg pt-2 pb-2">
             <span class="titre">{{matchdetail.titre}}</span><span v-if="currentmatch.horaire">({{currentmatch.horaire}})</span><span>&nbsp;Equipe {{matchdetail.equipe }}</span>
         </div>
-        <div class="main">
+        <div class="main text-xl">
             <table>
                 <thead>
                 </thead>

@@ -1,7 +1,7 @@
 <?php
 require_once("utils.php");
-require_once("Users.php");
-require_once("Matchs.php");
+require_once("users.php");
+require_once("matchs.php");
 
 class Opposition extends CommonModel{
     public Joueur $joueur;

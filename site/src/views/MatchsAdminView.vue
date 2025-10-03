@@ -6,7 +6,7 @@
     <div class="flex md:grid md:grid-cols-6 flex-col gap-1">
       <div class="md:col-span-4 md:col-start-2" v-for="(jour,i) of matchs" :key="i" >        
           <div v-if="page==i+1" class="flex flex-col gap-2">
-            <div class="bg-yellow-400 rounded-md font-bold text-xl" >
+            <div class="bg-amber-500 rounded-md font-bold text-xl" >
                 <span>{{displaydate(jour["jour"])}}</span>
                 <cust-pagination message="" v-model="page" :nbpages="matchs.length" />
             </div>
@@ -54,13 +54,13 @@
 
   function updateMatch(newmatch) {
     setMatch(newmatch)
-    refreshMatch(newmatch.jour)
+    //refreshMatch(newmatch.jour)
   }
 
   function updateOpp(matchid,userid,val) {
     let jour = matchs.value[parseInt(page.value)-1].jour  
     setOpposition(matchid,userid,val);
-    refreshMatch(jour);      
+    //refreshMatch(jour);      
       
   } 
 

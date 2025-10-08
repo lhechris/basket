@@ -99,4 +99,56 @@ th {
     text-align:left
 }
 
+.select-container {
+    margin: 10px;
+    width: 150px;
+}
+
+.styled-select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    color: #333;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+}
+
+/* Style au survol */
+.styled-select:hover {
+    border-color: #888;
+}
+
+/* Style au focus */
+.styled-select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+/* Style des options (limité selon les navigateurs) */
+.styled-select option {
+    padding: 10px;
+    background-color: white;
+    color: #333;
+}
+
+.selection {
+    display:block;
+    margin-left:auto;
+    margin-right:auto;    
+    width: 1200px;
+    height : 800px;
+    /*background-color:darkcyan;*/
+}
+
+
+
 </style>

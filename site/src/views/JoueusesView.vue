@@ -81,44 +81,87 @@
   }
   </script>
 
-<!--  <style scoped>
+<style scoped>
 .main {
-    display:flex;
+    display:block;
     margin-left:auto;
     margin-right:auto;    
     width: 400px;
     height : 500px;
-    align-items:center;
     /*overflow : scroll;
     scrollbar-color: rebeccapurple green;
     scrollbar-width: thin;*/
-}
-.inputdate {
-    width:6em;
-}
-
-.inputresultat {
-    width:4em;
-
-}
-
-button {
-    border-radius: 20%;
-    background-color: coral;
-}
-
-.btndelete {
-    border-radius: 4px;
-    margin : 0;
-    padding : 2px;
-    background-color:  white;
+    /*background-color:chocolate;*/
 }
 
 .disabled {
     background-color: grey;
 }
-input {
-    border-radius : 3px;
-    background-color: rgb(141, 228, 228);
+
+.inputnom {
+    width:100px;
 }
-</style>-->
+.inputbool {
+    width:20px;
+}
+
+.custom-checkbox {
+  display: block;
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  font-size: 1em;
+  user-select: none;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #4CAF50; /* Couleur de fond quand coché */
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.custom-checkbox .checkmark:after {
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+
+
+</style>

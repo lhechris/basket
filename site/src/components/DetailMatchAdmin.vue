@@ -164,8 +164,5 @@ th {
     width:100%;
 }
 
-.main {
-    height:auto;
-}
 
 </style>

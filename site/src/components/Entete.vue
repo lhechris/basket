@@ -1,5 +1,5 @@
 <template>
-    <div class="rounded-md font-bold text-xl flex mb-2" :class="couleur">
+    <div class="rounded-md font-bold text-xl flex mb-2 p-2 gap-2" :class="couleur">
         <cust-pagination message="" v-model="page" :nbpages="nbpages" />
         <slot></slot>
     </div>

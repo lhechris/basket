@@ -26,11 +26,14 @@ class Selections {
 		$matchs = $this->matchs->getArray();
 		$disponibilites = $this->disponibilites->getArray();
 
+		//On récupère toutes les selections des tous les matchs de toutes les équipes
 		$results = $this->db->query('SELECT A.match,A.user,A.val, B.jour, B.titre,B.equipe, C.prenom '.
 									'FROM selections A, matchs B, users C '.
 									'WHERE A.match=B.id AND A.user=C.id '.
 									'ORDER BY B.jour,B.equipe,C.prenom');
 
+		//On classe le résultat par match, 
+		//On crée une liste de match qui contient la liste des joueurs selectionnés
 		$selections = array();
 		while ($row = $results->fetchArray()) {
 			if (!array_key_exists($row['match'],$selections)) {				

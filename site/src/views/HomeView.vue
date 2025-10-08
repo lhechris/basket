@@ -15,32 +15,6 @@
             </template>
         </content>
     </div>
-
-
-
-
-
-
-
-<!--    <div class="main" >
-        <div v-for="(dispo,i) in disponibilites" :key="i">
-            <div v-if="page==i+1">
-                <div class="descr bg-1">
-                    <span class="date">{{ displaydate(dispo.jour) }}</span><br/>
-                    <cust-pagination message="Match" v-model="page" :nbpages="disponibilites.length" />
-                </div>
-                <table>
-                <tr v-for="(u,j) in dispo.users" :key="j">
-                    <th class="text-xl">{{ u.prenom }}</th>
-                    <td>
-                        <Presence :sel="u.dispo" @onUpdate="update(u.id,dispo.jour,$event)"/>
-                    </td>
-                </tr>
-                </table>
-            </div>
-        </div>
-        <cust-pagination message="Match" v-model="page" :nbpages="disponibilites.length" />
-    </div>-->
 </template>
 
 <script setup>

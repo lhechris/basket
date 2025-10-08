@@ -26,7 +26,7 @@
             </div>
             <div class="flex gap-2">
                 <div class="w-30 text-left">Rendez-vous</div>
-                <div class="gras">{{currentmatch.rendezvous}}</div>
+                <div class="font-bold">{{currentmatch.rendezvous}}</div>
             </div>                
             
             <div class="grid grid-cols-5 md:grid-cols-10 gap-1">
@@ -64,24 +64,3 @@
     });
 
 </script>
-
-
-
-<style scoped>
-table {
-    width:100%;
-}
-td {
-    text-align:left;
-}
-
-.joueurs {
-    margin-left : 10px;
-    width:100%;
-}
-
-.main {
-    height:auto;
-}
-
-</style>

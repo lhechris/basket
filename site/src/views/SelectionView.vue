@@ -1,7 +1,6 @@
 <template>
-    <div class="home">
-      <!--<img alt="Vue logo" src="../assets/logo.png">-->
-      <matchs-selection />
+    <div class="flex md:grid md:grid-cols-10 flex-col">
+        <matchs-selection />
     </div>
   </template>
   

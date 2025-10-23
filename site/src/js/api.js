@@ -233,3 +233,7 @@ import 'moment/dist/locale/fr';
 export function displaydate(d) {
     return moment(d).local('fr').format("dddd Do MMMM")
 }
+
+export function displaydatemin(d) {
+    return moment(d).local('fr').format("DD/MM")
+}

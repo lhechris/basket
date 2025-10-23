@@ -1,9 +1,21 @@
 <template>
 
-    <div :class="pres==1 ? 'presok' : pres==2 ? 'prespasok' : 'presundef'" >
-    <!--<span><button class="button-3 absente" :class="selected==0 ? '': 'unselected'" @click="toggle(0)">N</button></span>
-    <span><button class="button-3 presente" :class="selected==1 ? '': 'unselected'" @click="toggle(1)">S</button></span>-->
-    <Toggle v-model="btn.value" v-bind="btn" class="custombtn" @change="montoggle()"/>
+    <div :class="pres==1 ? 'bg-green-400' : pres==2 ? 'bg-red-400' : 'bg-orange-300'" class="">
+    <!--<Toggle v-model="btn.value" v-bind="btn" class="custombtn " @change="montoggle()"/>-->
+    <input 
+            v-model="btn.value" 
+            id="default-checkbox" 
+            type="checkbox" 
+            @change="montoggle()"
+            class="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+    >
+
+    <!--<label class="inline-flex items-center me-5 cursor-pointer">
+      <input type="checkbox" value="" class="sr-only peer" checked>
+      <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600 dark:peer-checked:bg-red-600"></div>
+    </label>-->
+
+
     </div>
 </template>
 
@@ -15,14 +27,20 @@
     const emits=defineEmits(['onUpdate'])
     const props=defineProps(['sel','pres'])
 
+    console.log(props.sel)
+
     const btn = ref({
-                value:props.sel,
+                value:props.sel==1,
                 trueValue:1,
                 falseValue:0,
             })
 
     function montoggle() {
-        emits('onUpdate',btn.value.value)
+        let v=0
+        if (btn.value.value) {
+            v=1
+        }
+        emits('onUpdate',v)
     }
 
 </script>
@@ -33,96 +51,8 @@
 .custombtn {
     --toggle-border-off:rgba(153, 13, 13, 0.5);
     --toggle-bg-off:rgba(153, 13, 13, 0.5);
-    --toggle-width:2rem;
-    --toggle-height:1rem;
+    --toggle-width:1.5rem;
+    --toggle-height:0.8rem;
 }
-
-.imgback {
-    opacity : 0.3;
-    filter:alpha(opacity=30)
-}
-
-.presok {
-    background: rgba(11, 226, 47, 0.5)
-}
-
-.prespasok {
-    background: rgba(224, 14, 14, 0.5)
-}
-.presundef {
-    background: rgba(250, 151, 4, 0.5)
-}
-
-span {
-    margin-left:10px;
-}
-
-/* CSS */
-.button-3 {
-  appearance: none;
-  background-color: #2ea44f;
-  border: 1px solid rgba(27, 31, 35, .15);
-  border-radius: 6px;
-  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 20px;
-  padding: 3px 12px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.presente {
-    background-color: #2ea44f;
-}
-.absente {
-    background-color: #a42e2e;
-}
-.aucun {
-    background-color: #d8a04d;
-}
-
-
-.button-3:focus:not(:focus-visible):not(.focus-visible) {
-  box-shadow: none;
-  outline: none;
-}
-
-.button-3:hover {
-  background-color: #2c974b;
-}
-
-.button-3:focus {
-  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
-  outline: none;
-}
-
-.unselected {
-    background-color: #474646;
-}
-
-.button-3:disabled {
-  background-color: #474646;
-  border-color: rgba(27, 31, 35, .1);
-  color: rgba(255, 255, 255, .8);
-  cursor: default;
-}
-
-.button-3:active {
-  background-color: #298e46;
-  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
-}
-
 
 </style>

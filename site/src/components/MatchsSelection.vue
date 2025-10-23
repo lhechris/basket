@@ -1,29 +1,38 @@
 <template>
-    <div class="selection"  >
-        <div class="select-container"><select class="styled-select" @change="changeEquipe($event)">
+    <div class="md:col-span-8 md:col-start-2 text-xs md:text-base">
+        <div class="select-container">
+            <select class="styled-select" @change="changeEquipe($event)">
                 <option v-for="e in listeequipes" :key="e.id" :value="e">Equipe {{ e }}</option>
             </select>
         </div>
+       
         <div v-for="(equipe,ie) in equipes" :key="ie">
             <table  v-if="equipe.equipe == equipeselected">
                 <thead>
-                <tr>
+                <tr class="">
                     <th></th>
                     <th></th>
-                    <th v-for="(u,j) in equipe['joueurs']" :key="j">{{ u.prenom }}<br/>{{ u.nb }}</th>
-                    <th v-for="(u,j) in equipe['autrejoueurs']" :key="j">{{ u.prenom }}<br/>{{ u.nb }}</th>
+                    <th class="odd:bg-blue-100 max-w-5" v-for="(u,j) in equipe['joueurs']" :key="j">
+                        
+                        <p class="rotate-60 pt-4">{{ u.prenom }}</p>
+                        <p>({{ u.nb }})</p>
+                    </th>
+                    <th class="odd:bg-blue-100 max-w-5" v-for="(u,j) in equipe['autrejoueurs']" :key="j">
+                        <p class="rotate-60">{{ u.prenom }}</p>
+                        <p>({{ u.nb }})</p>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="(s,n) in equipe.matchs" :key="n">                
-                    <th class="thmatch"><RouterLink :to="'/match/'+s.id">{{ s.jour }} - {{ s.titre }}</RouterLink></th>
+                    <th class="thmatch"><RouterLink :to="'/match/'+s.id">{{ displaydatemin(s.jour) }}</RouterLink></th>
                     <th>{{ s.nb }}</th>
-                    <td v-for="(u,j) in s.users" :key="j" >
+                    <td class="odd:bg-blue-100 p-1" v-for="(u,j) in s.users" :key="j" >
                         <Selection :pres="u.dispo" 
                                 :sel="u.selection" 
                                 @onUpdate="update(u.id,s.id,$event)"/>
                     </td>
-                    <td v-for="(u,j) in s.autres" :key="j" >
+                    <td class="odd:bg-blue-100 p-1" v-for="(u,j) in s.autres" :key="j" >
                         <Selection :pres="u.dispo" 
                                 :sel="u.selection" 
                                 @onUpdate="update(u.id,s.id,$event)"/>
@@ -32,51 +41,45 @@
                 </tbody>
             </table>
         </div>
+
+
+
+
     </div>
 </template>
 
-<script>
-import {getSelections,setSelection} from '@/js/api.js'
+<script setup>
+import {getSelections,setSelection,displaydatemin} from '@/js/api.js'
 import Selection from '@/components/Selection.vue'
 import {ref} from 'vue'
 
 import '@coreui/coreui/dist/css/coreui.min.css'
-export default {
+    const equipes = ref([])
+    const listeequipes = ref([])
+    const equipeselected = ref(0)
 
-    components: {
-        Selection
+    getSelections().then( p => {
+        equipes.value = p
         
-  },    
-    setup() {
-        const equipes = ref([])
-        const listeequipes = ref([])
-        const equipeselected = ref(0)
+        listeequipes.value=[]
+        for (let e in p) {
+            listeequipes.value.push(p[e]["equipe"])
+        }
+        equipeselected.value=p[0]['equipe']
+    })
 
-        getSelections().then( p => {
-            equipes.value = p
-           
-            listeequipes.value=[]
-            for (let e in p) {
-                listeequipes.value.push(p[e]["equipe"])
-            }
-            equipeselected.value=p[0]['equipe']
+    function update(usr,match,val) {
+            setSelection(usr,match,val).then( p => {
+                equipes.value = p
         })
-
-        function update(usr,match,val) {
-                setSelection(usr,match,val).then( p => {
-                    equipes.value = p
-            })
-        }
-
-        function changeEquipe(event) {
-            equipeselected.value=event.target.value;
-            
-           
-        }
-
-        return {equipes,equipeselected,update,changeEquipe,listeequipes}
     }
-}
+
+    function changeEquipe(event) {
+        equipeselected.value=event.target.value;
+        
+        
+    }
+
 </script>
 <style scoped>
 

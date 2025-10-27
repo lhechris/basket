@@ -7,6 +7,7 @@ import MatchsAdminView from '../views/MatchsAdminView.vue'
 import JoueusesView from '../views/JoueusesView.vue'
 import MatchAdminView from '../views/MatchAdminView.vue'
 import MatchsView from '../views/MatchsView.vue'
+import FeuilleMatchView from '../views/FeuilleMatch.vue'
 
 const routes = [
   {
@@ -28,11 +29,18 @@ const routes = [
     path: '/matchsadmin',
     name: 'matchsadmin',
     component: MatchsAdminView
-  },  {
+  },
+  {
     path: '/match/:id',
     name: 'match',
     props:true,
     component: MatchAdminView
+  },
+  {
+    path: '/feuillematch/:id',
+    name: 'feuillematch',
+    props:true,
+    component: FeuilleMatchView
   },
   {
     path: '/matchs',

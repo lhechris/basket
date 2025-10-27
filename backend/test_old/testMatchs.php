@@ -2,12 +2,12 @@
 include_once("../api/env.php");
 include_once("../api/donnees.php");
 include_once("../api/matchs.php");
-include_once("../api/oppositions.php");
+include_once("../api/matchinfos.php");
 include_once("./utilsTest.php");
 
 loadEnv(".env");
 $donnees = new Donnees();
-$oppositions = new Oppositions($donnees);
+$oppositions = new MatchInfos($donnees);
 
 //creation BD de test
 $sql= file_get_contents("../config/createdb.sql");
@@ -104,9 +104,9 @@ function test_getMatchsAvecOppositionsArray() {
                     "selections" : null,
                     "oppositions": {"A" : [] , 
                                     "B" : [], 
-                                    "Autres" : [{"user": 2, "prenom" :"fifi", "licence" : "BC011002", "val":null},
-                                                {"user": 3, "prenom" :"loulou", "licence" : "BC011003", "val":null},
-                                                {"user": 1, "prenom" :"riri", "licence" : "BC011001", "val":null}]
+                                    "Autres" : [{"user": 2, "prenom" :"fifi",  "opposition":null, "numero" : null, "commentaire" : null},
+                                                {"user": 3, "prenom" :"loulou", "opposition":null, "numero" : null, "commentaire" : null},
+                                                {"user": 1, "prenom" :"riri", "opposition":null, "numero" : null, "commentaire" : null}]
                                    },
                     "adresse" : null,
                     "horaire" : null,
@@ -161,9 +161,9 @@ function test_getArrayMatch() {
              "oppositions": { "A" : [], 
                               "B" : [], 
                               "Autres": [
-                        {"user" : 2, "prenom" : "fifi", "val" : null,"licence": "BC011002"},
-                        {"user" : 3, "prenom" : "loulou", "val" : null,"licence": "BC011003" },
-                        {"user" : 1, "prenom" : "riri", "val" : null,"licence": "BC011001"  } ]
+                        {"user" : 2, "prenom" : "fifi", "opposition" : null, "numero":null, "commentaire":null},
+                        {"user" : 3, "prenom" : "loulou", "opposition" : null, "numero":null, "commentaire":null },
+                        {"user" : 1, "prenom" : "riri", "opposition" : null, "numero":null, "commentaire":null  } ]
                             },
             "selections" : null,
             "adresse" : null,

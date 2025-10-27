@@ -13,7 +13,7 @@
             </div>            
 
         </div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 ">
             <div class="flex gap-2"><div class="text-left w-40">Score</div><input class="w-full bg-teal-300" v-model="currentmatch.score"  @input="debouncedOnChange()"/></div>
             <div class="flex gap-2"><div class="text-left w-40">Collation</div><input class="w-full bg-teal-300" v-model="currentmatch.collation"  @input="debouncedOnChange()"/></div>
             <div class="flex gap-2"><div class="text-left w-40">OTM</div><input class="w-full bg-teal-300" v-model="currentmatch.otm"  @input="debouncedOnChange()"/></div>
@@ -21,12 +21,17 @@
             <div class="flex gap-2"><div class="text-left w-40">Adresse</div><textarea class="w-full bg-teal-300" v-model="currentmatch.adresse"  @input="debouncedOnChange()"></textarea></div>
             <div class="flex gap-2"><div class="text-left w-40">Horaire</div><input class="w-full bg-teal-300" v-model="currentmatch.horaire"  @input="debouncedOnChange()"/></div>
             <div class="flex gap-2"><div class="text-left w-40">Rendez-vous</div><input class="w-full bg-teal-300" v-model="currentmatch.rendezvous"  @input="debouncedOnChange()"/></div>
-            <div class="grid grid-cols-8 text-lg">
+            <div class="grid grid-cols-8 text-lg" v-if="currentmatch.oppositions">
                 <div class="font-bold text-left col-span-3">Opposition A</div><div class="font-bold text-left col-span-3">Opposition B</div><div class="font-bold col-span-2">-</div>
                 <div class="flex flex-col gap-2 col-span-3">
                     <div class="grid grid-cols-12 gap-2 text-left" v-for="opp of currentmatch.oppositions.A">
                         <span class="col-span-5">{{opp.prenom}}</span>
-                        <span class="col-span-5">{{ opp.licence }}</span>
+                        <span class="col-span-5">
+                            <input type="number" 
+                                   class="w-full bg-teal-300"
+                                   v-model="opp.numero"
+                                   @input="debouncedOnChangeNumero(currentmatch.id,opp.user,'A',opp.numero)"/>
+                        </span>
                         <button class="col-span-2" @click="updateOpp(currentmatch.id,opp.user,'B','A')">
                             <img src= "@/assets/fleche_droite.png" width="16"/>
                         </button>
@@ -38,7 +43,12 @@
                             <img width="16" src= "@/assets/fleche_gauche.png" />
                         </button>
                         <span class="col-span-5">{{opp.prenom}}</span>
-                        <span class="col-span-5">{{ opp.licence }}</span>
+                        <span class="col-span-5">
+                            <input type="number" 
+                                   class="w-full bg-teal-300" 
+                                   v-model="opp.numero"
+                                   @input="debouncedOnChangeNumero(currentmatch.id,opp.user,'B',opp.numero)"/>
+                        </span>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2 col-span-2">
@@ -47,7 +57,14 @@
                         <button2-choix val="0" texte1="A" texte2="B" val1="A" val2="B" @onUpdate="updateOpp(currentmatch.id,opp.user,$event,'Autres')"></button2-choix>
                     </div>
                 </div>
-            </div>        
+            </div> 
+            <div class="mb-5 flex items-start">
+                <router-link 
+                    role="button" 
+                    :to="'/feuillematch/'+currentmatch.id"
+                    class="text-decoration-none inline-flex items-center justify-center rounded-lg bg-blue-500 py-1 px-3 text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-85 focus:outline-none active:opacity-85"
+                >Feuille de match</router-link>                
+            </div>       
         </div>        
     </div>
 </template>
@@ -75,7 +92,6 @@
     function updateOpp(matchid,userid,val,prev) {
         let from = null
         let arr = null
-        console.log(matchid,userid,val)
         if (prev=='A') {
             arr = currentmatch.value.oppositions.A.filter( (item) => {
                     if (item.user==userid) {                    
@@ -110,8 +126,6 @@
         if (val=='B') {currentmatch.value.oppositions.B.push(from)}
         if (val=='Autres') {currentmatch.value.oppositions.Autres.push(from)}
 
-        console.log("from:",from," newarray:",arr)
-
         emit('changeOpp',matchid,userid,val)
 
     }
@@ -120,8 +134,14 @@
     const onChange = () => {
         emit('changeMatch',currentmatch.value)
     }
-        
+
+    const onChangeNumero = (matchid,userid,opposition,numero) => {
+        console.log("onChangeNumero(",matchid,userid,opposition,numero,")" )
+        emit('changeOpp', matchid,userid,opposition,numero,'')
+    }
+
     const debouncedOnChange = debounce(onChange, 1000);
+    const debouncedOnChangeNumero = debounce(onChangeNumero, 1000);
 
     onBeforeUnmount(() => {
         debouncedOnChange.cancel();

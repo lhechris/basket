@@ -3,7 +3,7 @@
     <div class="grid grid-cols-6 mb-2 pl-1">
         <button class="btn btn-primary" @click="ajouteMatch()">Créer un match</button>
     </div>
-      <content  v-for="(jour,i) of matchs" :key="i" :index="i" couleur="bg-teal-600" :nbpages="matchs.length" v-model="page">        
+    <content  v-for="(jour,i) of matchs" :key="i" :index="i" couleur="bg-teal-600" :nbpages="matchs.length" v-model="page">        
             <template #titre>
                 <span>{{displaydate(jour["jour"])}}</span>
             </template>
@@ -12,8 +12,8 @@
                   <detail-match-admin :matchdetail="match" @change-match="updateMatch" @changeOpp="updateOpp" /> 
               </div>
             </template>
-        </content>
-    </div>
+      </content>      
+  </div>
 </template>
   
   <script setup>
@@ -54,9 +54,9 @@
     //refreshMatch(newmatch.jour)
   }
 
-  function updateOpp(matchid,userid,val) {
+  function updateOpp(matchid,userid,val,numero,commentaire) {
     let jour = matchs.value[parseInt(page.value)-1].jour  
-    setOpposition(matchid,userid,val);
+    setOpposition(matchid,userid,val,numero,commentaire);
     //refreshMatch(jour);      
       
   } 

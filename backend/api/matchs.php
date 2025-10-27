@@ -4,12 +4,12 @@ require_once("utils.php");
 
 class Matchbasket extends CommonModel {
 
-	public $id,$equipe,$jour,$titre,$score,$otm,$collation,$maillots,$oppositions;
+	public $id,$equipe,$jour,$titre,$score,$otm,$collation,$maillots,$matchinfos;
 	public $adresse,$horaire,$rendezvous;
 
 	public function to_array() : array {
 		
-		$opps = $this->toarrayrecursif($this->oppositions);
+		$opps = $this->toarrayrecursif($this->matchinfos);
 		if (($opps!=null) && (count($opps)==1)) {
 			$opps=$opps[0];
 		}
@@ -44,7 +44,7 @@ class Matchbasket extends CommonModel {
 		$this->adresse = $this->nullifnotexists($data,"adresse");
 		$this->horaire = $this->nullifnotexists($data,"horaire");
 		$this->rendezvous = $this->nullifnotexists($data,"rendezvous");
-		$this->oppositions = null;
+		$this->matchinfos = null;
 		$this->selections = null;
 	}
 
@@ -86,10 +86,10 @@ class MatchsParJour extends CommonModel {
 
 class Matchs extends CommonCtrl{
 
-	private $oppositions;
+	private $matchinfos;
 
-	public function __construct($donnees,$oppositions) {
-		$this->oppositions = $oppositions;
+	public function __construct($donnees,$matchinfos) {
+		$this->matchinfos = $matchinfos;
 		parent::__construct($donnees);
 	}
 
@@ -100,8 +100,8 @@ class Matchs extends CommonCtrl{
 		} else {
 			$results = $this->query('SELECT * FROM matchs WHERE id=:id',[[':id',intval($id),SQLITE3_INTEGER]],'MatchBasket');
 			if (count($results)>0) {
-				$o = $this->oppositions->getArray($id);
-				$results[0]->oppositions = $o;
+				$o = $this->matchinfos->getArray($id);
+				$results[0]->matchinfos = $o;
 			}
 		}
 
@@ -116,8 +116,8 @@ class Matchs extends CommonCtrl{
 
 		foreach($allmatchs as &$m) {			
 		
-			$o = $this->oppositions->getArray($m->id);
-			$m->oppositions = $o;
+			$o = $this->matchinfos->getArray($m->id);
+			$m->matchinfos = $o;
 
 			$notfound=true;
 			foreach($results as &$res) {
@@ -147,7 +147,7 @@ class Matchs extends CommonCtrl{
 
 		foreach($allmatchs as &$m) {			
 			$s = $this->query('SELECT A.user,C.prenom '.
-					 'FROM selections A, matchs B, users C,oppositions D '.
+					 'FROM selections A, matchs B, users C,matchinfos D '.
 					 'WHERE A.match=B.id AND A.user=C.id AND B.id=:id AND D.match=B.id AND D.user=C.id '.
 					 'ORDER BY C.prenom',[[':id',intval($m->id),SQLITE3_INTEGER]],'SelectionMatch');			
 			$m->selections = $s;
@@ -256,15 +256,15 @@ class Matchs extends CommonCtrl{
 		$sql='DELETE FROM selections WHERE match=:id';
 		$this->query ($sql,[[':id', $id, SQLITE3_INTEGER]]);
 
-		$sql='DELETE FROM oppositions WHERE match=:id';
+		$sql='DELETE FROM matchinfos WHERE match=:id';
 		$this->query ($sql,[[':id', $id, SQLITE3_INTEGER]]);
 
 	}
 
 
 	private function setOne($tab) {
-		loginfo("setOne");
-		loginfo(print_r($tab,true));
+		//loginfo("setOne");
+		//loginfo(print_r($tab,true));
 		if (is_array($tab) && 
 			array_key_exists("titre",$tab) && 
 			array_key_exists("jour",$tab) && 
@@ -274,8 +274,7 @@ class Matchs extends CommonCtrl{
 			array_key_exists("otm",$tab) &&
 			array_key_exists("maillots",$tab)
 			) {
-
-			loginfo("ici");
+		
 
 			if (array_key_exists("id",$tab)) {
 				if (array_key_exists("todelete",$tab)) {

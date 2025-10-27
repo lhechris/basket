@@ -13,13 +13,13 @@ include_once("auth.php");
 include_once("presences.php");
 include_once("disponibilites.php");
 include_once("selections.php");
-include_once("oppositions.php");
+include_once("matchinfos.php");
 include_once("donnees.php");
 
 $donnees = new Donnees();
 $users = new Users($donnees);
-$oppositions = new Oppositions($donnees);
-$matchs = new Matchs($donnees,$oppositions);
+$matchinfo = new MatchInfos($donnees);
+$matchs = new Matchs($donnees,$matchinfo);
 $entrainements=new Entrainements($donnees);
 $presences = new Presences($donnees,$users,$entrainements);
 $disponibilites = new Disponibilites($donnees,$users,$matchs);
@@ -71,13 +71,12 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 		}
 	
 	} else 	if (array_key_exists('oppositions',$_GET)) {
-		loginfo("arf");
+		
 		if (islogged()) {
-			$oppositions->get($_GET['oppositions']);
+			$matchinfo->get($_GET['oppositions']);
 		} else {
 			responseJson(array());
 		}
-
 	} else 	if (array_key_exists('disponibilites',$_GET)) {
 		$disponibilites->get();
 
@@ -128,11 +127,10 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 		}
 
 	} else if (array_key_exists("usr",$json) && array_key_exists("match",$json) && array_key_exists("opposition",$json)) {
-		//SELECTION
+		//OPPOSITION
 		if (islogged()) {
-			return $oppositions->set($json);
+			return $matchinfo->set($json);
 		}
-	
 	} else if (array_key_exists("type",$json) && (array_key_exists("tab",$json))&& (islogged())) {
 		if ($json["type"]=="matchs") {
 			//MATCHS

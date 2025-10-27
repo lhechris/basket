@@ -4,5 +4,7 @@ CREATE TABLE disponibilites(jour integer,user integer,val integer);
 CREATE TABLE selections(match integer,user integer,val integer);
 CREATE TABLE entrainements(id integer primary key,jour text,titre text);
 CREATE TABLE presences(entrainement integer, user integer,val integer);
-CREATE TABLE oppositions(user integer,match integer,val text);
+CREATE TABLE matchinfos(user integer,match integer,opposition text, numero integer, commentaire text);
 
+ALTER TABLE matchinfos RENAME COLUMN val TO opposition;
+ALTER TABLE matchinfos ADD COLUMN commentaire TEXT

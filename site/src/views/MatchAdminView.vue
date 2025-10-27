@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-1">
-      <DetailMatchAdmin :matchdetail="match" @changeOpp="updateOpp" @change-match="updateMatch"/> 
+      <DetailMatchAdmin :matchdetail="match" @changeOpp="updateOpp" @change-match="updateMatch" /> 
   
     </div>
   </template>
@@ -24,8 +24,8 @@
     setMatch(newmatch)
   }
 
-  function updateOpp(matchid,userid,val) {
-      setOpposition(matchid,userid,val);
+  function updateOpp(matchid,userid,opposition,numero,commentaire) {
+      setOpposition(matchid,userid,opposition,numero,commentaire);
       refreshMatch();      
       
   } 

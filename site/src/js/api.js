@@ -53,15 +53,16 @@ export function setMatch(onematch) {
     });
 }
 
-
-export function setOpposition(matchid,userid,val) {
-    var baseurl = "/api/";
-
+export function setOpposition(matchid,userid,val,numero,commentaire) {
+    var baseurl = "/api/"
+    numero=parseInt(numero)
     return new Promise((successClbk,failClbk) => {
         axios.post(baseurl, {
             usr:userid,
             match:matchid,
-            opposition:val
+            opposition:val,
+            numero:numero,
+            commentaire:commentaire            
         }).then(response =>{
             var r=response.data;        
             successClbk(r);

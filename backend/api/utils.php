@@ -43,7 +43,8 @@ class CommonCtrl {
 		
 		$stmt = $this->db->prepare($sql);
 		if ($stmt===false) {
-			loginfo("Erreur prepare");
+			loginfo("Erreur prepare : ".$this->db->lastErrorMsg());
+			loginfo($sql);
 			return;
 		}
 
@@ -51,6 +52,8 @@ class CommonCtrl {
 
 		foreach ($binds as $bind) {
 			if (! $stmt->bindValue($bind[0],$bind[1],$bind[2])) {
+				loginfo("Erreur binding : ".$this->db->lastErrorMsg());
+				loginfo($sql);
 				$bindingok = false;
 			}
 		}
@@ -58,7 +61,8 @@ class CommonCtrl {
         if ($bindingok ) {
 
             $results = $stmt->execute();
-			
+			//loginfo($stmt->getSQL(true));
+
             if ($results===false) {
 				loginfo($stmt->getSQL(true));
                 loginfo("Erreur");
@@ -70,8 +74,11 @@ class CommonCtrl {
 						$obj->from_array($row);
 						array_push($datas,$obj);
 					}
+				} else {
+					$datas = true;
 				}
-				$stmt->reset();        
+
+				$stmt->reset(); 
 				return $datas;
 			}
         } 

@@ -27,8 +27,6 @@
     const emits=defineEmits(['onUpdate'])
     const props=defineProps(['sel','pres'])
 
-    console.log(props.sel)
-
     const btn = ref({
                 value:props.sel==1,
                 trueValue:1,

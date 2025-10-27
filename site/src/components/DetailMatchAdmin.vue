@@ -136,7 +136,6 @@
     }
 
     const onChangeNumero = (matchid,userid,opposition,numero) => {
-        console.log("onChangeNumero(",matchid,userid,opposition,numero,")" )
         emit('changeOpp', matchid,userid,opposition,numero,'')
     }
 

@@ -175,7 +175,6 @@ class Selections {
 				return false;
 			}
 			while ($row = $result->fetchArray()) {
-				loginfo($row[0]);
 				return ($row[0] >= 1);
 			}
 			

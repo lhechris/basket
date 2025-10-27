@@ -263,8 +263,6 @@ class Matchs extends CommonCtrl{
 
 
 	private function setOne($tab) {
-		//loginfo("setOne");
-		//loginfo(print_r($tab,true));
 		if (is_array($tab) && 
 			array_key_exists("titre",$tab) && 
 			array_key_exists("jour",$tab) && 
@@ -278,11 +276,9 @@ class Matchs extends CommonCtrl{
 
 			if (array_key_exists("id",$tab)) {
 				if (array_key_exists("todelete",$tab)) {
-					loginfo("todelete");
 					$this->supprime($tab["id"]);
 
 				} else {
-					loginfo("update");
 					$this->update($tab["id"],
 								  $tab["equipe"],
 								  $tab["titre"],
@@ -301,7 +297,6 @@ class Matchs extends CommonCtrl{
 				/**
 				 * Il n'y a pas d'id pour ce match c'est donc un ajout 
 				 */
-				loginfo("la");
 				$this->ajoute($tab["equipe"],
 							  $tab["titre"],
 							  $tab["score"],
@@ -315,7 +310,6 @@ class Matchs extends CommonCtrl{
 							);
 			}			
 		}
-		loginfo("end");
 	}
 
 

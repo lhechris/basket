@@ -52,6 +52,14 @@ class ListMatchInfo extends CommonModel {
 
 }
 
+// Callback de usort pour trier les opposition par numero
+function cb_tri($a,$b) {
+    if ($a->numero === null) return 1;
+    if ($b->numero === null) return -1;
+    $ret=$a->numero - $b->numero;
+    return $a->numero - $b->numero;
+}
+
 class MatchInfos extends CommonCtrl {
 
     public function getArray($match) {     
@@ -63,7 +71,6 @@ class MatchInfos extends CommonCtrl {
                  'ORDER BY C.prenom';
 
 		$opps = $this->query($query, [[':match',$match, SQLITE3_INTEGER]],'MatchInfo');
-        //loginfo(print_r($opps,true));
 
         //on ajoute tous les joueurs sélectionnées pour le match et qui ne sont pas dans 
         //la table oppositions
@@ -73,7 +80,6 @@ class MatchInfos extends CommonCtrl {
                  'ORDER BY C.prenom';
 
 		$selectionnes = $this->query($query, [[':match',$match, SQLITE3_INTEGER]],'MatchInfo');
-        //loginfo(print_r($selectionnes,true));
 
         $ret = new ListMatchInfo();
 
@@ -89,12 +95,8 @@ class MatchInfos extends CommonCtrl {
             else if ($sel->opposition == 'B') { array_push($ret->b, $sel); }
             else  { array_push($ret->autres, $sel); }
         }
-        usort($ret->a, function($a, $b) {
-            if ($a->numero === null) return 1;
-            if ($b->numero === null) return -1;
-            return $a->numero - $b->numero;
-        });
-
+        usort($ret->a, "cb_tri");
+        usort($ret->b, "cb_tri");
         return array($ret);
 
     }

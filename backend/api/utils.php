@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * 
+ */
+function retourneErreur($content) {
+    header("Content-Type:text/html");
+    header("HTTP/1.1 400");
+    echo ($content);
+}
+
+/**
+ * 
+ */
+function retourneNotAuth() {
+    header("Content-Type:text/html");
+    header("HTTP/1.1 401");
+    echo ("Désolé");
+}
+
+
 function responseError($msg) {
     header("Content-Type:text/html");
 	header("HTTP/1.1 400");

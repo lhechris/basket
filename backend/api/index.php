@@ -28,8 +28,7 @@ $selections = new Selections($donnees,$users,$matchs,$disponibilites);
 
 if ($_SERVER["REQUEST_METHOD"]=="GET") { 
 	//Gestion du GET
-
- 	if (array_key_exists('users',$_GET)) {
+	if (array_key_exists('users',$_GET)) {
 		$users->get();
 
 	} else 	if (array_key_exists('matchs',$_GET)) {
@@ -77,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 		} else {
 			responseJson(array());
 		}
-	} else 	if (array_key_exists('disponibilites',$_GET)) {
+	} else 	if (array_key_exists('disponibilites',$_GET)) {		
 		$disponibilites->get();
 
 	} else 	if (array_key_exists('selections',$_GET)) {
@@ -86,8 +85,11 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 		} else {
 			responseJson(array());
 		}
-	} else 	if (array_key_exists('islogged',$_GET)) {
+	} else 	if (array_key_exists('islogged',$_GET)) {	
 			getIslogged();
+
+	} else {
+		retourneErreur("Bad Request");
 	}
 
 
@@ -156,24 +158,6 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 else 
 {
 	retourneErreur("Invalid Request");
-}
-
-/**
- * 
- */
-function retourneErreur($content) {
-	header("Content-Type:text/html");
-	header("HTTP/1.1 400");
-	echo ($content);
-}
-
-/**
- * 
- */
-function retourneNotAuth() {
-	header("Content-Type:text/html");
-	header("HTTP/1.1 401");
-	echo ("Désolé");
 }
 
 

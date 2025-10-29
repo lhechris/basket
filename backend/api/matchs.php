@@ -4,12 +4,12 @@ require_once("utils.php");
 
 class Matchbasket extends CommonModel {
 
-	public $id,$equipe,$jour,$titre,$score,$otm,$collation,$maillots,$matchinfos;
-	public $adresse,$horaire,$rendezvous;
+	public $id,$equipe,$jour,$titre,$score,$otm,$collation,$maillots,$matchinfo;
+	public $adresse,$horaire,$rendezvous,$selections;
 
 	public function to_array() : array {
 		
-		$opps = $this->toarrayrecursif($this->matchinfos);
+		$opps = $this->toarrayrecursif($this->matchinfo);
 		if (($opps!=null) && (count($opps)==1)) {
 			$opps=$opps[0];
 		}
@@ -44,7 +44,7 @@ class Matchbasket extends CommonModel {
 		$this->adresse = $this->nullifnotexists($data,"adresse");
 		$this->horaire = $this->nullifnotexists($data,"horaire");
 		$this->rendezvous = $this->nullifnotexists($data,"rendezvous");
-		$this->matchinfos = null;
+		$this->matchinfo = null;
 		$this->selections = null;
 	}
 
@@ -101,7 +101,7 @@ class Matchs extends CommonCtrl{
 			$results = $this->query('SELECT * FROM matchs WHERE id=:id',[[':id',intval($id),SQLITE3_INTEGER]],'MatchBasket');
 			if (count($results)>0) {
 				$o = $this->matchinfos->getArray($id);
-				$results[0]->matchinfos = $o;
+				$results[0]->matchinfo = $o;
 			}
 		}
 
@@ -117,7 +117,7 @@ class Matchs extends CommonCtrl{
 		foreach($allmatchs as &$m) {			
 		
 			$o = $this->matchinfos->getArray($m->id);
-			$m->matchinfos = $o;
+			$m->matchinfo = $o;
 
 			$notfound=true;
 			foreach($results as &$res) {

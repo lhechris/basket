@@ -43,18 +43,22 @@ class MatchInfosTest extends TestCase
     protected function setUp(): void {
         $this->matchInfos = new MatchInfos(self::$donnees);
     }
+
+
+    /**
+     * GetArray
+     */
     public function testGetArray()
     {
         $match = 1; // Assuming match 1 exists in the database
         $result = $this->matchInfos->getArray($match);
 
-        $this->assertIsArray($result);
+        //On doit avoir un seul enregistrement de ListMatchInfo
+        $this->assertIsArray($result);        
+        $this->assertEquals(1,count($result));        
         $this->assertInstanceOf(ListMatchInfo::class, $result[0]);
 
-        //On doit avoir un seul enregistrement de ListMatchInfo
-        $this->assertEquals(1,count($result));
-        $li = $result[0];
-        $this->assertInstanceOf(ListMatchInfo::class, $li);
+        $li = $result[0];        
 
         $a = $li->a;
         $b = $li->b;
@@ -65,16 +69,16 @@ class MatchInfosTest extends TestCase
         $this->assertEquals(1,count($autres));
         
         $this->assertInstanceOf(MatchInfo::class,$a[0]);
-        $this->assertEquals(2,      $a[0]->joueur->id);
-        $this->assertEquals("fifi", $a[0]->joueur->prenom);
-        $this->assertEquals("A",    $a[0]->opposition);
-        $this->assertEquals(5,      $a[0]->numero);
+        $this->assertEquals(1,     $a[0]->joueur->id);
+        $this->assertEquals("riri",$a[0]->joueur->prenom);
+        $this->assertEquals("A",   $a[0]->opposition);
+        $this->assertEquals(4,     $a[0]->numero);
 
         $this->assertInstanceOf(MatchInfo::class,$a[1]);
-        $this->assertEquals(1,     $a[1]->joueur->id);
-        $this->assertEquals("riri",$a[1]->joueur->prenom);
-        $this->assertEquals("A",   $a[1]->opposition);
-        $this->assertEquals(4,     $a[1]->numero);
+        $this->assertEquals(2,      $a[1]->joueur->id);
+        $this->assertEquals("fifi", $a[1]->joueur->prenom);
+        $this->assertEquals("A",    $a[1]->opposition);
+        $this->assertEquals(5,      $a[1]->numero);
 
         $this->assertInstanceOf(MatchInfo::class,$b[0]);
         $this->assertEquals(3,       $b[0]->joueur->id);
@@ -119,7 +123,7 @@ class MatchInfosTest extends TestCase
     {
         $json = [
             'match' => 1,
-            'usr' => 4, // Assuming user 5 exists
+            'usr' => 4, // Assuming user 4 exists
             'opposition' => "B",
             'numero' => 20,
             'commentaire' => "Updated comment"
@@ -143,11 +147,11 @@ class MatchInfosTest extends TestCase
         $this->assertEquals(2,count($li->b));
         $this->assertEquals(0,count($li->autres));
 
-        $this->assertEquals(4,      $li->b[0]->joueur->id);
-        $this->assertEquals("daisy",$li->b[0]->joueur->prenom);
-        $this->assertEquals("B",    $li->b[0]->opposition);
-        $this->assertEquals($json['numero'], $li->b[0]->numero);
-        $this->assertEquals($json['commentaire'], $li->b[0]->commentaire);
+        $this->assertEquals(4,      $li->b[1]->joueur->id);
+        $this->assertEquals("daisy",$li->b[1]->joueur->prenom);
+        $this->assertEquals("B",    $li->b[1]->opposition);
+        $this->assertEquals($json['numero'], $li->b[1]->numero);
+        $this->assertEquals($json['commentaire'], $li->b[1]->commentaire);
     }
 
     public function testUpdateNonExistentRecord()

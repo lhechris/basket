@@ -33,14 +33,14 @@
                                    @input="debouncedOnChangeNumero(currentmatch.id,opp.user,'A',opp.numero)"/>
                         </span>
                         <button class="col-span-2" @click="updateOpp(currentmatch.id,opp.user,'B','A')">
-                            <img src= "@/assets/fleche_droite.png" width="16"/>
+                            <img src= "../assets/fleche_droite.png" width="16"/>
                         </button>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2 col-span-3">
                     <div class="grid grid-cols-12 text-left" v-for="opp of currentmatch.oppositions.B">
                         <button class="col-span-2" @click="updateOpp(currentmatch.id,opp.user,'A','B')">
-                            <img width="16" src= "@/assets/fleche_gauche.png" />
+                            <img width="16" src= "../assets/fleche_gauche.png" />
                         </button>
                         <span class="col-span-5">{{opp.prenom}}</span>
                         <span class="col-span-5">

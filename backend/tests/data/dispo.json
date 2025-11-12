@@ -1,0 +1,19 @@
+    
+[
+    {
+        "jour": "2025-09-01",
+        "users": [{"id": 4,"dispo": 0,"prenom": "daisy"},
+                    {"id": 2,"dispo": 1,"prenom": "fifi"},
+                    {"id": 3,"dispo": 0,"prenom": "loulou"},
+                    {"id": 1,"dispo": 1,"prenom": "riri"}],
+        "titre": "sans titre"
+    },
+    {
+        "jour": "2025-09-08",
+        "users": [{"id": 4,"dispo": 0,"prenom": "daisy"},
+                    {"id": 2,"dispo": 0,"prenom": "fifi"},
+                    {"id": 3,"dispo": 0,"prenom": "loulou"},
+                    {"id": 1,"dispo": 0,"prenom": "riri"}],
+        "titre": "sans titre"
+    }
+]

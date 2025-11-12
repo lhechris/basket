@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-    import CustPagination from '@/components/CustPagination.vue'
+    import CustPagination from '../components/CustPagination.vue'
 
     const props = defineProps(["nbpages","couleur"])
     const page = defineModel()

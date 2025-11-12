@@ -1,0 +1,114 @@
+{
+
+"jours" : [
+    {"jour":"2025-09-01", 
+     "matchs" : [
+        {"id" : 1 , "equipe" : 1 , "nb" : 2},
+        {"id" : 2 , "equipe" : 2 , "nb" : 0}]
+    },
+    {"jour" : "2025-09-08" , 
+     "matchs" : [
+        {"id" : 3 , "equipe" : 2, "nb" : 0}]
+    },
+    {"jour" : "2025-09-09" , 
+     "matchs" : [
+        {"id" : 4 , "equipe" : 1, "nb" : 0}]
+    }
+],
+ "joueurs" : [    
+    { 
+      "id" : 4,
+      "prenom" : "daisy",
+      "nb" : 0,
+      "jours" : [
+          {"jour":"2025-09-01", 
+          "dispo" : 1,
+          "matchs" : [
+              {"id" : 1 , "equipe" : 1 , "nb" : 2},
+              {"id" : 2 , "equipe" : 2 , "nb" : 0}]
+          },
+          {"jour" : "2025-09-08" , 
+          "dispo" : 0,
+          "matchs" : [
+              {"id" : 3 , "equipe" : 2, "nb" : 0}]
+          },
+          {"jour" : "2025-09-09" , 
+          "dispo" : 0,
+          "matchs" : [
+              {"id" : 4 , "equipe" : 1, "nb" : 0}]
+          }
+      ]
+    },
+    { 
+      "id" : 2,
+      "prenom" : "fifi",
+      "nb" : 0,
+      "jours" : [
+          {"jour":"2025-09-01", 
+          "dispo" : 1,
+          "matchs" : [
+              {"id" : 1 , "equipe" : 1 , "nb" : 2},
+              {"id" : 2 , "equipe" : 2 , "nb" : 0}]
+          },
+          {"jour" : "2025-09-08" , 
+          "dispo" : 0,
+          "matchs" : [
+              {"id" : 3 , "equipe" : 2, "nb" : 0}]
+          },
+          {"jour" : "2025-09-09" , 
+          "dispo" : 0,
+          "matchs" : [
+              {"id" : 4 , "equipe" : 1, "nb" : 0}]
+          }
+      ]
+    },
+    { 
+      "id" : 3,
+      "prenom" : "loulou",
+      "nb" : 1,
+      "jours" : [
+          {"jour":"2025-09-01", 
+          "dispo" : 1,
+          "matchs" : [
+              {"id" : 1 , "equipe" : 1 , "nb" : 2, "selection" : 1} ,
+              {"id" : 2 , "equipe" : 2 , "nb" : 0}]
+          },
+          {"jour" : "2025-09-08" , 
+          "dispo" : 0,
+          "matchs" : [
+              {"id" : 3 , "equipe" : 2, "nb" : 0}]
+          },
+          {"jour" : "2025-09-09" , 
+          "dispo" : 0,
+          "matchs" : [
+              {"id" : 4 , "equipe" : 1, "nb" : 0}]
+          }
+      ]
+    },
+    { 
+      "id" : 1,
+      "prenom" : "riri",
+      "nb" : 1,
+      "jours" : [
+          {"jour":"2025-09-01", 
+          "dispo" : 2,
+          "matchs" : [
+              {"id" : 1 , "equipe" : 1 , "nb" : 2, "selection" : 1} ,
+              {"id" : 2 , "equipe" : 2 , "nb" : 0}]
+          },
+          {"jour" : "2025-09-08" , 
+          "dispo" : 0,
+          "matchs" : [
+              {"id" : 3 , "equipe" : 2, "nb" : 0}]
+          },
+          {"jour" : "2025-09-09" , 
+          "dispo" : 0,
+          "matchs" : [
+              {"id" : 4 , "equipe" : 1, "nb" : 0}]
+          }
+      ]
+    }
+
+
+]
+}

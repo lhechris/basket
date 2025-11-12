@@ -56,6 +56,41 @@ class MatchsTest extends TestCase
     }
 
     /**
+     * Pour tester l'interface on verifie que l'on genere bien le json de sortie 
+     * definie dans le repertoire data et qui est utilisé par les tests du front (vitest)
+     */
+    public function testGet() 
+    {
+        ob_start();
+        $this->matchs->get();
+        $output = ob_get_clean();
+
+        $json=json_decode($output,true);
+
+        $expected = json_decode(file_get_contents('tests/data/matchs.json'),true);
+        $this->assertEquals($expected, $json);
+   
+    }
+
+    /**
+     * Pour tester l'interface on verifie que l'on genere bien le json de sortie 
+     * definie dans le repertoire data et qui est utilisé par les tests du front (vitest)
+     */
+    public function testGetAvecSelections() 
+    {
+        ob_start();
+        $this->matchs->getAvecSelections();
+        $output = ob_get_clean();
+
+        $json=json_decode($output,true);
+
+        $expected = json_decode(file_get_contents('tests/data/matchsavecsel.json'),true);
+        $this->assertEquals($expected, $json);
+   
+    }
+
+
+    /**
      * GetArray
      */
     public function testGetArrayAllMatchs()

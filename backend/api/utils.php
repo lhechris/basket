@@ -84,7 +84,7 @@ class CommonCtrl {
 
             if ($results===false) {
 				loginfo($stmt->getSQL(true));
-                loginfo("Erreur");
+                loginfo("Erreur");				
             } else {				
 				$datas = array();
 				if ($classname !== null) {
@@ -104,6 +104,27 @@ class CommonCtrl {
 		$stmt->reset(); 
 		return false;
 	}
+
+	// execute un select count(*)
+	public function querycount(string $table,string $where, array $binds) {
+		$query = 'SELECT count(*) FROM '.$table.' WHERE '.$where;
+		$result = $this->query($query,$binds,'CommonModelCount');
+
+		if ($result === false) { return -1;}
+
+		return $result[0]->count;
+	}
+
+
+	//retourne s'il y a au moins un enregistrement
+	public function queryexists(string $table,string $where, array $binds) {
+
+		$result = $this->querycount($table,$where,$binds);
+
+		if ($result === false) { return -1;}
+
+		return $result >= 1;
+	}	
 
 
 	// parcours recursif

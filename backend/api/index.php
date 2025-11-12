@@ -81,11 +81,16 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 
 	} else 	if (array_key_exists('selections',$_GET)) {
 		if (islogged()) {
-			$selections->get();
+			$selections->getOld();
 		} else {
 			responseJson(array());
 		}
-	} else 	if (array_key_exists('islogged',$_GET)) {	
+	} else 	if (array_key_exists('selections2',$_GET)) {
+		if (islogged()) {
+			$selections->get();
+		} else {
+			responseJson(array());
+		}	} else 	if (array_key_exists('islogged',$_GET)) {	
 			getIslogged();
 
 	} else {

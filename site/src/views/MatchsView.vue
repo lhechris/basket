@@ -16,10 +16,10 @@
 
   <script setup>
   // @ is an alias to /src
-  import DetailMatch from '@/components/DetailMatch.vue'
-  import {getMatchsAvecSel,displaydate} from '@/js/api.js'
+  import DetailMatch from '../components/DetailMatch.vue'
+  import {getMatchsAvecSel,displaydate} from '../js/api.js'
   import {ref} from "vue"
-  import Content from '@/components/Content.vue'
+  import Content from '../components/Content.vue'
   
   const matchs = ref([])
   const page=ref(1)

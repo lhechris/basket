@@ -1,0 +1,47 @@
+[
+    {
+        "id": 2,
+        "equipe": 1,
+        "jour": "2025-09-20",
+        "titre": "match1",
+        "score": "0/0",
+        "otm": "picsou",
+        "collation": "donald",
+        "maillots": "nobody",
+        "adresse": "ici ou la bas",
+        "horaire": "12h00",
+        "rendezvous": "11h00",
+        "oppositions": null,
+        "selections": null
+    },
+    {
+        "id": 1,
+        "equipe": 1,
+        "jour": "2025-09-27",
+        "titre": "match2",
+        "score": "24/8",
+        "otm": "geo trouvetou",
+        "collation": "gontran",
+        "maillots": "machine à laver",
+        "adresse": "quelque part",
+        "horaire": "12h15",
+        "rendezvous": "11h20",
+        "oppositions": null,
+        "selections": null
+    },
+    {
+        "id": 3,
+        "equipe": 2,
+        "jour": "2025-10-05",
+        "titre": "match3",
+        "score": "24/8",
+        "otm": "flairsou",
+        "collation": "flagada",
+        "maillots": "rapetou",
+        "adresse": null,
+        "horaire": null,
+        "rendezvous": null,
+        "oppositions": null,
+        "selections": null
+    }
+]

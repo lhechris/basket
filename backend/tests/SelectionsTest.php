@@ -38,8 +38,10 @@ class SelectionsTest extends TestCase
         self::$donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(1,'2025-09-09','sans titre','0/0')");
 
 
-        self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(1,'2025-09-01',1)");
+        self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(1,'2025-09-01',2)");
         self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(2,'2025-09-01',1)");
+        self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(3,'2025-09-01',1)");
+        self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(4,'2025-09-01',1)");
 
         self::$donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(1,1,1)");
         self::$donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(3,1,1)");
@@ -71,78 +73,12 @@ class SelectionsTest extends TestCase
     {
         $results = $this->selections->getArray(1);
         $json = $results;
+        $this->assertIsArray($json);
 
-        //Tableau par equipe liste des match, où dans chaque match liste des joueuses
-        $s = '[ { "equipe" : 1,
-                  "joueurs" : [
-                      {"prenom" : "fifi", "nb" : 0},
-                      {"prenom" : "riri" ,"nb" : 1}],
-                  "autrejoueurs" : [  
-                      {"prenom" : "loulou", "nb":1}],
-                  "matchs" : [{
-                        "id" : 1,
-                        "jour": "2025-09-01",
-                        "users": [{"id": 2,"dispo": 1, "selection":0,"prenom": "fifi"},
-                                {"id": 1,"dispo": 1, "selection":1,"prenom": "riri"}
-                                ],
-                        "autres" : [{"id": 3,"dispo": 0, "selection":1,"prenom": "loulou"}],
-                        "equipe" : 1,
-                        "titre": "sans titre",
-                        "nb" : 2
-                    },
-                    {
-                        "id" : 4,
-                        "jour": "2025-09-09",
-                        "users": [{"id": 2,"dispo": 0, "selection":0,"prenom": "fifi"},
-                                {"id": 1,"dispo": 0, "selection":0,"prenom": "riri"}
-                                ],
-                        "autres": [],
-                        "equipe" : 1,
-                        "titre": "sans titre",
-                        "nb" : 0
-                    }]
-                },
-                { "equipe" : 2,
-                "joueurs" : [
-                    {"prenom" : "daisy",  "nb" : 0},
-                    {"prenom" : "loulou", "nb" : 1}], 
-                "autrejoueurs" : [],
-                "matchs" : [{
-                        "id" : 2,
-                        "jour": "2025-09-01",
-                        "users": [{"id": 4,"dispo": 0, "selection":0,"prenom": "daisy"},
-                                {"id": 3,"dispo": 0, "selection":0,"prenom": "loulou"}],
-                        "autres": [],
-                        "equipe" : 2,
-                        "titre": "sans titre",
-                        "nb" : 0
-                    },
-                    {
-                        "id" : 3,
-                        "jour": "2025-09-08",
-                        "users": [{"id": 4,"dispo": 0, "selection":0,"prenom": "daisy"},
-                                {"id": 3,"dispo": 0, "selection":0,"prenom": "loulou"}],
-                        "autres": [],
-                        "equipe" : 2,
-                        "titre": "sans titre",
-                        "nb" : 0
-                    }]
-            }]';     
+        //print_r($json);
 
-    $expected = json_decode($s,true);
-    $this->assertIsArray($json);
-    $this->assertCount(2, $json);
-    $this->assertEquals($expected, $json);        
-
-    }
-
-    public function testExists(): void
-    {
-        $exists = $this->reflection->getMethod('exists');
-        $exists->setAccessible(true);
-        
-        $this->assertTrue($exists->invoke($this->selections, 1, 1));
-        $this->assertFalse($exists->invoke($this->selections, 999, 999));
+        $expected = json_decode(file_get_contents('tests/data/selections.json'),true);
+        $this->assertEquals($expected, $json);
     }
 
     public function testUpdate(): void
@@ -162,56 +98,36 @@ class SelectionsTest extends TestCase
         }
         $this->assertFalse($noval,"Modification enregistrement nok");
        
-
+        //Verifie qu'on ne peut pas ajouter un match qui n'existe pas
         $input = array("match"=>99, "usr"=>98, "selection"=>97);
         $update->invoke($this->selections,$input);
         $json=$this->SelectionsGet();
         $noval = true;
         foreach ($json as $v) {
             if (($v["match"] == 99) && ($v["user"] == 98)) {
-                $this->assertEquals(97,$v["val"]);
-                $this->assertEquals(98,$v["user"]);
-                $this->assertEquals(99,$v["match"]);
                 $noval=false;
             }
         }
-
-        $this->assertFalse($noval,"Ajout enregistrement nok");
+        $this->assertTrue($noval,"Ajout enregistrement nok");
         
-        //Supprime l'enregistrement nouvellement cree
-        self::$donnees->db->exec("DELETE FROM selections WHERE match=99");
 
-    }
+        //Test l'update sur un autre match le meme jour (il ne doit y avoir qu'un seul enregistrement a la fin)
+        $input = array("match"=>2, "usr"=>1, "selection"=>33);
+        $update->invoke($this->selections,$input);
+        $json=$this->SelectionsGet();
+        $nb = 0;
+        foreach ($json as $v) {
+            if ($v["user"] == 1) {
+                $nb++;
+                if ($v["match"] == 2) {
+                    $this->assertEquals(33,$v["val"]);
+                }
+            }
+        }
 
-    public function test_SelectionExists() {
+        $this->assertEquals(1,$nb,"update sur un autre match");
 
-        $method = $this->reflection->getMethod('exists');
-        $method->setAccessible(true);
 
-        $ret=$method->invoke($this->selections,1,1);
-        $this->assertTrue($ret);
-        
-        $ret=$method->invoke($this->selections,3,1);
-        $this->assertFalse($ret);
-
-    }
-
-    /**
-     * 
-     */
-    public function testCreateIfNotExists(): void
-    {
-        $create = $this->reflection->getMethod('createIfNotExists');
-        $create->setAccessible(true);
-
-        // Test creating new selection
-        $create->invoke($this->selections, 1, 1);
-        $json1=$this->SelectionsGet();
-        $this->assertEquals(2,count($json1));
-       
-        $this->assertTrue($create->invoke($this->selections, 3, 1));
-        $json2 = $this->SelectionsGet();
-        $this->assertEquals(3,count($json2));
     }
 
     public static function tearDownAfterClass(): void

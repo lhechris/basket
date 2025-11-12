@@ -9,7 +9,7 @@
                 
             <template #default>
                 <div class="grid grid-cols-3 gap-2 pt-2" v-for="(u,j) in e.users" :key="j">
-                    <div class="span-col-2 text-xl font-bold text-right">{{ u.prenom }}</div>
+                    <div class="span-col-2 text-xl font-bold text-right" vtprenom>{{ u.prenom }}</div>
                     <Presence :sel="u.dispo" @onUpdate="update(u.id,e.jour,$event)"/>
                 </div>
             </template>
@@ -18,11 +18,11 @@
 </template>
 
 <script setup>
-import {getDisponibilites,setDisponibilite,displaydate} from '@/js/api.js'
-import Presence from '@/components/Presence.vue'
+import {getDisponibilites,setDisponibilite,displaydate} from '../js/api.js'
+import Presence from '../components/Presence.vue'
 import {ref} from 'vue'
 //import CustPagination from "@/components/CustPagination.vue"
-import Content from '@/components/Content.vue'
+import Content from '../components/Content.vue'
 
 import '@coreui/coreui/dist/css/coreui.min.css'
 

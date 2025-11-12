@@ -67,24 +67,7 @@ final class DisponibilitesTest extends TestCase
         
         $json = $this->disponibilites->getArray();
 
-        $expected = json_decode('
-        [
-            {
-                "jour": "2025-09-01",
-                "users": [{"id": 4,"dispo": 0,"prenom": "daisy"},
-                          {"id": 2,"dispo": 1,"prenom": "fifi"},
-                          {"id": 3,"dispo": 0,"prenom": "loulou"},
-                          {"id": 1,"dispo": 1,"prenom": "riri"}],
-                "titre": "sans titre"
-            },
-            {
-                "jour": "2025-09-08",
-                "users": [{"id": 4,"dispo": 0,"prenom": "daisy"},
-                          {"id": 2,"dispo": 0,"prenom": "fifi"},
-                          {"id": 3,"dispo": 0,"prenom": "loulou"},
-                          {"id": 1,"dispo": 0,"prenom": "riri"}],
-                "titre": "sans titre"
-            }]', true);
+        $expected = json_decode(file_get_contents('tests/data/dispo.json'),true);
 
         // Basic structural assertions before full comparison
         $this->assertIsArray($json);

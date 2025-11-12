@@ -162,6 +162,11 @@ export function getSelections() {
         getResource('selections').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
     });
 }
+export function getSelections2() {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('selections2').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+}
 
 export function setSelection(usr,match,val) {
     var baseurl = "/api/";

@@ -33,33 +33,30 @@ class DisponibilitesDAO extends BaseDAO {
 
         $sql = "INSERT INTO disponibilites(jour,user,val) VALUES(:jour,:user,:val)";
         $this->prepareAndExecute($sql, [
-            ':jour' => $jour,
+            ':jour' => [$jour, SQLITE3_TEXT],
             ':user' => [$user, SQLITE3_INTEGER],
             ':val' => [$val, SQLITE3_INTEGER]
         ]);
         return $this->db->lastInsertRowID();
     }
 
-    public function update(int $jour,int $user, int $val): int {
+    public function update(string $jour,int $user, int $val): int {
         $sql = "UPDATE disponibilites SET val=:val WHERE jour=:jour AND user=:user";
         $this->prepareAndExecute($sql, [
             ':val' => [$val, SQLITE3_INTEGER],
-            ':jour' => [$jour, SQLITE3_INTEGER],
+            ':jour' => [$jour, SQLITE3_TEXT],
             ':user' => [$user, SQLITE3_INTEGER]
         ]);
         return $this->db->changes();
     }
 
+    /**
+     * Retourne toutes les disponibilites classées par jour et prenom
+     */
     public function getAll(): array {
-        $sql = "SELECT jour,user,val FROM disponibilites";
+        $sql = "SELECT A.jour,A.user,A.val FROM disponibilites A, users B WHERE A.user=B.id ORDER BY A.jour,B.prenom";
+                
         $res = $this->prepareAndExecute($sql, []);
-        
-        $ret = array();
-        while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
-            $obj = (object) $row;
-            array_push($ret,$obj);
-        }
-        
-        return $ret;
+        return $this->fetchAll($res);
     }
 }

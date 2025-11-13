@@ -14,7 +14,6 @@
                 "adresse": "ici ou la bas",
                 "horaire": "12h00",
                 "rendezvous": "11h00",
-                "oppositions": null,
                 "selections": []
             }
         ]
@@ -34,7 +33,6 @@
                 "adresse": "quelque part",
                 "horaire": "12h15",
                 "rendezvous": "11h20",
-                "oppositions": null,
                 "selections": [
                     {
                         "user": 2,
@@ -63,7 +61,6 @@
                 "adresse": null,
                 "horaire": null,
                 "rendezvous": null,
-                "oppositions": null,
                 "selections": []
             }
         ]

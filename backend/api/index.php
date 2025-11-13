@@ -19,11 +19,11 @@ include_once("donnees.php");
 $donnees = new Donnees();
 $users = new Users($donnees);
 $matchinfo = new MatchInfos($donnees);
-$matchs = new Matchs($donnees,$matchinfo);
+$matchs = new Matchs($donnees);
 $entrainements=new Entrainements($donnees);
-$presences = new Presences($donnees,$users,$entrainements);
-$disponibilites = new Disponibilites($donnees,$users,$matchs);
-$selections = new Selections($donnees,$users,$matchs,$disponibilites);
+$presences = new Presences($donnees);
+$disponibilites = new Disponibilites($donnees);
+$selections = new Selections($donnees);
 
 
 if ($_SERVER["REQUEST_METHOD"]=="GET") { 
@@ -68,14 +68,7 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 		} else {
 			responseJson(array());
 		}
-	
-	} else 	if (array_key_exists('oppositions',$_GET)) {
-		
-		if (islogged()) {
-			$matchinfo->get($_GET['oppositions']);
-		} else {
-			responseJson(array());
-		}
+
 	} else 	if (array_key_exists('disponibilites',$_GET)) {		
 		$disponibilites->get();
 

@@ -36,7 +36,7 @@ class UsersTest extends TestCase
         $this->users = new Users(self::$donnees);
     }
 
-    public function testGetArrayUsers(): void
+    public function testGetArray(): void
     {
         $json = $this->users->getArray();
         
@@ -49,7 +49,7 @@ class UsersTest extends TestCase
         $this->assertEquals($expected, $json);
     }
 
-    public function testUpdateUsers(): void
+    public function testUpdate(): void
     {
         // Get initial state
         $initial = $this->users->getArray();
@@ -72,5 +72,33 @@ class UsersTest extends TestCase
         $this->assertEquals('gertrude', $updated['prenom'], 'Prenom should be updated to gertrude');
         $this->assertEquals(2, $updated['equipe'], 'Equipe should be updated to 2');
     }
+
+
+    public function testAjoute(): void
+    {
+
+        // Use ReflectionClass to access protected method
+        $reflection = new ReflectionClass(Users::class);
+        $ajoute = $reflection->getMethod('ajoute');
+        $ajoute->setAccessible(true);
+        
+        // Call protected update method
+        $id = $ajoute->invoke($this->users, 'falbala', 3);
+
+        // Verify changes
+        $json = $this->users->getArray();
+        $created = array_filter($json, fn($v) => $v['id'] == $id);
+        $created = reset($created);
+        
+        $this->assertEquals('falbala', $created['prenom'], 'Prenom should be updated to gertrude');
+        $this->assertEquals(3, $created['equipe'], 'Equipe should be updated to 2');
+
+        //supprime l'enregistrement
+        self::$donnees->db->exec("DELETE FROM users WHERE id=$id");
+
+    }
+
+    
+
 
 }

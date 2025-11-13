@@ -25,7 +25,9 @@ class BaseDAO {
                 $stmt->bindValue($k, $v);
             }
         }
+        //loginfo($stmt->getSql(true));
         $res = $stmt->execute();
+
         if ($res === false) {
             throw new RuntimeException("Execute error: " . $this->db->lastErrorMsg());
         }
@@ -37,6 +39,7 @@ class BaseDAO {
         while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
             $out[] = (object)$row;
         }
+        //loginfo(print_r($out,true));
         return $out;
     }
 }

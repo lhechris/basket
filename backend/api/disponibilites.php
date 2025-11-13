@@ -1,19 +1,27 @@
 <?php 
 
 require_once("utils.php");
-require_once("matchs.php");
 
+require_once("dao/DisponibilitesDAO.php");
+require_once("dao/MatchsDAO.php");
+require_once("dao/UsersDAO.php");
+
+use dao\DisponibilitesDAO;
+use dao\MatchsDAO;
+use dao\UsersDAO;
 
 class Disponibilites {
 
 	private $db;
 	private $users;
+	private $disponibilites;
 	private $matchs;
 	
-	public function __construct($donnees,$users,$matchs) {
+	public function __construct($donnees) {
 		$this->db = $donnees->db;
-		$this->users = $users;
-		$this->matchs = $matchs;
+		$this->users = new UsersDAO($donnees);
+		$this->matchs = new MatchsDAO($donnees);
+		$this->disponibilites = new DisponibilitesDAO($donnees);
 	}
 
 	/**
@@ -36,8 +44,8 @@ class Disponibilites {
 
 	public function getArray() {
 		
-		$matchs=$this->matchs->getArray();
-		$users=$this->users->getArray();
+		$matchs=$this->matchs->getAll();
+		$users=$this->users->getAll();
 		if ($users == null) {
 			loginfo("Il n'y a pas d'utilisateur!");
 			return array();
@@ -47,13 +55,13 @@ class Disponibilites {
 			return array();
 		}			
 
-		$results = $this->db->query('SELECT A.jour,A.user,A.val FROM disponibilites A, users B WHERE A.user=B.id ORDER BY A.jour,B.prenom');
+		$results = $this->disponibilites->getAll();
 		$dispo= array();
-		while ($row = $results->fetchArray()) {
-			if (!array_key_exists($row['jour'],$dispo)) {
-				$dispo[$row['jour']]=array();
+		foreach ($results as $row) {
+			if (!array_key_exists($row->jour,$dispo)) {
+				$dispo[$row->jour]=array();
 			}
-			array_push($dispo[$row['jour']],array( "user"=>$row['user'],"val"=>$row['val']));
+			array_push($dispo[$row->jour],array( "user"=>$row->user,"val"=>$row->val));
 		}
 
 		$json = array();
@@ -76,7 +84,7 @@ class Disponibilites {
 				$val=0;
 				if (array_key_exists($e->jour,$dispo)) {
 					foreach($dispo[$e->jour] as $p) {
-						if ($p["user"] == $u["id"]) {
+						if ($p["user"] == $u->id) {
 							$val=$p["val"];
 							break;
 						}
@@ -84,9 +92,9 @@ class Disponibilites {
 				}
 
 				array_push($currentmatch["users"],array(
-					"id" => $u["id"],
+					"id" => $u->id,
 					"dispo" => $val,
-					"prenom" => $u["prenom"]
+					"prenom" => $u->prenom
 				));
 			}
 			
@@ -105,78 +113,15 @@ class Disponibilites {
 			
 		if ( is_int($json['usr']) && is_string($json['jour']) && is_int($json['value'])) {
 
-			$this->createIfNotExists($json['jour'],$json['usr']);
-
-			$query='UPDATE disponibilites SET val=:val WHERE jour=:jour AND user=:user';
-			$stmt = $this->db->prepare($query);
-
-			if (($stmt->bindValue(':jour', $json['jour'], SQLITE3_TEXT)) &&
-				($stmt->bindValue(':user', $json['usr'], SQLITE3_INTEGER)) &&
-				($stmt->bindValue(':val', $json['value'], SQLITE3_INTEGER)) ) {
-
-				if ($stmt->execute()===false) {
-					loginfo($stmt->getSQL(true));
-					loginfo("Erreur");
-				}
-				$stmt->reset();					
-
+			if ($this->disponibilites->exists($json['jour'],$json['usr'])) {
+				$this->disponibilites->update($json['jour'],$json['usr'],$json['value']);
 			} else {
-				loginfo("Erreur query values");
+				$this->disponibilites->create($json['jour'],$json['usr'],$json['value']);
 			}
+
 		} else {
 			loginfo("bad input values");
 		}
-	}
-
-	/**
-	 * Comme son nom l'indique retourne true si l'enregistrement existe
-	 * db doit etre instancié
-	 */
-	protected function exists($jour,$usr) {
-		$query = 'SELECT count(*) FROM disponibilites WHERE jour=:jour AND user=:user';
-		$stmt = $this->db->prepare($query);
-
-		if (($stmt->bindValue(':jour', $jour, SQLITE3_TEXT)) &&
-			($stmt->bindValue(':user', $usr, SQLITE3_INTEGER))) {	
-		
-			$result = $stmt->execute();
-			if ($result===false) {
-				loginfo($stmt->getSQL(true));
-				loginfo("Erreur");	
-				return false;
-			}
-			while ($row = $result->fetchArray()) {
-				return ($row[0] >= 1);
-			}
-			
-		} else {
-			loginfo("Erreur bindValue");	
-			return false;
-		}
-	}
-
-
-	/** Cree l'enregistrement s'il n'existe pas.
-	 * db doit etre instancié
-	*/
-	protected function createIfNotExists($entrainement,$usr) {
-
-		if ($this->exists($entrainement,$usr)==false) {
-			$query = 'INSERT INTO disponibilites(jour,user,val) VALUES (:jour,:user,0)';
-			$stmt = $this->db->prepare($query);
-
-			if (($stmt->bindValue(':jour', $entrainement, SQLITE3_TEXT)) &&
-				($stmt->bindValue(':user', $usr, SQLITE3_INTEGER))) {
-			
-				$result = $stmt->execute();
-				if ($result===false) {
-					loginfo($stmt->getSQL(true));
-					loginfo("Erreur");	
-					return false;
-				}
-			}	
-		}
-		return true;
 	}
 
 

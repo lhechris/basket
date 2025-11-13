@@ -7,8 +7,6 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../api/env.php';
 require_once __DIR__ . '/../api/presences.php';
 require_once __DIR__ . '/../api/donnees.php';
-require_once __DIR__ . '/../api/users.php';
-require_once __DIR__ . '/../api/entrainements.php';
 
 class PresencesTest extends TestCase
 {
@@ -41,9 +39,7 @@ class PresencesTest extends TestCase
 
     protected function setUp(): void
     {
-        $users = new Users(self::$donnees);
-        $entrainements = new Entrainements(self::$donnees);
-        $this->presences = new Presences(self::$donnees, $users, $entrainements);
+        $this->presences = new Presences(self::$donnees);
         $this->reflection = new ReflectionClass(Presences::class);        
     }
 
@@ -118,34 +114,6 @@ class PresencesTest extends TestCase
 
     }
 
-    public function testPresenceExists(): void
-    {
-        $method = $this->reflection->getMethod('exists');
-        $method->setAccessible(true);
-
-        $ret=$method->invoke($this->presences,1,1);
-        $this->assertTrue($ret,"Presence should exist");
-        
-        $ret=$method->invoke($this->presences,99,99);
-        $this->assertFalse($ret, "Presence should not exist");
-
-    }
-
-    public function testPresenceCreateIfNotExists(): void
-    {
-        $create = $this->reflection->getMethod('createIfNotExists');
-        $create->setAccessible(true);
-
-        // Test creating new selection
-        $create->invoke($this->presences, 1, 1);
-        $json1=$this->presencesGet();
-        $this->assertEquals(2,count($json1));
-       
-        $this->assertTrue($create->invoke($this->presences, 3, 1));
-        $json2 = $this->presencesGet();
-        $this->assertEquals(3,count($json2));
-
-    }
 
     public static function tearDownAfterClass(): void
     {

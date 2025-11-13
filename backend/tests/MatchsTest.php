@@ -100,7 +100,6 @@ class MatchsTest extends TestCase
         // On doit avoir 3 enregistrement de l'objet Matchs
         $this->assertIsArray($result);
         $this->assertEquals(3,count($result));
-        $this->assertInstanceOf(MatchBasket::class, $result[0]);
       
         //On verifie que les champs du 1er enreg sont ok
         $this->assertEquals(1,$result[0]->equipe);
@@ -124,22 +123,23 @@ class MatchsTest extends TestCase
         $result = $this->matchs->getArray(1);
 
         // On doit avoir 1 enregistrement de l'objet Matchs
-        $this->assertIsArray($result);
-        $this->assertEquals(1,count($result));
-        $this->assertInstanceOf(MatchBasket::class, $result[0]);
+        $this->assertIsObject($result);
       
         //On verifie que les champs sont ok
-        $this->assertEquals(1,$result[0]->id);
-        $this->assertEquals(1,$result[0]->equipe);
-        $this->assertEquals("2025-09-27",$result[0]->jour);
-        $this->assertEquals("match2",$result[0]->titre);
-        $this->assertEquals("24/8",$result[0]->score);
-        $this->assertEquals("gontran",$result[0]->collation);
-        $this->assertEquals("geo trouvetou",$result[0]->otm);
-        $this->assertEquals("machine à laver",$result[0]->maillots);
-        $this->assertEquals("quelque part",$result[0]->adresse);
-        $this->assertEquals("12h15",$result[0]->horaire);
-        $this->assertEquals("11h20",$result[0]->rendezvous);
+        $this->assertEquals(1,$result->id);
+        $this->assertEquals(1,$result->equipe);
+        $this->assertEquals("2025-09-27",$result->jour);
+        $this->assertEquals("match2",$result->titre);
+        $this->assertEquals("24/8",$result->score);
+        $this->assertEquals("gontran",$result->collation);
+        $this->assertEquals("geo trouvetou",$result->otm);
+        $this->assertEquals("machine à laver",$result->maillots);
+        $this->assertEquals("quelque part",$result->adresse);
+        $this->assertEquals("12h15",$result->horaire);
+        $this->assertEquals("11h20",$result->rendezvous);
+
+        $this->assertEquals(3,$result->oppositions->A[0]->user);
+        $this->assertEquals(2,$result->oppositions->B[0]->user);
     }
  
 
@@ -155,7 +155,7 @@ class MatchsTest extends TestCase
         // On doit avoir 3 enregistrement de l'objet Matchs
         $this->assertIsArray($results);
         $this->assertEquals(3,count($results));
-        $this->assertInstanceOf(MatchsParJour::class, $results[0]);
+        $this->assertInstanceOf(stdClass::class, $results[0]);
         
         //On verifie que l'ordre est croissant
         $this->assertEquals('2025-09-20',$results[0]->jour);
@@ -176,30 +176,32 @@ class MatchsTest extends TestCase
         $this->assertEquals(3,$results[2]->matchs[0]->id);
 
         //Pour le match du 1er jour il n'y a aucun joueur    
-        $this->assertIsArray($results[0]->matchs[0]->matchinfo);
-        $this->assertInstanceOf(ListMatchInfo::class, $results[0]->matchs[0]->matchinfo[0]);
-        $this->assertEquals(0,count($results[0]->matchs[0]->matchinfo[0]->a));
-        $this->assertEquals(0,count($results[0]->matchs[0]->matchinfo[0]->b));
-        $this->assertEquals(0,count($results[0]->matchs[0]->matchinfo[0]->autres));
+        //$this->assertIsArray($results[0]->matchs[0]->oppositions);
+        $this->assertIsArray($results[0]->matchs[0]->oppositions->A);
+        $this->assertIsArray($results[0]->matchs[0]->oppositions->B);
+        $this->assertIsArray($results[0]->matchs[0]->oppositions->Autres);
+        $this->assertEquals(0,count($results[0]->matchs[0]->oppositions->A));
+        $this->assertEquals(0,count($results[0]->matchs[0]->oppositions->B));
+        $this->assertEquals(0,count($results[0]->matchs[0]->oppositions->Autres));
 
         //Pour le match du 2e jour les 1 joueurs n'est pas positionnés dans une opposition
         //les 2 autres sont chacun dans une opposition
-        $this->assertEquals(1,count($results[1]->matchs[0]->matchinfo[0]->a));
-        $this->assertEquals(1,count($results[1]->matchs[0]->matchinfo[0]->b));
-        $this->assertEquals(1,count($results[1]->matchs[0]->matchinfo[0]->autres));
+        $this->assertEquals(1,count($results[1]->matchs[0]->oppositions->A));
+        $this->assertEquals(1,count($results[1]->matchs[0]->oppositions->B));
+        $this->assertEquals(1,count($results[1]->matchs[0]->oppositions->Autres));
 
         //Verifie les joueurs de l'opposition autres du match du 2e jour        
-        $this->assertEquals(2,$results[1]->matchs[0]->matchinfo[0]->b[0]->joueur->id);
-        $this->assertEquals('fifi',$results[1]->matchs[0]->matchinfo[0]->b[0]->joueur->prenom);
-        $this->assertEquals(3,$results[1]->matchs[0]->matchinfo[0]->a[0]->joueur->id);
-        $this->assertEquals('loulou',$results[1]->matchs[0]->matchinfo[0]->a[0]->joueur->prenom);
-        $this->assertEquals(1,$results[1]->matchs[0]->matchinfo[0]->autres[0]->joueur->id);
-        $this->assertEquals('riri',$results[1]->matchs[0]->matchinfo[0]->autres[0]->joueur->prenom);
+        $this->assertEquals(2,$results[1]->matchs[0]->oppositions->B[0]->user);
+        $this->assertEquals('fifi',$results[1]->matchs[0]->oppositions->B[0]->prenom);
+        $this->assertEquals(3,$results[1]->matchs[0]->oppositions->A[0]->user);
+        $this->assertEquals('loulou',$results[1]->matchs[0]->oppositions->A[0]->prenom);
+        $this->assertEquals(1,$results[1]->matchs[0]->oppositions->Autres[0]->user);
+        $this->assertEquals('riri',$results[1]->matchs[0]->oppositions->Autres[0]->prenom);
 
         //Pour le match du 3e jour il n'y a aucun joueur
-        $this->assertEquals(0,count($results[2]->matchs[0]->matchinfo[0]->a));
-        $this->assertEquals(0,count($results[2]->matchs[0]->matchinfo[0]->b));
-        $this->assertEquals(0,count($results[2]->matchs[0]->matchinfo[0]->autres));
+        $this->assertEquals(0,count($results[2]->matchs[0]->oppositions->A));
+        $this->assertEquals(0,count($results[2]->matchs[0]->oppositions->B));
+        $this->assertEquals(0,count($results[2]->matchs[0]->oppositions->Autres));
     }
 
 
@@ -215,7 +217,7 @@ class MatchsTest extends TestCase
         // On doit avoir 3 enregistrement de l'objet Matchs
         $this->assertIsArray($results);
         $this->assertEquals(3,count($results));
-        $this->assertInstanceOf(MatchsParJour::class, $results[0]);
+        $this->assertIsObject($results[0]);
         
         //On verifie que l'ordre est croissant
         $this->assertEquals('2025-09-20',$results[0]->jour);
@@ -244,10 +246,10 @@ class MatchsTest extends TestCase
         $this->assertEquals(2,count($results[1]->matchs[0]->selections));
 
         //Verifie les joueurs de l'opposition autres du match du 2e jour 
-        $this->assertInstanceOf(SelectionMatch::class, $results[1]->matchs[0]->selections[0]);
+        $this->assertIsObject($results[1]->matchs[0]->selections[0]);
         $this->assertEquals(2,$results[1]->matchs[0]->selections[0]->user);
         $this->assertEquals('fifi',$results[1]->matchs[0]->selections[0]->prenom);
-        $this->assertInstanceOf(SelectionMatch::class, $results[1]->matchs[0]->selections[1]);
+        $this->assertIsObject($results[1]->matchs[0]->selections[1]);
         $this->assertEquals(3,$results[1]->matchs[0]->selections[1]->user);
         $this->assertEquals('loulou',$results[1]->matchs[0]->selections[1]->prenom);
 
@@ -266,24 +268,19 @@ class MatchsTest extends TestCase
         $method->invoke($this->matchs,1,2,'match numero 1','8/9','2025-10-06',"germaine","personne","gigi","la bas","15h30", "Au gymnase");
 
         $result = $this->matchs->getArray(1);
-
-        // On doit avoir 1 enregistrement de l'objet Matchs
-        $this->assertIsArray($result);
-        $this->assertEquals(1,count($result));
-        $this->assertInstanceOf(MatchBasket::class, $result[0]);
-      
+     
         //On verifie que les champs sont ok
-        $this->assertEquals(1,$result[0]->id);
-        $this->assertEquals(2,$result[0]->equipe);
-        $this->assertEquals("2025-10-06",$result[0]->jour);
-        $this->assertEquals("match numero 1",$result[0]->titre);
-        $this->assertEquals("8/9",$result[0]->score);
-        $this->assertEquals("germaine",$result[0]->collation);
-        $this->assertEquals("personne",$result[0]->otm);
-        $this->assertEquals("gigi",$result[0]->maillots);
-        $this->assertEquals("la bas",$result[0]->adresse);
-        $this->assertEquals("15h30",$result[0]->horaire);
-        $this->assertEquals("Au gymnase",$result[0]->rendezvous);        
+        $this->assertEquals(1,$result->id);
+        $this->assertEquals(2,$result->equipe);
+        $this->assertEquals("2025-10-06",$result->jour);
+        $this->assertEquals("match numero 1",$result->titre);
+        $this->assertEquals("8/9",$result->score);
+        $this->assertEquals("germaine",$result->collation);
+        $this->assertEquals("personne",$result->otm);
+        $this->assertEquals("gigi",$result->maillots);
+        $this->assertEquals("la bas",$result->adresse);
+        $this->assertEquals("15h30",$result->horaire);
+        $this->assertEquals("Au gymnase",$result->rendezvous);        
     }
 
 
@@ -296,24 +293,19 @@ class MatchsTest extends TestCase
         $method->invoke($this->matchs,2,'match numero 4','5/9','2025-11-08',"bubulle","jojo","coco","ici","11h","quelquepart");
 
         $result = $this->matchs->getArray(4);
-
-        // On doit avoir 1 enregistrement de l'objet Matchs
-        $this->assertIsArray($result);
-        $this->assertEquals(1,count($result));
-        $this->assertInstanceOf(MatchBasket::class, $result[0]);
-      
+     
         //On verifie que les champs sont ok
-        $this->assertEquals(4,$result[0]->id);
-        $this->assertEquals(2,$result[0]->equipe);
-        $this->assertEquals("2025-11-08",$result[0]->jour);
-        $this->assertEquals("match numero 4",$result[0]->titre);
-        $this->assertEquals("5/9",$result[0]->score);
-        $this->assertEquals("bubulle",$result[0]->collation);
-        $this->assertEquals("jojo",$result[0]->otm);
-        $this->assertEquals("coco",$result[0]->maillots);
-        $this->assertEquals("ici",$result[0]->adresse);
-        $this->assertEquals("11h",$result[0]->horaire);
-        $this->assertEquals("quelquepart",$result[0]->rendezvous);
+        $this->assertEquals(4,$result->id);
+        $this->assertEquals(2,$result->equipe);
+        $this->assertEquals("2025-11-08",$result->jour);
+        $this->assertEquals("match numero 4",$result->titre);
+        $this->assertEquals("5/9",$result->score);
+        $this->assertEquals("bubulle",$result->collation);
+        $this->assertEquals("jojo",$result->otm);
+        $this->assertEquals("coco",$result->maillots);
+        $this->assertEquals("ici",$result->adresse);
+        $this->assertEquals("11h",$result->horaire);
+        $this->assertEquals("quelquepart",$result->rendezvous);
         
         //Supprime cet enregistrement
         self::$donnees->db->exec("DELETE FROM matchs WHERE id=4");

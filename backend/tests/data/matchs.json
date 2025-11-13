@@ -10,9 +10,7 @@
         "maillots": "nobody",
         "adresse": "ici ou la bas",
         "horaire": "12h00",
-        "rendezvous": "11h00",
-        "oppositions": null,
-        "selections": null
+        "rendezvous": "11h00"
     },
     {
         "id": 1,
@@ -25,9 +23,7 @@
         "maillots": "machine à laver",
         "adresse": "quelque part",
         "horaire": "12h15",
-        "rendezvous": "11h20",
-        "oppositions": null,
-        "selections": null
+        "rendezvous": "11h20"
     },
     {
         "id": 3,
@@ -40,8 +36,6 @@
         "maillots": "rapetou",
         "adresse": null,
         "horaire": null,
-        "rendezvous": null,
-        "oppositions": null,
-        "selections": null
+        "rendezvous": null
     }
 ]

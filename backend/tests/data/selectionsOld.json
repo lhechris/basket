@@ -1,0 +1,124 @@
+[
+    {
+        "equipe": 1,
+        "joueurs": [{"prenom": "fifi","nb": 0},
+                    {"prenom": "riri","nb": 1}
+        ],
+        "autrejoueurs": [
+            {"prenom": "loulou","nb": 1 }
+        ],
+        "matchs": [
+            {
+                "id": 1,
+                "jour": "2025-09-01",
+                "users": [
+                    {
+                        "id": 2,
+                        "selection": 0,
+                        "dispo": 1,
+                        "prenom": "fifi"
+                    },
+                    {
+                        "id": 1,
+                        "selection": 1,
+                        "dispo": 2,
+                        "prenom": "riri"
+                    }
+                ],
+                "autres": [
+                    {
+                        "id": 3,
+                        "selection": 1,
+                        "dispo": 1,
+                        "prenom": "loulou"
+                    }
+                ],
+                "equipe": 1,
+                "titre": "sans titre",
+                "nb": 2
+            },
+            {
+                "id": 4,
+                "jour": "2025-09-09",
+                "users": [
+                    {
+                        "id": 2,
+                        "selection": 0,
+                        "dispo": 0,
+                        "prenom": "fifi"
+                    },
+                    {
+                        "id": 1,
+                        "selection": 0,
+                        "dispo": 0,
+                        "prenom": "riri"
+                    }
+                ],
+                "autres": [],
+                "equipe": 1,
+                "titre": "sans titre",
+                "nb": 0
+            }
+        ]
+    },
+    {
+        "equipe": 2,
+        "joueurs": [
+            {
+                "prenom": "daisy",
+                "nb": 0
+            },
+            {
+                "prenom": "loulou",
+                "nb": 1
+            }
+        ],
+        "autrejoueurs": [],
+        "matchs": [
+            {
+                "id": 2,
+                "jour": "2025-09-01",
+                "users": [
+                    {
+                        "id": 4,
+                        "selection": 0,
+                        "dispo": 1,
+                        "prenom": "daisy"
+                    },
+                    {
+                        "id": 3,
+                        "selection": 0,
+                        "dispo": 1,
+                        "prenom": "loulou"
+                    }
+                ],
+                "autres": [],
+                "equipe": 2,
+                "titre": "sans titre",
+                "nb": 0
+            },
+            {
+                "id": 3,
+                "jour": "2025-09-08",
+                "users": [
+                    {
+                        "id": 4,
+                        "selection": 0,
+                        "dispo": 0,
+                        "prenom": "daisy"
+                    },
+                    {
+                        "id": 3,
+                        "selection": 0,
+                        "dispo": 0,
+                        "prenom": "loulou"
+                    }
+                ],
+                "autres": [],
+                "equipe": 2,
+                "titre": "sans titre",
+                "nb": 0
+            }
+        ]
+    }
+]

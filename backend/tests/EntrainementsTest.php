@@ -42,12 +42,8 @@ class EntrainementsTest extends TestCase
         $this->assertCount(2, $arr);
 
         // Ordered by jour ascending -> first should be 2025-10-01
-        $this->assertEquals('2025-10-01', $arr[0]['jour']);
-        $this->assertEquals('2025-10-08', $arr[1]['jour']);
-
-        // Each item has id and jour keys
-        $this->assertArrayHasKey('id', $arr[0]);
-        $this->assertArrayHasKey('jour', $arr[0]);
+        $this->assertEquals('2025-10-01', $arr[0]->jour);
+        $this->assertEquals('2025-10-08', $arr[1]->jour);
     }
 
     public function testGetOutputsJson(): void
@@ -60,9 +56,12 @@ class EntrainementsTest extends TestCase
         // must be valid JSON and match getArray()
         $decoded = json_decode($output, true);
         $this->assertIsArray($decoded);
+    
+        print($output."\n");
 
-        $expected = $this->entrainements->getArray();
+        $expected = json_decode(file_get_contents('tests/data/entrainements.json'),true);
         $this->assertEquals($expected, $decoded);
+
     }
 
     public static function tearDownAfterClass(): void

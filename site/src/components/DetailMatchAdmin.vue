@@ -73,7 +73,7 @@
     import {ref,watch} from 'vue'
     import {onBeforeUnmount} from 'vue'
     import { debounce } from 'lodash';
-    //import tableauoppositions from './tableauoppositions.vue';
+    
     import Button2Choix from './Button2Choix.vue';
 
     const props = defineProps (['matchdetail' ])

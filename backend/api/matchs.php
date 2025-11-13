@@ -2,122 +2,49 @@
 
 require_once("utils.php");
 
-class Matchbasket extends CommonModel {
+require_once("dao/MatchsDAO.php");
+require_once("dao/SelectionsDAO.php");
+require_once("dao/MatchInfosDAO.php");
 
-	public $id,$equipe,$jour,$titre,$score,$otm,$collation,$maillots,$matchinfo;
-	public $adresse,$horaire,$rendezvous,$selections;
+use dao\MatchsDAO;
+use dao\SelectionsDAO;
+use dao\MatchInfosDAO;
 
-	public function to_array() : array {
-		
-		$opps = $this->toarrayrecursif($this->matchinfo);
-		if (($opps!=null) && (count($opps)==1)) {
-			$opps=$opps[0];
-		}
-
-		return [
-			"id" => $this->id,
-			"equipe" => $this->equipe,
-			"jour" => $this->jour,
-			"titre" => $this->titre,
-			"score" => $this->score,
-			"otm" => $this->otm,
-			"collation" => $this->collation,
-			"maillots" => $this->maillots,
-			"adresse" => $this->adresse,
-			"horaire" => $this->horaire,
-			"rendezvous" => $this->rendezvous,
-			"oppositions" => $opps,
-			"selections" => $this->toarrayrecursif($this->selections)
-		];
-	}
-
-	public function from_array(array $data) {
-		$this->id = $this->nullifnotexists($data,"id");
-		if ($this->id == null) { $this->id = $this->nullifnotexists($data,"match");}
-		$this->equipe = $this->nullifnotexists($data,"equipe");
-		$this->jour = $this->nullifnotexists($data,"jour");
-		$this->titre = $this->nullifnotexists($data,"titre");
-		$this->score = $this->nullifnotexists($data,"score");
-		$this->collation = $this->nullifnotexists($data,"collation");
-		$this->otm = $this->nullifnotexists($data,"otm");
-		$this->maillots = $this->nullifnotexists($data,"maillots");
-		$this->adresse = $this->nullifnotexists($data,"adresse");
-		$this->horaire = $this->nullifnotexists($data,"horaire");
-		$this->rendezvous = $this->nullifnotexists($data,"rendezvous");
-		$this->matchinfo = null;
-		$this->selections = null;
-	}
-
-}
-
-class SelectionMatch extends CommonModel {
-	public $user,$prenom;
-
-	public function to_array() : array {
-		return [
-			"user" => $this->user,
-			"prenom" => $this->prenom
-		];
-	}
-
-	public function from_array(array $data) {
-		$this->user = $this->nullifnotexists($data,"user");
-		$this->prenom = $this->nullifnotexists($data,"prenom");
-	}
-}
-
-class MatchsParJour extends CommonModel {
-	public $jour,$matchs;
-
-	public function to_array() : array {
-		return [
-			"jour" => $this->jour,
-			"matchs" => $this->toarrayrecursif($this->matchs)
-		];
-	}
-
-	public function from_array(array $data) {
-		$this->jour = $this->nullifnotexists($data,"jour");		
-		$this->matchs = array($this->nullifnotexists($data,"matchs"));
-	}
-
-}
-
-
-class Matchs extends CommonCtrl{
+class Matchs {
 
 	private $matchinfos;
+	private $matchs;
+	private $selections;
 
-	public function __construct($donnees,$matchinfos) {
-		$this->matchinfos = $matchinfos;
-		parent::__construct($donnees);
+	public function __construct($donnees) {
+		$this->matchinfos =  new MatchInfosDAO($donnees);
+		$this->matchs = new MatchsDAO($donnees);
+		$this->selections = new SelectionsDAO($donnees);
 	}
 
 	public function getArray($id=null) {
 		if ($id === null) {
-			$results = $this->query('SELECT * FROM matchs ORDER BY jour',[],'MatchBasket');
+			$results = $this->matchs->getAll();
 		
 		} else {
-			$results = $this->query('SELECT * FROM matchs WHERE id=:id',[[':id',intval($id),SQLITE3_INTEGER]],'MatchBasket');
-			if (count($results)>0) {
-				$o = $this->matchinfos->getArray($id);
-				$results[0]->matchinfo = $o;
-			}
+			$results = $this->matchs->getById($id);
+			$results->oppositions = $this->getOppositions($id);		
 		}
-
 		return $results;
 	}
 
-
+	/**
+	 * Retourne une liste de jour avec les matchs et les oppositions
+	 * pour chaque match
+	 */
 	public function getAvecOppositionsArray() {
-		$allmatchs = $this->query('SELECT * FROM matchs ORDER BY jour,equipe',[],'MatchBasket');
+		$allmatchs = $this->matchs->getAll();
 
 		$results=array();
 
 		foreach($allmatchs as &$m) {			
 		
-			$o = $this->matchinfos->getArray($m->id);
-			$m->matchinfo = $o;
+			$m->oppositions = $this->getOppositions($m->id);
 
 			$notfound=true;
 			foreach($results as &$res) {
@@ -128,8 +55,9 @@ class Matchs extends CommonCtrl{
 				}
 			}
 			if ($notfound) {
-				$nm = new MatchsParJour();
-				$nm->from_array(["jour"=>$m->jour,"matchs"=>$m]);
+				$nm = new stdClass();
+				$nm->jour = $m->jour;
+				$nm->matchs = [$m];				
 				array_push($results,$nm);
 			}		
 		}
@@ -139,19 +67,21 @@ class Matchs extends CommonCtrl{
 	}
 
 
-
+	/**
+	 * Retourne une liste de jour avec les matchs et les joueurs
+	 * sélectionnés pour chaque match
+	 */
 	public function getAvecSelectionsArray() {
-		$allmatchs = $this->query('SELECT * FROM matchs ORDER BY jour,equipe',[],'MatchBasket');
+		$allmatchs = $this->matchs->getAll();
 
 		$results=array();
 
+		//On regroupe les matchs par journée
 		foreach($allmatchs as &$m) {			
-			$s = $this->query('SELECT A.user,C.prenom '.
-					 'FROM selections A, matchs B, users C,matchinfos D '.
-					 'WHERE A.match=B.id AND A.user=C.id AND B.id=:id AND D.match=B.id AND D.user=C.id '.
-					 'ORDER BY C.prenom',[[':id',intval($m->id),SQLITE3_INTEGER]],'SelectionMatch');			
-			$m->selections = $s;
+			//On ajoute les joueurs sélectionné pour ce match
+			$m->selections = $this->selections->getPlayersByMatchId($m->id);						
 			
+			//Si la journée existe déjà, on rajoute ce match
 			$notfound=true;
 			foreach($results as &$res) {
 				if ($res->jour == $m->jour) {
@@ -160,9 +90,11 @@ class Matchs extends CommonCtrl{
 					break;
 				}
 			}
+			//Sinon on crée une nouvelle journée avec ce match
 			if ($notfound) {
-				$nm = new MatchsParJour();
-				$nm->from_array(["jour"=>$m->jour,"matchs"=>$m]);
+				$nm = new stdClass();
+				$nm->jour = $m->jour;
+				$nm->matchs = [$m];				
 				array_push($results,$nm);				
 			}
 			
@@ -173,16 +105,17 @@ class Matchs extends CommonCtrl{
 	}
 	
 	public function get($id=null) {		
-		$resp = $this->to_array($this->getArray($id));
+		$resp = $this->getArray($id);
+
 		if ($id==null) {
 			return responseJson($resp);
 		} else {
-			return responseJson($resp[0]);
+			return responseJson($resp);
 		}
 	}
 
 	public function getAvecOppositions() {		
-		$resp = $this->to_array($this->getAvecOppositionsArray());
+		$resp = $this->getAvecOppositionsArray();
 		return responseJson($resp);
 	}
 
@@ -190,56 +123,63 @@ class Matchs extends CommonCtrl{
 
 
 	public function getAvecSelections() {				
-		$resp = $this->to_array($this->getAvecSelectionsArray());
+		$resp = $this->getAvecSelectionsArray();
 		return responseJson($resp);
 	}
 
+
+    private function getOppositions($match) {     
+
+        //On recupère les oppositions dans la table matchinfos
+        $opps = $this->matchinfos->getByMatch($match);
+
+
+        //on ajoute tous les joueurs sélectionnées pour le match et qui ne sont pas dans 
+        //la table oppositions
+        $selectionnes = $this->selections->getByMatch($match);
+
+        $ret = new stdClass;
+        $ret->A = [];
+        $ret->B = [];
+        $ret->Autres = [];
+
+        foreach ($selectionnes as &$sel ) {
+            $sel->opposition = null;
+            $sel->numero = null;
+            $sel->commentaire = null;
+
+            foreach ($opps as $opp) {
+                if ($opp->user == $sel->user) {
+                    $sel->opposition = $opp->opposition;
+                    $sel->numero = $opp->numero;
+                    $sel->commentaire = $opp->commentaire;
+                }
+            }
+            if ($sel->opposition == 'A') { array_push($ret->A, $sel); }
+            else if ($sel->opposition == 'B') { array_push($ret->B, $sel); }
+            else  { array_push($ret->Autres, $sel); }
+        }
+        usort($ret->A, "cb_tri");
+        usort($ret->B, "cb_tri");
+        return $ret;
+
+    }
 
 
 	/**
 	 * Execute la requete UPDATE sur la table match
 	 */
 	protected function update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
-		
-		$sql='UPDATE matchs '.
-			  'SET equipe=:equipe, titre=:titre, score=:score, jour=:jour, collation=:collation, otm=:otm, maillots=:maillots,adresse=:adresse, horaire=:horaire,rendezvous=:rendezvous  '.
-			  'WHERE id=:id';
-		
-		$this->query ($sql,
-			[[':id', $id, SQLITE3_INTEGER],
-			[':equipe', $equipe, SQLITE3_INTEGER],
-			[':titre', $titre, SQLITE3_TEXT],
-			[':score', $score, SQLITE3_TEXT],
-			[':jour', $jour, SQLITE3_TEXT],
-			[':collation', $collation, SQLITE3_TEXT],
-			[':otm', $otm, SQLITE3_TEXT],
-			[':maillots', $maillots, SQLITE3_TEXT],
-			[':adresse', $adresse, SQLITE3_TEXT],
-			[':horaire', $horaire, SQLITE3_TEXT],
-			[':rendezvous', $rendezvous, SQLITE3_TEXT]
-		]);
 
+		$this->matchs->update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);
 	}
 
 	/**
 	 * Execute la requete INSERT INTO dans la table match
 	 */
 	protected function ajoute($equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
-		
-		$sql = 'INSERT INTO matchs(titre,score,jour,equipe,collation,otm,maillots,adresse,horaire,rendezvous) '.
-								   'VALUES(:titre,:score,:jour,:equipe,:collation,:otm,:maillots,:adresse,:horaire,:rendezvous)';
-		$this->query ($sql,
-			[[':titre', $titre, SQLITE3_TEXT],
-			[':score', $score, SQLITE3_TEXT], 
-			[':jour', $jour, SQLITE3_TEXT],
-			[':equipe', $equipe, SQLITE3_INTEGER],
-			[':collation', $collation, SQLITE3_TEXT],
-			[':otm', $otm, SQLITE3_TEXT],
-			[':maillots', $maillots, SQLITE3_TEXT],
-			[':adresse', $adresse, SQLITE3_TEXT],
-			[':horaire', $horaire, SQLITE3_TEXT],
-			[':rendezvous', $rendezvous, SQLITE3_TEXT]
-		]);		
+
+		$this->matchs->create($equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);				
 	}
 
 	/**
@@ -248,17 +188,7 @@ class Matchs extends CommonCtrl{
 	 */
 	protected function supprime($id) {
 		
-		$sql='DELETE FROM matchs WHERE id=:id';
-		$this->query ($sql,[[':id', $id, SQLITE3_INTEGER]]); 
-
-		//TODO supprime dans la table disponibilite uniquement s'il n'y a plus de match ce jour ci
-
-		$sql='DELETE FROM selections WHERE match=:id';
-		$this->query ($sql,[[':id', $id, SQLITE3_INTEGER]]);
-
-		$sql='DELETE FROM matchinfos WHERE match=:id';
-		$this->query ($sql,[[':id', $id, SQLITE3_INTEGER]]);
-
+		$this->matchs->delete($id);
 	}
 
 

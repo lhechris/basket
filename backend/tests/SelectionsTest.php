@@ -7,8 +7,6 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../api/env.php';
 require_once __DIR__ . '/../api/donnees.php';
 require_once __DIR__ . '/../api/selections.php';
-require_once __DIR__ . '/../api/matchinfos.php';
-require_once __DIR__ . '/../api/disponibilites.php';
 
 
 class SelectionsTest extends TestCase
@@ -49,11 +47,7 @@ class SelectionsTest extends TestCase
 
     protected function setUp(): void
     {
-        $users = new Users(self::$donnees);
-        $matchInfos = new MatchInfos(self::$donnees);
-        $matchs = new Matchs(self::$donnees,$matchInfos);
-        $disponibilites = new Disponibilites(self::$donnees,$users,$matchs);        
-        $this->selections = new Selections(self::$donnees,$users,$matchs,$disponibilites);
+        $this->selections = new Selections(self::$donnees);
         $this->reflection = new ReflectionClass(Selections::class);
     }
 
@@ -71,13 +65,25 @@ class SelectionsTest extends TestCase
 
     public function testGetArray(): void
     {
-        $results = $this->selections->getArray(1);
+        $results = $this->selections->getArray();
         $json = $results;
         $this->assertIsArray($json);
 
         //print_r($json);
 
         $expected = json_decode(file_get_contents('tests/data/selections.json'),true);
+        $this->assertEquals($expected, $json);
+    }
+
+    public function testGetArrayOld(): void
+    {
+        $results = $this->selections->getArrayOld();
+        $json = $results;
+        $this->assertIsArray($json);
+
+        //print(json_encode($json));
+
+        $expected = json_decode(file_get_contents('tests/data/selectionsOld.json'),true);
         $this->assertEquals($expected, $json);
     }
 

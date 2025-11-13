@@ -14,8 +14,6 @@ require_once __DIR__ . '/../api/disponibilites.php';
 final class DisponibilitesTest extends TestCase
 {
     private Users $users;
-    private Matchs $matchs;
-    private MatchInfos $matchInfos;
     private Disponibilites $disponibilites;
 
     private static $donnees;
@@ -46,9 +44,7 @@ final class DisponibilitesTest extends TestCase
     protected function setUp(): void
     {
         $this->users = new Users(self::$donnees);
-        $this->matchInfos = new MatchInfos(self::$donnees);
-        $this->matchs = new Matchs(self::$donnees, $this->matchInfos);
-        $this->disponibilites = new Disponibilites(self::$donnees, $this->users, $this->matchs);
+        $this->disponibilites = new Disponibilites(self::$donnees, $this->users);
 
     }
 
@@ -115,36 +111,5 @@ final class DisponibilitesTest extends TestCase
         $this->assertTrue($found, 'Inserted record should be present after update on non-existent');
     }
 
-    public function test_DisponibiliteExists(): void
-    {
-        // Call protected method using Reflection
-        $reflection = new ReflectionClass(get_class($this->disponibilites));
-        $method = $reflection->getMethod('exists');
-        $method->setAccessible(true);
-        
-        $ret=$method->invoke($this->disponibilites,'2025-09-01', 1);
-        $this->assertTrue($ret);
-
-        $ret=$method->invoke($this->disponibilites,'2025-10-10', 1);
-        $this->assertFalse($ret);
-    }
-
-    public function test_DisponibiliteCreateIfNotExists(): void
-    {
-        // Call protected method using Reflection
-        $reflection = new ReflectionClass(get_class($this->disponibilites));
-        $method = $reflection->getMethod('createIfNotExists');
-        $method->setAccessible(true);
-
-        // existing date/user pair -> should not increase rows
-        $method->invoke($this->disponibilites,'2025-09-01', 1);
-        $rows1 = $this->fetchDisponibilitesRows();
-        $this->assertCount(3, $rows1);
-
-        // new date -> should add a row
-        $method->invoke($this->disponibilites,'2025-09-20', 1);
-        $rows2 = $this->fetchDisponibilitesRows();
-        $this->assertCount(4, $rows2);
-    }
 }
 ?>

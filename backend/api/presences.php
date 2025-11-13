@@ -1,18 +1,26 @@
 <?php 
 
 require_once("utils.php");
-require_once("entrainements.php");
-require_once("auth.php");
+
+require_once("dao/EntrainementsDAO.php");
+require_once("dao/UsersDAO.php");
+require_once("dao/PresencesDAO.php");
+
+use dao\EntrainementsDAO;
+use dao\UsersDAO;
+use dao\PresencesDAO;
 
 class Presences {
 	private $db;
 	private $users;
 	private $entrainements;
+	private $presences;
 
-	public function __construct($donnees,$users,$entrainements) {
+	public function __construct($donnees) {
 		$this->db = $donnees->db;
-		$this->users = $users;
-		$this->entrainements = $entrainements;
+		$this->users = new UsersDAO($donnees);
+		$this->entrainements = new EntrainementsDAO($donnees);
+		$this->presences = new PresencesDAO($donnees);
 	}
 
 	/**
@@ -20,35 +28,36 @@ class Presences {
 	 */
 	public function getArray() {
 		
-		$entrainements=$this->entrainements->getArray();
-		$myusers=$this->users->getArray();
+		$entrainements=$this->entrainements->getAll();
+		$myusers=$this->users->getAll();
 		if ($myusers == null) {
 			loginfo("Il n'y a pas d'utilisateurs!");
 			return array();
 		}		
 
-		$results = $this->db->query('SELECT A.entrainement,A.user,A.val FROM presences A, users B WHERE A.user=B.id ORDER BY A.entrainement,B.prenom');
+		$results = $this->presences->getAll();
 		$presences= array();
-		while ($row = $results->fetchArray()) {
-			if (!array_key_exists($row['entrainement'],$presences)) {
-				$presences[$row['entrainement']]=array();
+		foreach ($results as $row) {
+			if (!array_key_exists($row->entrainement,$presences)) {
+				$presences[$row->entrainement]=array();
 			}
-			array_push($presences[$row['entrainement']],array( "user"=>$row['user'],"val"=>$row['val']));
+			array_push($presences[$row->entrainement],array( "user"=>$row->user,"val"=>$row->val));
 		}
+
 
 		$json = array();
 
 		foreach ($entrainements as $e) {
 
-			$currententrainement=array( "id"    => $e["id"],
-										"date"  => $e["jour"],
+			$currententrainement=array( "id"    => $e->id,
+										"date"  => $e->jour,
 										"users" => array());
 
 			foreach($myusers as $u) {
 				$val=0;
-				if (array_key_exists($e["id"],$presences)) {
-					foreach($presences[$e["id"]] as $p) {
-						if ($p["user"] == $u["id"]) {
+				if (array_key_exists($e->id,$presences)) {
+					foreach($presences[$e->id] as $p) {
+						if ($p["user"] == $u->id) {
 							$val=$p["val"];
 							break;
 						}
@@ -56,9 +65,9 @@ class Presences {
 				}
 
 				array_push($currententrainement["users"],array(
-					"id" => $u["id"],
+					"id" => $u->id,
 					"pres" => $val,
-					"prenom" => $u["prenom"]
+					"prenom" => $u->prenom
 				));
 			}
 			
@@ -84,57 +93,6 @@ class Presences {
 	}
 
 	/**
-	 * Comme son nom l'indique retourne true si l'enregistrement existe
-	 * db doit etre instancié
-	 */
-	protected function exists($entrainement,$usr) {
-		$query = 'SELECT count(*) FROM presences WHERE entrainement=:entrainement AND user=:user';
-		$stmt = $this->db->prepare($query);
-
-		if (($stmt->bindValue(':entrainement', $entrainement, SQLITE3_INTEGER)) &&
-			($stmt->bindValue(':user', $usr, SQLITE3_INTEGER))) {	
-		
-			$result = $stmt->execute();
-			if ($result===false) {
-				loginfo($stmt->getSQL(true));
-				loginfo("Erreur");	
-				return false;
-			}
-			while ($row = $result->fetchArray()) {
-				return ($row[0] >= 1);
-			}
-			
-		} else {
-			loginfo("Erreur bindValue");	
-			return false;
-		}
-	}
-
-
-	/** Cree l'enregistrement s'il n'existe pas.
-	 * db doit etre instancié
-	*/
-	protected function createIfNotExists($entrainement,$usr) {
-
-		if ($this->exists($entrainement,$usr)==false) {
-			$query = 'INSERT INTO presences(entrainement,user,val) VALUES (:entrainement,:user,0)';
-			$stmt = $this->db->prepare($query);
-
-			if (($stmt->bindValue(':entrainement', $entrainement, SQLITE3_INTEGER)) &&
-				($stmt->bindValue(':user', $usr, SQLITE3_INTEGER))) {
-			
-				$result = $stmt->execute();
-				if ($result===false) {
-					loginfo($stmt->getSQL(true));
-					loginfo("Erreur");	
-					return false;
-				}
-			}	
-		}
-		return true;
-	}
-
-	/**
 	 * Verifie s'il y a déjà un enregistrement sinon le cree
 	 * Ensuite met à jour la valeur de la presence
 	 * Attend en entree un json : { entrainement : id, "usr" : id, "pres": int}
@@ -144,25 +102,12 @@ class Presences {
 
 		if ( is_int($json['usr']) && is_int($json['entrainement']) && is_int($json['pres'])) {
 
-			$this->createIfNotExists($json['entrainement'],$json['usr']);
-			
-			$query='UPDATE presences SET val=:val WHERE entrainement=:entrainement AND user=:user';
-		
-			$stmt = $this->db->prepare($query);
-
-			if (($stmt->bindValue(':entrainement', $json['entrainement'], SQLITE3_INTEGER)) &&
-				($stmt->bindValue(':user', $json['usr'], SQLITE3_INTEGER)) &&
-				($stmt->bindValue(':val', $json['pres'], SQLITE3_INTEGER)) ) {
-
-				if ($stmt->execute()===false) {
-					loginfo($stmt->getSQL(true));
-					loginfo("Erreur");
-				}
-				$stmt->reset();					
-
+			if ($this->presences->exists($json['entrainement'],$json['usr'])) {				
+				$this->presences->update($json['entrainement'],$json['usr'],$json['pres']);
 			} else {
-				loginfo("Erreur query values");
+				$this->presences->create($json['entrainement'],$json['usr'],$json['pres']);
 			}
+
 		} else {
 			responseError("Bad input");
 		}

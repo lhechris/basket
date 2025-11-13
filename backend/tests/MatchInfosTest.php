@@ -44,82 +44,40 @@ class MatchInfosTest extends TestCase
         $this->matchInfos = new MatchInfos(self::$donnees);
     }
 
-
-    /**
-     * GetArray
-     */
-    public function testGetArray()
+    public function testUpdateRecordExists()
     {
-        $match = 1; // Assuming match 1 exists in the database
-        $result = $this->matchInfos->getArray($match);
-
-        //On doit avoir un seul enregistrement de ListMatchInfo
-        $this->assertIsArray($result);        
-        $this->assertEquals(1,count($result));        
-        $this->assertInstanceOf(ListMatchInfo::class, $result[0]);
-
-        $li = $result[0];        
-
-        $a = $li->a;
-        $b = $li->b;
-        $autres = $li->autres;
-
-        $this->assertEquals(2,count($a));
-        $this->assertEquals(1,count($b));
-        $this->assertEquals(1,count($autres));
-        
-        $this->assertInstanceOf(MatchInfo::class,$a[0]);
-        $this->assertEquals(1,     $a[0]->joueur->id);
-        $this->assertEquals("riri",$a[0]->joueur->prenom);
-        $this->assertEquals("A",   $a[0]->opposition);
-        $this->assertEquals(4,     $a[0]->numero);
-
-        $this->assertInstanceOf(MatchInfo::class,$a[1]);
-        $this->assertEquals(2,      $a[1]->joueur->id);
-        $this->assertEquals("fifi", $a[1]->joueur->prenom);
-        $this->assertEquals("A",    $a[1]->opposition);
-        $this->assertEquals(5,      $a[1]->numero);
-
-        $this->assertInstanceOf(MatchInfo::class,$b[0]);
-        $this->assertEquals(3,       $b[0]->joueur->id);
-        $this->assertEquals("loulou",$b[0]->joueur->prenom);
-        $this->assertEquals("B",     $b[0]->opposition);
-        $this->assertEquals(6,       $b[0]->numero);
-
-        $this->assertInstanceOf(MatchInfo::class,$autres[0]);
-        $this->assertEquals(4,       $autres[0]->joueur->id);
-        $this->assertEquals("daisy", $autres[0]->joueur->prenom);
-        $this->assertEquals(null,    $autres[0]->opposition);
-        $this->assertEquals(null,    $autres[0]->numero);
-
-    }
-
-    public function testCreateIfNotExists()
-    {
-        $match = 1;
-        $user = 5; // Assuming user 5 does not exist in matchinfos
-        $opposition = "Team B";
-        $numero = 10;
-        $commentaire = "Test comment";
-
+        $json = [
+            'match' => 1,
+            'usr' => 3, 
+            'opposition' => "C",
+            'numero' => 20,
+            'commentaire' => "Updated comment"
+        ];
 
         // Call protected method using Reflection
         $reflection = new ReflectionClass(get_class($this->matchInfos));
-        $method = $reflection->getMethod('createIfNotExists');
+        $method = $reflection->getMethod('update');
         $method->setAccessible(true);
-        $result = $method->invoke($this->matchInfos, $match, $user, $opposition, $numero, $commentaire);
+        $method->invoke($this->matchInfos, $json);
 
-        $this->assertTrue($result, "Expected to create a new record");
 
-        // Check if the record was created
-        $method = $reflection->getMethod('exists');
-        $method->setAccessible(true);
-        $exists=$method->invoke($this->matchInfos, $match, $user);
-
-        $this->assertTrue($exists, "Record should exist after creation");
+        //Verifie qu'il y a un nouvelle enregistrement
+        $nb=0;
+        $results = self::$donnees->db->query('SELECT user,match,opposition,numero,commentaire FROM matchinfos');
+        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+            if ($row["user"] == $json["usr"] && $row["match"] == $json["match"]) {
+                $this->assertEquals($json["opposition"],    $row["opposition"]);
+                $this->assertEquals($json['numero'], $row["numero"]);
+                $this->assertEquals($json['commentaire'], $row["commentaire"]);                
+            }
+            $nb++;
+        }
+        $this->assertEquals(3,$nb);
+        
     }
 
-    public function testUpdate()
+
+    public function testUpdateRecordNotExists()
     {
         $json = [
             'match' => 1,
@@ -135,26 +93,28 @@ class MatchInfosTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($this->matchInfos, $json);
 
-        // Verify the update
-        $result = $this->matchInfos->getArray($json['match']);        
 
-        //On doit avoir un seul enregistrement de ListMatchInfo
-        $this->assertEquals(1,count($result));
-        $li = $result[0];
-        $this->assertInstanceOf(ListMatchInfo::class, $li);
-
-        $this->assertEquals(2,count($li->a));
-        $this->assertEquals(2,count($li->b));
-        $this->assertEquals(0,count($li->autres));
-
-        $this->assertEquals(4,      $li->b[1]->joueur->id);
-        $this->assertEquals("daisy",$li->b[1]->joueur->prenom);
-        $this->assertEquals("B",    $li->b[1]->opposition);
-        $this->assertEquals($json['numero'], $li->b[1]->numero);
-        $this->assertEquals($json['commentaire'], $li->b[1]->commentaire);
+        //Verifie qu'il y a un nouvelle enregistrement
+        $nb=0;
+        $results = self::$donnees->db->query('SELECT user,match,opposition,numero,commentaire FROM matchinfos');
+        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+            if ($row["user"] == $json["usr"] && $row["match"] == $json["match"]) {
+                $this->assertEquals($json["opposition"],    $row["opposition"]);
+                $this->assertEquals($json['numero'], $row["numero"]);
+                $this->assertEquals($json['commentaire'], $row["commentaire"]);                
+            }
+            $nb++;
+        }
+        $this->assertEquals(4,$nb);
+        
+        //supprime l'enregistrement
+        self::$donnees->db->exec("DELETE FROM matchinfos WHERE user=".$json['usr']." and match=".$json['match']);
     }
 
-    public function testUpdateNonExistentRecord()
+
+
+
+    public function testUpdateNonExistentPlayer()
     {
         $json = [
             'match' => 999, // Assuming this match does not exist
@@ -170,10 +130,16 @@ class MatchInfosTest extends TestCase
         $method->invoke($this->matchInfos, $json);
 
         // Verify that record was created
-        $method = $reflection->getMethod('exists');
-        $method->setAccessible(true);
-        $exists = $method->invoke($this->matchInfos, $json['match'], $json['usr']);        
-
-        $this->assertTrue($exists, "Record should exist after trying to update a non-existent record");
+        $nb=0;
+        $results = self::$donnees->db->query('SELECT user,match,opposition,numero,commentaire FROM matchinfos');
+        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+            if ($row["user"] == $json["usr"] && $row["match"] == $json["match"]) {
+                $this->assertEquals($json["opposition"],    $row["opposition"]);
+                $this->assertEquals($json['numero'], $row["numero"]);
+                $this->assertEquals($json['commentaire'], $row["commentaire"]);                
+            }
+            $nb++;
+        }
+        $this->assertEquals(4,$nb);
     }
 }

@@ -1,59 +1,28 @@
 <?php 
 
-require_once("utils.php");
-require_once("matchs.php");
-require_once("users.php");
+//require_once("utils.php");
 require_once("dao/SelectionsDAO.php");
 require_once("dao/DisponibilitesDAO.php");
 require_once("dao/MatchsDAO.php");
+require_once("dao/UsersDAO.php");
 
 use dao\SelectionsDAO;
 use dao\DisponibilitesDAO;
 use dao\MatchsDAO;
+use dao\UsersDAO;
 
-class Selection extends CommonModel {
-	public $match, $user, $val, $jour, $titre,$equipe, $prenom, $dispo;
-
-	public function to_array() : array {
-		return [
-			"match"  => $this->match,
-			"user"   => $this->user,
-			"val"    => $this->val,
- 			"jour"   => $this->jour,
-			"titre"  => $this->titre,
-			"equipe" => $this->equipe,
-			"prenom" =>$this->prenom,
-			"dispo"  => $this->dispo
-		];
-	}
-
-	public function from_array(array $data) {
-		$this->jour = $this->nullifnotexists($data,"jour");		
-		$this->match = $this->nullifnotexists($data,"match");
-		$this->user = $this->nullifnotexists($data,"user");
-		$this->val = $this->nullifnotexists($data,"val");
-		$this->titre = $this->nullifnotexists($data,"titre");
-		$this->equipe = $this->nullifnotexists($data,"equipe");
-		$this->prenom = $this->nullifnotexists($data,"prenom");
-		$this->dispo = $this->nullifnotexists($data,"dispo");
-
-	}
-}
-
-class Selections extends CommonCtrl {
+class Selections  {
 	private $users;	
-	private $matchs, $matchsOld;
-	private $disponibilites, $disponibilitesOld;
+	private $matchs;
+	private $disponibilites;
 	private $selections;
 
-	public function __construct($donnees,$users,$matchs) {		
-		$this->users = $users;
-		$this->matchsOld = $matchs;
-		$this->disponibilitesOld = new Disponibilites($donnees,$users,$matchs);
+	public function __construct($donnees) {		
+		$this->users = $users = new UsersDAO($donnees);
 		$this->disponibilites = new DisponibilitesDAO($donnees);
 		$this->matchs = new MatchsDAO($donnees);
 		$this->selections = new SelectionsDAO($donnees);
-		parent::__construct($donnees);
+		//parent::__construct($donnees);
 	}	
 
 
@@ -62,56 +31,48 @@ class Selections extends CommonCtrl {
 	 * [ { prenom, nb, matchs : [{jour,equipe,selection,dispo},...]},...] 
 	 */
 	public function getArray() {
-		$users = $this->users->getArray();
 
-		//Initialize le tableau de sortie
-		$json = array("jours"=>array(),"joueurs"=>array());
+		//Initialize le tableau de sortie		
 		$jours = array();
+		$joueurs = array();
 
 		//recupère la liste des matchs par jour
-		$results = $this->query('SELECT id,jour,equipe FROM matchs ORDER BY jour',[],"MatchBasket");
+		$results = $this->matchs->getAll();
 		foreach($results as $m) {
 
 			//calcule le nombre de joueur selectionné pour ce match
-			$nbmatchs = $this->querycount("matchs A,selections B",
-										  "A.id=B.match AND B.val=1 AND A.id=:id",
-										  [[':id', $m->id, SQLITE3_INTEGER]]);
-
+			$nbjoueurs = $this->selections->getNbPlayer($m->id);
+				
 			//Ajoute ce match dans la liste de jour
 			$notfound=true;
-			foreach ($json["jours"] as &$j) { 
+			foreach ($jours as &$j) { 
 				if ($j["jour"] == $m->jour) {					
-					array_push($j["matchs"],["id"=>$m->id,"equipe"=>$m->equipe, "nb"=>$nbmatchs]);
+					array_push($j["matchs"],["id"=>$m->id,"equipe"=>$m->equipe, "nb"=>$nbjoueurs]);
 					$notfound=false;
 					break;
 				}
 			}
 			if ($notfound) {
-				array_push($json["jours"],["jour"=>$m->jour ,"matchs"=>array(["id"=>$m->id,"equipe"=>$m->equipe,"nb"=>$nbmatchs])]);
+				array_push($jours,["jour"=>$m->jour ,"matchs"=>array(["id"=>$m->id,"equipe"=>$m->equipe,"nb"=>$nbjoueurs])]);
 			}	
 		}
 
 		//On récupère toutes les selections des tous les matchs de toutes les équipes
-		$results = $this->query('SELECT A.match,A.user,A.val, B.jour, B.titre,B.equipe, C.prenom '.
-									'FROM selections A, matchs B, users C '.
-									'WHERE A.match=B.id AND A.user=C.id '.
-									'ORDER BY B.jour,B.equipe,C.prenom',
-								[],"Selection");
+		$results = $this->selections->getAll();
 		
 		//Prepare le tableau finale (cree une ligne par joueur)
+		$users = $this->users->getAll();
 		foreach ($users as $u) {
 
 			//calcul le nombre de match selectionne pour ce joueur
-			$nbmatchs = $this->querycount("users A,selections B, matchs C",
-										  "A.id=B.user AND B.val=1 AND C.id=B.match AND A.id=:id",
-										  [[':id', $u["id"], SQLITE3_INTEGER]]);
-
-			array_push($json["joueurs"],["id" => $u["id"],"prenom" => $u["prenom"],"nb" => $nbmatchs,"jours" => $json["jours"]]);
+			$nbmatchs = $this->selections->getNbMatch($u->id);
+			$jours2=unserialize(serialize($jours));
+			array_push($joueurs,["id" => $u->id,"prenom" => $u->prenom,"nb" => $nbmatchs, "jours" => $jours2]);
 		}
 
 		//Ajoute les matchs et selection pour chaque joueurs
 		foreach ($results as $row) {
-			foreach ($json["joueurs"] as &$u) { 
+			foreach ($joueurs as &$u) { 
 				if ($u["id"] == $row->user) {
 					//ajoute les champs dans le match
 					foreach ($u["jours"] as &$jour) {						
@@ -129,7 +90,7 @@ class Selections extends CommonCtrl {
 		//Ajoute les dispo
 		$disponibilites = $this->disponibilites->getAll();
 
-		foreach ($json["joueurs"] as &$u) {
+		foreach ($joueurs as &$u) {
 			foreach($u["jours"] as &$jour) {
 				$notfound=true;
 				foreach ($disponibilites as $dispo) {
@@ -142,7 +103,8 @@ class Selections extends CommonCtrl {
 				if ($notfound) {$jour["dispo"] = 0;}
 			}
 		}
-		return $json;
+
+		return ["jours" => $jours,"joueurs" => $joueurs];
 
 	}
 
@@ -151,25 +113,21 @@ class Selections extends CommonCtrl {
 	 * retourne le fichier json
 	 */
 	public function getArrayOld() {
-
-		$users = $this->users->getArray();
-		$matchs = $this->matchsOld->getArray();	
-		$disponibilites = $this->disponibilitesOld->getArray();
+		
+		$disponibilites = $this->disponibilites->getAll();
+		$matchs = $this->matchs->getAll();
 
 		//On récupère toutes les selections des tous les matchs de toutes les équipes
-		$results = $this->db->query('SELECT A.match,A.user,A.val, B.jour, B.titre,B.equipe, C.prenom '.
-									'FROM selections A, matchs B, users C '.
-									'WHERE A.match=B.id AND A.user=C.id '.
-									'ORDER BY B.jour,B.equipe,C.prenom');
+		$results = $this->selections->getAll();
 
 		//On classe le résultat par match, 
 		//On crée une liste de match qui contient la liste des joueurs selectionnés
 		$selections = array();
-		while ($row = $results->fetchArray()) {
-			if (!array_key_exists($row['match'],$selections)) {				
-				$selections[$row['match']]=array();
+		foreach ($results as $row) {
+			if (!array_key_exists($row->match,$selections)) {				
+				$selections[$row->match]=array();
 			}
-			array_push($selections[$row['match']],array( "user"=>$row['user'],"val"=>$row['val']));
+			array_push($selections[$row->match],array( "user"=>$row->user,"val"=>$row->val));
 
 		}
 		
@@ -187,12 +145,13 @@ class Selections extends CommonCtrl {
 			
 			$nbselected=0;					 
 			//on ajoute chaque joueurs
+			$users = $this->users->getAll();
 			foreach($users as $u) {
 				$selected=0;
 				//si ce joueur à une selection pour ce match on garde sa valeur				
 				if (array_key_exists($m->id,$selections)) {					
 					foreach($selections[$m->id] as $p) {
-						if ($p["user"] == $u["id"]) {
+						if ($p["user"] == $u->id) {
 							$selected=$p["val"];
 							if ($selected == 1) {$nbselected++;}
 							break;
@@ -200,31 +159,27 @@ class Selections extends CommonCtrl {
 					}
 				}
 
-				if (($selected == 0) && ($u["equipe"]!=$m->equipe)) {
+				if (($selected == 0) && ($u->equipe!=$m->equipe)) {
 					//on ne met pas le joueur parce qu'il ne fait pas partie de l'equipe
 					//et qu'il n'a pas de selection (ça peut arriver si on l'a changé d'équipe)
 				} else {
 					//on recherche sa disponibilité
 					$dispo=0;
 					foreach ($disponibilites as $disponibilite) {
-						if ($disponibilite["jour"]==$m->jour) {
-							foreach($disponibilite["users"] as $du) {
-								if ($du["id"] == $u["id"]) {
-									$dispo=$du["dispo"];
-									break;
-								}
-							}
+						if ($disponibilite->jour == $m->jour && $disponibilite->user == $u->id) {
+							$dispo=$disponibilite->val;
 							break;
 						}
 					}
+					
 					$joueur=array(
-						"id" => $u["id"],
+						"id" => $u->id,
 						"selection" => $selected,
 						"dispo" => $dispo,
-						"prenom" => $u["prenom"]
+						"prenom" => $u->prenom
 					);
 					//en fonction de l'equipe on ne le met pas dans la meme liste
-					if ($u["equipe"]==$m->equipe) {
+					if ($u->equipe==$m->equipe) {
 						array_push($currentmatch["users"],$joueur);
 					} else {
 						array_push($currentmatch["autres"],$joueur);
@@ -291,45 +246,24 @@ class Selections extends CommonCtrl {
 			if ($j["equipe"] == $match["equipe"]) { $key=$k;}
 		}
 		if ($key < 0) {
+			//L'equipe n'est pas dans le json on cree donc l'entete
 			$joueurs = array();
-			$autrejoueurs=array();
 			//on cree la liste des joueurs de l'equipe
-			$query = "SELECT prenom,equipe FROM users WHERE equipe=:equipe ORDER BY prenom";
-			$stmt = $this->db->prepare($query);
-			
-			if ($stmt->bindValue(':equipe', $match["equipe"], SQLITE3_INTEGER)) {
-				$result = $stmt->execute();
-				if ($result===false) {
-					loginfo($stmt->getSQL(true));
-					loginfo("Erreur");	
-					return false;
-				}
+			$result = $this->users->getPlayersByTeam($match["equipe"]);
 
-				while ($row = $result->fetchArray()) {
-					array_push($joueurs,array("prenom"=>$row['prenom'],"nb"=>0));
-				}		
-			}			
+			foreach ($result as $row) {
+				array_push($joueurs,array("prenom"=>$row->prenom,"nb"=>0));
+			}		
 
 			//on ajoute les joueurs qui ne font pas partie de l'equipe
 			//mais qui ont participes aux matchs
-			$query = "SELECT C.prenom,C.equipe FROM selections A, matchs B, users C ".
-					 "WHERE A.match=B.id AND B.equipe=:equipe AND C.id=A.user AND C.equipe!=:equipe AND A.val=1 ".
-					 "GROUP BY (C.id) ORDER BY C.prenom";
-			$stmt = $this->db->prepare($query);
-
-			if ($stmt->bindValue(':equipe', $match["equipe"], SQLITE3_INTEGER)) {
-				$result = $stmt->execute();
-				if ($result===false) {
-					loginfo($stmt->getSQL(true));
-					loginfo("Erreur");	
-					return false;
-				}
-
-				while ($row = $result->fetchArray()) {
-					array_push($autrejoueurs,array("prenom"=>$row['prenom'],"nb"=>0));
-				}		
+			$result = $this->selections->getPlayersSelectedButInOtherTeam($match["equipe"]);
+			
+			$autrejoueurs=array();
+			foreach ($result as $row) {
+					array_push($autrejoueurs,array("prenom"=>$row->prenom,"nb"=>0,"id"=>$row->id));					
 			}
-
+			$match["autres"] = $this->reclassejoueurs($autrejoueurs,$match["autres"]);
 			array_push($json,array(
 						"equipe" => $match["equipe"],
 						"joueurs" => $joueurs,
@@ -338,38 +272,46 @@ class Selections extends CommonCtrl {
 			));
 		} else {
 			//l'equipe existe dejà on ajoute juste le match
+			
+			//On reclasse autrejoueurs pour etre le meme que dans l'entete
+			$match["autres"] = $this->reclassejoueurs($json[$key]["autrejoueurs"],$match["autres"]);
 			array_push($json[$key]["matchs"],$match);
 		}
 	}
+
+	private function reclassejoueurs($listejoueurs, $toreclasse) {
+		$out = $listejoueurs;
+		foreach($out as &$nj) {
+			$nj["dispo"] = 0;
+			$nj["selection"] = 0;
+			foreach ($toreclasse as $j) {
+				if ($nj["id"] == $j["id"]) {
+					$nj["dispo"] = $j["dispo"];
+					$nj["selection"] = $j["selection"];
+				}
+			}
+		}
+		return $out;
+	}
+
 
 	/**
 	 * Met à jour les compteurs du nombre de match selectionne par joueur
 	 */
 	private function majcompteurs(&$json) {
-		foreach ($json as &$equipe) {
-			$query = 'SELECT A.prenom ,count(*) '.
-					  'FROM users A,selections B, matchs C '.
-					  'WHERE A.id=B.user AND B.val=1 AND C.id=B.match '.
-					  'GROUP BY A.prenom ORDER BY A.prenom';
-			$stmt = $this->db->prepare($query);
-
-			$result = $stmt->execute();
-			if ($result===false) {
-				loginfo($stmt->getSQL(true));
-				loginfo("Erreur");	
-				return false;
-			}
-
-			while ($row = $result->fetchArray()) {
+		
+		$result = $this->selections->getNbMatchForEachPlayer();
+		foreach ($json as &$equipe) {		
+			foreach ($result as $row) {
 				foreach ($equipe["joueurs"] as &$joueur){ 
-					if ($joueur["prenom"] == $row["prenom"]) {
-						$joueur["nb"] = $row["count(*)"];
+					if ($joueur["prenom"] == $row->prenom) {
+						$joueur["nb"] = $row->nb;
 						break;
 					}
 				}
 				foreach ($equipe["autrejoueurs"] as &$joueur){ 
-					if ($joueur["prenom"] == $row["prenom"]) {
-						$joueur["nb"] = $row["count(*)"];
+					if ($joueur["prenom"] == $row->prenom) {
+						$joueur["nb"] = $row->nb;
 						break;
 					}
 				}

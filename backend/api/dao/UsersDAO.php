@@ -19,7 +19,7 @@ class UsersDAO extends BaseDAO {
      * Retourne la liste des joueurs dans une équipe
      */
     public function getPlayersByTeam($equipe): array {
-        $sql = "SELECT prenom,equipe FROM users WHERE equipe=:equipe ORDER BY prenom";
+        $sql = "SELECT id,prenom,equipe FROM users WHERE equipe=:equipe ORDER BY prenom";
         $res = $this->prepareAndExecute($sql, [':equipe' => [$equipe, SQLITE3_INTEGER]]);
         return $this->fetchAll($res);
     }
@@ -42,7 +42,7 @@ class UsersDAO extends BaseDAO {
 			':otm' => [ $otm, SQLITE3_INTEGER],
 			':charte' => [ $charte, SQLITE3_INTEGER]
         ]);
-        return $this->db->lastInsertRowID();
+        return $this->lastInsertRowID();
     }
 
 
@@ -58,7 +58,7 @@ class UsersDAO extends BaseDAO {
 			':charte' => [ $charte, SQLITE3_INTEGER]
         ]);
 
-        return $this->db->changes();
+        return $this->changes();
     }
 
     public function delete(int $id): int {
@@ -74,6 +74,6 @@ class UsersDAO extends BaseDAO {
         $sql = "DELETE FROM presences WHERE user=:id";
         $this->prepareAndExecute($sql, [':id' => [$id, SQLITE3_INTEGER]]);
         
-        return $this->db->changes();
+        return $this->changes();
     }
 }

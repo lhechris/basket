@@ -3,9 +3,10 @@
 use PHPUnit\Framework\TestCase;
 
 include_once("api/env.php");
-include_once("api/donnees.php");
+include_once("api/dao/BaseDAO.php");
 include_once("api/matchinfos.php");
 
+use dao\BaseDAO;
 
 class MatchsTest extends TestCase
 {
@@ -20,30 +21,39 @@ class MatchsTest extends TestCase
     public static function setUpBeforeClass(): void    
     {
         loadEnv("tests/.env");
-        self::$donnees = new Donnees();
+        loginfo("START MatchsTest");
+        self::$donnees = new BaseDAO();
         
         $sql= file_get_contents("config/createdb.sql");
-        self::$donnees->db->exec($sql);      
+        self::$donnees->exec($sql);      
 
         //ajout donnees de test
-        self::$donnees->db->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
+        self::$donnees->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
                         "VALUES(1,'2025-09-27','match2','24/8','gontran','geo trouvetou','machine à laver','quelque part','12h15','11h20')");
-        self::$donnees->db->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
+        self::$donnees->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
                         "VALUES(1,'2025-09-20','match1','0/0','donald','picsou','nobody','ici ou la bas','12h00','11h00')");
-        self::$donnees->db->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots) ".
+        self::$donnees->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots) ".
                         "VALUES(2,'2025-10-05','match3','24/8','flagada','flairsou','rapetou')");
 
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('riri',1,  'duck','BC011001',1,1)");
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('fifi',1,  'duck','BC011002',0,1)");
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('loulou',2,'duck','BC011003',1,0)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('riri',1,  'duck','BC011001',1,1)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('fifi',1,  'duck','BC011002',0,1)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('loulou',2,'duck','BC011003',1,0)");
 
-        self::$donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(1,1,1)");
-        self::$donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(2,1,1)");
-        self::$donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(3,1,1)");
+        self::$donnees->exec("INSERT INTO selections(user,match,val) VALUES(1,1,1)");
+        self::$donnees->exec("INSERT INTO selections(user,match,val) VALUES(2,1,1)");
+        self::$donnees->exec("INSERT INTO selections(user,match,val) VALUES(3,1,1)");
         
-        self::$donnees->db->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(3,1,'A')");
-        self::$donnees->db->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(2,1,'B')");
+        self::$donnees->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(3,1,'A')");
+        self::$donnees->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(2,1,'B')");
 
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (isset(self::$donnees) && self::$donnees) {
+            self::$donnees->close();
+        }
+        loginfo("STOP MatchsTest");
     }
 
     /**
@@ -51,8 +61,8 @@ class MatchsTest extends TestCase
      * Create a new instance
      */
     protected function setUp(): void {
-        $this->matchInfos = new MatchInfos(self::$donnees);
-        $this->matchs = new Matchs(self::$donnees, $this->matchInfos);
+        $this->matchInfos = new MatchInfos();
+        $this->matchs = new Matchs();
     }
 
     /**
@@ -308,15 +318,15 @@ class MatchsTest extends TestCase
         $this->assertEquals("quelquepart",$result->rendezvous);
         
         //Supprime cet enregistrement
-        self::$donnees->db->exec("DELETE FROM matchs WHERE id=4");
+        self::$donnees->exec("DELETE FROM matchs WHERE id=4");
     }
 
 
     public function test_supprimeMatch() {
 
-        self::$donnees->db->exec("INSERT INTO matchs(id,equipe,titre) VALUES(99,3,'to be deleted')");
-        self::$donnees->db->exec("INSERT INTO selections(match,user,val) VALUES(99,1,1)");
-        self::$donnees->db->exec("INSERT INTO matchinfos(match,user) VALUES(99,1)");
+        self::$donnees->exec("INSERT INTO matchs(id,equipe,titre) VALUES(99,3,'to be deleted')");
+        self::$donnees->exec("INSERT INTO selections(match,user,val) VALUES(99,1,1)");
+        self::$donnees->exec("INSERT INTO matchinfos(match,user) VALUES(99,1)");
 
         // Call protected method using Reflection
         $reflection = new ReflectionClass(get_class($this->matchs));
@@ -325,15 +335,15 @@ class MatchsTest extends TestCase
         $method->invoke($this->matchs,99);
 
         // Verifie que les enregistrements ont disparus dans les 3 tables
-        $results=self::$donnees->db->query("SELECT count(*) from matchs where id=99");
+        $results=self::$donnees->query("SELECT count(*) from matchs where id=99");
         while ($row = $results->fetchArray()) {
             $this->assertEquals(0,$row[0]);
         }
-        $results=self::$donnees->db->query("SELECT count(*) from selections where match=99");
+        $results=self::$donnees->query("SELECT count(*) from selections where match=99");
         while ($row = $results->fetchArray()) {
             $this->assertEquals(0,$row[0]);
         }
-        $results=self::$donnees->db->query("SELECT count(*) from matchinfos where match=99");
+        $results=self::$donnees->query("SELECT count(*) from matchinfos where match=99");
         while ($row = $results->fetchArray()) {
             $this->assertEquals(0,$row[0]);
         }

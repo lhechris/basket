@@ -8,8 +8,8 @@ use dao\EntrainementsDAO;
 class Entrainements {
 	private $entrainements;
 
-	public function __construct($donnees) {
-		$this->entrainements = new EntrainementsDAO($donnees);
+	public function __construct() {
+		$this->entrainements = new EntrainementsDAO();
 	}
 
 

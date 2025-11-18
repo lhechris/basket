@@ -10,8 +10,8 @@ use dao\UsersDAO;
 class Users {
 	private $users;
 
-	public function __construct($donnees) {
-		$this->users = new UsersDAO($donnees);
+	public function __construct() {
+		$this->users = new UsersDAO();
 	}
 
 

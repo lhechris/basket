@@ -22,9 +22,9 @@ class MatchInfos  {
     private $matchinfos;
     private $selections;
 
-    public function __construct($donnees) {
-        $this->matchinfos = new MatchInfosDAO($donnees);
-        $this->selections = new SelectionsDAO($donnees);
+    public function __construct() {
+        $this->matchinfos = new MatchInfosDAO();
+        $this->selections = new SelectionsDAO();
     }
 
     public function set($json) {

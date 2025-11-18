@@ -24,7 +24,7 @@ class SelectionsDAO extends BaseDAO {
             ':user' => [$user, SQLITE3_INTEGER],
             ':val' => [$val, SQLITE3_INTEGER]
         ]);
-        return $this->db->lastInsertRowID();
+        return $this->lastInsertRowID();
     }
 
     /**
@@ -120,7 +120,7 @@ class SelectionsDAO extends BaseDAO {
             ':jour' => [$jour, SQLITE3_TEXT],
             ':user' => [$user, SQLITE3_INTEGER]
         ]);
-        return $this->db->changes();
+        return $this->changes();
     }    
 
 

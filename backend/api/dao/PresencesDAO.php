@@ -44,7 +44,7 @@ class PresencesDAO extends BaseDAO {
 					 ':user' => [$userid, SQLITE3_INTEGER],
                      ':val' => [$val, SQLITE3_INTEGER]] );
 
-        return $this->db->changes();
+        return $this->changes();
     }
 	
     public function create($entrainementid,$userid,$val) {
@@ -55,7 +55,7 @@ class PresencesDAO extends BaseDAO {
 					 ':user' => [$userid, SQLITE3_INTEGER],
                      ':val' => [$val, SQLITE3_INTEGER]] );
 
-        return $this->db->lastInsertRowID();
+        return $this->lastInsertRowID();
 	}
 
 
@@ -66,7 +66,7 @@ class PresencesDAO extends BaseDAO {
                     [':entrainement'=> [$entrainementid, SQLITE3_INTEGER],
 					 ':user' => [$userid, SQLITE3_INTEGER]] );
 
-		return $this->db->changes();
+		return $this->changes();
 	}
 
 

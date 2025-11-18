@@ -5,8 +5,10 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../api/env.php';
-require_once __DIR__ . '/../api/donnees.php';
+require_once __DIR__ . '/../api/dao/BaseDAO.php';
 require_once __DIR__ . '/../api/users.php';
+
+use dao\BaseDAO;
 
 class UsersTest extends TestCase
 {
@@ -16,24 +18,39 @@ class UsersTest extends TestCase
     public static function setUpBeforeClass(): void    
     {
         loadEnv(__DIR__ . '/.env');
-        self::$donnees = new Donnees();
+        //$dbfilename = "tests/data/UsersTest.db";
+        //if (file_exists($dbfilename)) { unlink($dbfilename);}
+        //putenv("DBLOCATION=".$dbfilename);
+        loginfo("START UsersTest");
+        self::$donnees = new BaseDAO();
+        self::$donnees->close();
+        self::$donnees->open();
+
 
         // Create test database
         $sql = file_get_contents(__DIR__ . '/../config/createdb.sql');
-        self::$donnees->db->exec($sql);
+        self::$donnees->exec($sql);
 
         // Add test data
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('riri',1,'duck','BC011001',1,1)");
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('fifi',1,'duck','BC011002',0,1)");
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('loulou',2,'duck','BC011003',1,0)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('riri',1,'duck','BC011001',1,1)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('fifi',1,'duck','BC011002',0,1)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('loulou',2,'duck','BC011003',1,0)");
 
-        self::$donnees->db->exec("INSERT INTO presences(user,entrainement,val) VALUES(1,1,1)");
-        self::$donnees->db->exec("INSERT INTO presences(user,entrainement,val) VALUES(2,1,1)");
+        self::$donnees->exec("INSERT INTO presences(user,entrainement,val) VALUES(1,1,1)");
+        self::$donnees->exec("INSERT INTO presences(user,entrainement,val) VALUES(2,1,1)");
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (isset(self::$donnees) && self::$donnees) {
+            self::$donnees->close();
+        }
+        loginfo("STOP UsersTest");
     }
 
     protected function setUp(): void
     {
-        $this->users = new Users(self::$donnees);
+        $this->users = new Users();
     }
 
     public function testGetArray(): void
@@ -94,7 +111,7 @@ class UsersTest extends TestCase
         $this->assertEquals(3, $created['equipe'], 'Equipe should be updated to 2');
 
         //supprime l'enregistrement
-        self::$donnees->db->exec("DELETE FROM users WHERE id=$id");
+        self::$donnees->exec("DELETE FROM users WHERE id=$id");
 
     }
 

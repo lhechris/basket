@@ -21,7 +21,7 @@ class EntrainementsDAO extends BaseDAO {
 
 		$sql = 'INSERT INTO entrainements(jour) VALUES(:jour)';
 		$this->prepareAndExecute($sql,[ ':jour' => [$jour, SQLITE3_TEXT]]);        
-        return $this->db->lastInsertRowID();
+        return $this->lastInsertRowID();
 	}
 
 
@@ -29,14 +29,14 @@ class EntrainementsDAO extends BaseDAO {
 		
 		$sql='DELETE FROM entrainements WHERE jour=:jour';
 		$this->prepareAndExecute ($sql,[':jour' => [$jour, SQLITE3_TEXT]]); 
-		return $this->db->changes();
+		return $this->changes();
 	}
 
     public function deleteAll() {
 		
 		$sql='DELETE FROM entrainements';
 		$this->prepareAndExecute ($sql,[]); 
-		return $this->db->changes();
+		return $this->changes();
 	}
 
 }

@@ -2,20 +2,44 @@
 
 namespace dao;
 
+//include_once("../utils.php");
+
 use RuntimeException;
+use SQLite3;
 
 class BaseDAO {
-    protected $db;
+    static public $db=null;
 
-    public function __construct($donnees) {
-        // $donnees peut être l'objet Donnees ou l'objet DB direct
-        $this->db = $donnees->db;
+    public function __construct() {
+        $this->open();
     }
 
+    public function exec($sql) {
+        return self::$db->exec($sql);
+    }
+    public function query($sql) {
+        return self::$db->query($sql);
+    }
+    public function close() {
+        //loginfo("Close DB");
+        $ret=self::$db->close();
+        self::$db = null;
+        return $ret;
+    }   
+    public function open() {
+        if (self::$db == null) {
+            self::$db = new SQLite3(getenv("DBLOCATION"));
+            //loginfo("DB Initialisee (".getenv("DBLOCATION").")");
+        }
+    }
+
+
     protected function prepareAndExecute(string $sql, array $params = []) {
-        $stmt = $this->db->prepare($sql);
+        $this->open();
+
+        $stmt = self::$db->prepare($sql);
         if ($stmt === false) {
-            throw new RuntimeException("Prepare error: " . $this->db->lastErrorMsg() . " SQL: $sql");
+            throw new RuntimeException("Prepare error: " . self::$db->lastErrorMsg() . " SQL: $sql");
         }
         foreach ($params as $k => $v) {
             // params as [':name' => [value, SQLITE3_TEXT|SQLITE3_INTEGER]]
@@ -29,7 +53,7 @@ class BaseDAO {
         $res = $stmt->execute();
 
         if ($res === false) {
-            throw new RuntimeException("Execute error: " . $this->db->lastErrorMsg());
+            throw new RuntimeException("Execute error: " . self::$db->lastErrorMsg());
         }
         return $res;
     }
@@ -41,5 +65,13 @@ class BaseDAO {
         }
         //loginfo(print_r($out,true));
         return $out;
+    }
+
+    protected function lastInsertRowID() {
+        return self::$db->lastInsertRowID();
+    }
+
+    protected function changes() {
+        return self::$db->changes();
     }
 }

@@ -47,7 +47,7 @@ class MatchInfosDAO extends BaseDAO {
 					':commentaire' => [$commentaire, SQLITE3_TEXT]
 				]);
 
-        return $this->db->changes();
+        return $this->changes();
     }
 	
     public function create($matchid,$userid,$opposition,$numero,$commentaire) {
@@ -64,7 +64,7 @@ class MatchInfosDAO extends BaseDAO {
 					]);
 
         
-        return $this->db->lastInsertRowID();
+        return $this->lastInsertRowID();
 	}
 
 
@@ -74,7 +74,7 @@ class MatchInfosDAO extends BaseDAO {
 		$this->prepareAndExecute ($sql,[':match' => [$matchid, SQLITE3_INTEGER],
 									    ':user' => [$userid, SQLITE3_INTEGER]]); 
 
-		return $this->db->changes();
+		return $this->changes();
 	}
 
 

@@ -4,7 +4,6 @@ namespace dao;
 require_once 'BaseDAO.php';
 
 use dao\BaseDAO;
-use SQLite3;
 
 /**
  * DAO pour la table disponibilites
@@ -14,10 +13,6 @@ use SQLite3;
  * - val (INTEGER)
  */
 class DisponibilitesDAO extends BaseDAO {
-
-    public function __construct($donnees) {
-        parent::__construct($donnees);
-    }
 
     public function exists(string $jour, int $user): bool {
         
@@ -37,7 +32,7 @@ class DisponibilitesDAO extends BaseDAO {
             ':user' => [$user, SQLITE3_INTEGER],
             ':val' => [$val, SQLITE3_INTEGER]
         ]);
-        return $this->db->lastInsertRowID();
+        return $this->lastInsertRowID();
     }
 
     public function update(string $jour,int $user, int $val): int {
@@ -47,7 +42,7 @@ class DisponibilitesDAO extends BaseDAO {
             ':jour' => [$jour, SQLITE3_TEXT],
             ':user' => [$user, SQLITE3_INTEGER]
         ]);
-        return $this->db->changes();
+        return $this->changes();
     }
 
     /**

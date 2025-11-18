@@ -1,11 +1,11 @@
 [
     {
         "equipe": 1,
-        "joueurs": [{"prenom": "fifi","nb": 0},
-                    {"prenom": "riri","nb": 1}
+        "joueurs": [{"prenom": "fifi","nb": 0, "id" : 2},
+                    {"prenom": "riri","nb": 1, "id" : 1}
         ],
         "autrejoueurs": [
-            {"prenom": "loulou","nb": 1 }
+            {"prenom": "loulou","nb": 1,"id":3 }
         ],
         "matchs": [
             {
@@ -54,7 +54,14 @@
                         "prenom": "riri"
                     }
                 ],
-                "autres": [],
+                "autres": [
+                    {
+                        "id": 3,
+                        "selection": 0,
+                        "dispo": 0,
+                        "prenom": "loulou"
+                    }                    
+                ],
                 "equipe": 1,
                 "titre": "sans titre",
                 "nb": 0
@@ -64,14 +71,8 @@
     {
         "equipe": 2,
         "joueurs": [
-            {
-                "prenom": "daisy",
-                "nb": 0
-            },
-            {
-                "prenom": "loulou",
-                "nb": 1
-            }
+            {"prenom": "daisy", "nb": 0, "id" : 4 },
+            {"prenom": "loulou","nb": 1, "id" : 3 }
         ],
         "autrejoueurs": [],
         "matchs": [

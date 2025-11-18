@@ -17,12 +17,11 @@ class Selections  {
 	private $disponibilites;
 	private $selections;
 
-	public function __construct($donnees) {		
-		$this->users = $users = new UsersDAO($donnees);
-		$this->disponibilites = new DisponibilitesDAO($donnees);
-		$this->matchs = new MatchsDAO($donnees);
-		$this->selections = new SelectionsDAO($donnees);
-		//parent::__construct($donnees);
+	public function __construct() {		
+		$this->users = $users = new UsersDAO();
+		$this->disponibilites = new DisponibilitesDAO();
+		$this->matchs = new MatchsDAO();
+		$this->selections = new SelectionsDAO();
 	}	
 
 
@@ -252,7 +251,7 @@ class Selections  {
 			$result = $this->users->getPlayersByTeam($match["equipe"]);
 
 			foreach ($result as $row) {
-				array_push($joueurs,array("prenom"=>$row->prenom,"nb"=>0));
+				array_push($joueurs,array("prenom"=>$row->prenom,"nb"=>0,"id"=>$row->id));
 			}		
 
 			//on ajoute les joueurs qui ne font pas partie de l'equipe
@@ -281,9 +280,11 @@ class Selections  {
 
 	private function reclassejoueurs($listejoueurs, $toreclasse) {
 		$out = $listejoueurs;
+		
 		foreach($out as &$nj) {
 			$nj["dispo"] = 0;
 			$nj["selection"] = 0;
+			unset($nj["nb"]);
 			foreach ($toreclasse as $j) {
 				if ($nj["id"] == $j["id"]) {
 					$nj["dispo"] = $j["dispo"];

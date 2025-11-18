@@ -2,7 +2,9 @@
 
 function loadEnv($filePath) {
     if (!file_exists($filePath)) {
-        throw new Exception("Le fichier .env n'existe pas : $filePath");
+        //throw new Exception("Le fichier .env n'existe pas : $filePath");
+        //loginfo("Le fichier .env n'existe pas : $filePath");
+        return false;
     }
 
     $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -19,4 +21,5 @@ function loadEnv($filePath) {
             putenv(sprintf('%s=%s', $name, $value));
         }
     }
+    return true;
 }

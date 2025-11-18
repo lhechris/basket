@@ -14,16 +14,14 @@ include_once("presences.php");
 include_once("disponibilites.php");
 include_once("selections.php");
 include_once("matchinfos.php");
-include_once("donnees.php");
 
-$donnees = new Donnees();
-$users = new Users($donnees);
-$matchinfo = new MatchInfos($donnees);
-$matchs = new Matchs($donnees);
-$entrainements=new Entrainements($donnees);
-$presences = new Presences($donnees);
-$disponibilites = new Disponibilites($donnees);
-$selections = new Selections($donnees);
+$users = new Users();
+$matchinfo = new MatchInfos();
+$matchs = new Matchs();
+$entrainements=new Entrainements();
+$presences = new Presences();
+$disponibilites = new Disponibilites();
+$selections = new Selections();
 
 
 if ($_SERVER["REQUEST_METHOD"]=="GET") { 

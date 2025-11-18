@@ -40,7 +40,7 @@ class MatchsDAO extends BaseDAO {
 			':rendezvous'=> [$rendezvous, SQLITE3_TEXT]
 		]);
 
-        return $this->db->changes();
+        return $this->changes();
     }
 	
     public function create($equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
@@ -60,7 +60,7 @@ class MatchsDAO extends BaseDAO {
 			':rendezvous'=> [$rendezvous, SQLITE3_TEXT]
 		]);		
         
-        return $this->db->lastInsertRowID();
+        return $this->lastInsertRowID();
 	}
 
 

@@ -11,16 +11,14 @@ use dao\UsersDAO;
 use dao\PresencesDAO;
 
 class Presences {
-	private $db;
 	private $users;
 	private $entrainements;
 	private $presences;
 
-	public function __construct($donnees) {
-		$this->db = $donnees->db;
-		$this->users = new UsersDAO($donnees);
-		$this->entrainements = new EntrainementsDAO($donnees);
-		$this->presences = new PresencesDAO($donnees);
+	public function __construct() {
+		$this->users = new UsersDAO();
+		$this->entrainements = new EntrainementsDAO();
+		$this->presences = new PresencesDAO();
 	}
 
 	/**

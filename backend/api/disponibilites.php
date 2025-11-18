@@ -12,16 +12,14 @@ use dao\UsersDAO;
 
 class Disponibilites {
 
-	private $db;
 	private $users;
 	private $disponibilites;
 	private $matchs;
 	
-	public function __construct($donnees) {
-		$this->db = $donnees->db;
-		$this->users = new UsersDAO($donnees);
-		$this->matchs = new MatchsDAO($donnees);
-		$this->disponibilites = new DisponibilitesDAO($donnees);
+	public function __construct() {
+		$this->users = new UsersDAO();
+		$this->matchs = new MatchsDAO();
+		$this->disponibilites = new DisponibilitesDAO();
 	}
 
 	/**

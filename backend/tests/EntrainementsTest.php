@@ -4,9 +4,11 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../api/env.php';
-require_once __DIR__ . '/../api/donnees.php';
+require_once __DIR__ . '/../api/dao/BaseDAO.php';
 require_once __DIR__ . '/../api/utils.php';
 require_once __DIR__ . '/../api/entrainements.php';
+
+use dao\BaseDAO;
 
 class EntrainementsTest extends TestCase
 {
@@ -17,16 +19,16 @@ class EntrainementsTest extends TestCase
     {
         // load environment for tests
         loadEnv(__DIR__ . '/.env');
-
-        self::$donnees = new Donnees();
+        loginfo("START EntrainementsTest");
+        self::$donnees = new BaseDAO();
 
         // create schema
         $sql = file_get_contents(__DIR__ . '/../config/createdb.sql');
-        self::$donnees->db->exec($sql);
+        self::$donnees->exec($sql);
 
         // seed entrainements
-        self::$donnees->db->exec("INSERT INTO entrainements(jour) VALUES('2025-10-08')");
-        self::$donnees->db->exec("INSERT INTO entrainements(jour) VALUES('2025-10-01')");
+        self::$donnees->exec("INSERT INTO entrainements(jour) VALUES('2025-10-08')");
+        self::$donnees->exec("INSERT INTO entrainements(jour) VALUES('2025-10-01')");
     }
 
     protected function setUp(): void
@@ -57,7 +59,7 @@ class EntrainementsTest extends TestCase
         $decoded = json_decode($output, true);
         $this->assertIsArray($decoded);
     
-        print($output."\n");
+        //print($output."\n");
 
         $expected = json_decode(file_get_contents('tests/data/entrainements.json'),true);
         $this->assertEquals($expected, $decoded);
@@ -66,9 +68,10 @@ class EntrainementsTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        if (isset(self::$donnees) && self::$donnees->db) {
-            self::$donnees->db->close();
+        if (isset(self::$donnees) && self::$donnees) {
+            self::$donnees->close();
         }
+        loginfo("STOP EntrainementsTest");
     }
 }
 ?>

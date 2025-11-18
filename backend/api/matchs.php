@@ -16,10 +16,10 @@ class Matchs {
 	private $matchs;
 	private $selections;
 
-	public function __construct($donnees) {
-		$this->matchinfos =  new MatchInfosDAO($donnees);
-		$this->matchs = new MatchsDAO($donnees);
-		$this->selections = new SelectionsDAO($donnees);
+	public function __construct() {
+		$this->matchinfos =  new MatchInfosDAO();
+		$this->matchs = new MatchsDAO();
+		$this->selections = new SelectionsDAO();
 	}
 
 	public function getArray($id=null) {

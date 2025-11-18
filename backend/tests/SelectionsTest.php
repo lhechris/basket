@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
+require_once __DIR__ . '/../api/utils.php';
 require_once __DIR__ . '/../api/env.php';
-require_once __DIR__ . '/../api/donnees.php';
+require_once __DIR__ . '/../api/dao/BaseDAO.php';
 require_once __DIR__ . '/../api/selections.php';
 
+use dao\BaseDAO;
 
 class SelectionsTest extends TestCase
 {
@@ -18,41 +20,42 @@ class SelectionsTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         loadEnv(__DIR__ . '/.env');
-        self::$donnees = new Donnees();
+        loginfo("START SelectionsTest");
+        self::$donnees = new BaseDAO();
 
         // Create test database
         $sql = file_get_contents(__DIR__ . '/../config/createdb.sql');
-        self::$donnees->db->exec($sql);
+        self::$donnees->exec($sql);
 
         // Add test data
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe) VALUES('riri',1)");
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe) VALUES('fifi',1)");
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe) VALUES('loulou',2)");
-        self::$donnees->db->exec("INSERT INTO users(prenom,equipe) VALUES('daisy',2)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe) VALUES('riri',1)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe) VALUES('fifi',1)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe) VALUES('loulou',2)");
+        self::$donnees->exec("INSERT INTO users(prenom,equipe) VALUES('daisy',2)");
 
-        self::$donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(1,'2025-09-01','sans titre','0/0')");
-        self::$donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(2,'2025-09-01','sans titre','0/0')");
-        self::$donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(2,'2025-09-08','sans titre','0/0')");
-        self::$donnees->db->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(1,'2025-09-09','sans titre','0/0')");
+        self::$donnees->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(1,'2025-09-01','sans titre','0/0')");
+        self::$donnees->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(2,'2025-09-01','sans titre','0/0')");
+        self::$donnees->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(2,'2025-09-08','sans titre','0/0')");
+        self::$donnees->exec("INSERT INTO matchs(equipe,jour,titre,score) VALUES(1,'2025-09-09','sans titre','0/0')");
 
 
-        self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(1,'2025-09-01',2)");
-        self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(2,'2025-09-01',1)");
-        self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(3,'2025-09-01',1)");
-        self::$donnees->db->exec("INSERT INTO disponibilites(user,jour,val) VALUES(4,'2025-09-01',1)");
+        self::$donnees->exec("INSERT INTO disponibilites(user,jour,val) VALUES(1,'2025-09-01',2)");
+        self::$donnees->exec("INSERT INTO disponibilites(user,jour,val) VALUES(2,'2025-09-01',1)");
+        self::$donnees->exec("INSERT INTO disponibilites(user,jour,val) VALUES(3,'2025-09-01',1)");
+        self::$donnees->exec("INSERT INTO disponibilites(user,jour,val) VALUES(4,'2025-09-01',1)");
 
-        self::$donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(1,1,1)");
-        self::$donnees->db->exec("INSERT INTO selections(user,match,val) VALUES(3,1,1)");
+        self::$donnees->exec("INSERT INTO selections(user,match,val) VALUES(1,1,1)");
+        self::$donnees->exec("INSERT INTO selections(user,match,val) VALUES(3,1,1)");
     }
 
     protected function setUp(): void
     {
-        $this->selections = new Selections(self::$donnees);
+        $this->selections = new Selections();
         $this->reflection = new ReflectionClass(Selections::class);
     }
 
     private function SelectionsGet() {
-        $results = self::$donnees->db->query('SELECT match,user,val FROM selections ORDER BY match,user');
+        $results = self::$donnees->query('SELECT match,user,val FROM selections ORDER BY match,user');
         $json= array();
         while ($row = $results->fetchArray()) {
             array_push($json,array("match"=>$row['match'],
@@ -138,6 +141,8 @@ class SelectionsTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        self::$donnees->db->close();
+        self::$donnees->close();
+        loginfo("STOP SelectionsTest");
+
     }
 }

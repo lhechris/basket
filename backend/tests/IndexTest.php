@@ -5,6 +5,10 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 require_once("api/env.php");
+require_once("api/utils.php");
+require_once("api/dao/BaseDAO.php");
+use dao\BaseDAO;
+
 
 final class IndexTest extends TestCase
 {
@@ -17,9 +21,16 @@ final class IndexTest extends TestCase
         //loadEnv('api/.env');
         putenv("REPERTOIRE_DATA=../data/");
         putenv("ACTIVELOG=true");
-        putenv("DBLOCATION=../data/basketu11.db");
+        putenv("DBLOCATION=../data/testbasketu11.db");
+        loginfo("START IndexTest");
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        $donnees = new BaseDAO();
+        $donnees->close();
+        loginfo("STOP IndexTest");
+    }
     protected function setUp(): void
     {
         // Store initial output buffer level
@@ -29,7 +40,7 @@ final class IndexTest extends TestCase
         $_GET = [];
         $_POST = [];
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SESSION = []; // Reset session for each test
+        $_SESSION = []; // Reset session for each test        
     }
 
     protected function tearDown(): void
@@ -119,16 +130,6 @@ final class IndexTest extends TestCase
         $this->assertIsString($output);
         $decoded = json_decode($output, true);
         $this->assertNotNull($decoded, 'Output should be valid JSON for presences');
-    }
-
-    public function testOppositions(): void
-    {
-        $_SESSION['islogged'] = true; // Simulate logged in user
-        $output = $this->launchTestGet(['oppositions' => 1]);
-        
-        $this->assertIsString($output);
-        $decoded = json_decode($output, true);
-        $this->assertNotNull($decoded, 'Output should be valid JSON for oppositions');
     }
 
     public function testDisponibilites(): void

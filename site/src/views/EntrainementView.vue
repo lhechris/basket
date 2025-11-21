@@ -3,7 +3,7 @@
         <content v-for="(e,n) in presences" :key="n" :index="n" couleur="bg-emerald-500" :nbpages="presences.length" v-model="page">         
 
             <template #titre>
-                    <span class="date">{{displaydate(e.date) }}</span>
+                    <span class="date">{{displaydate(e.jour) }}</span>
                     <span class="date">&nbsp; &nbsp;[{{ countJoueuses(e.id) }}]</span>
             </template>
                 
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import {getPresences,setPresence,displaydate} from '@/js/api.js'
+import {getPresences,setPresence,displaydate,getFirstDateAfterNow} from '@/js/api.js'
 import Presence from '@/components/Presence.vue'
 import Content from '@/components/Content.vue'
 
@@ -32,17 +32,9 @@ const page = ref(1)
 getPresences().then( p => {
     presences.value = p
 
-    //selectionne la prochaine page par rapport 
-    //au jour actuel
-    let d1=new Date()
-    for (let i in p) {
-        let d2=new Date(p[i].date)
-        d2.setDate(d2.getDate()+1)
-        if (d2 > d1)  {
-            page.value=parseInt(i) + 1
-            break
-        }                
-    }
+    //selectionne la prochaine page par rapport au jour actuel
+    page.value =  1 + getFirstDateAfterNow(p,false)
+
     countEntrainementParJoueuse()
    
 })

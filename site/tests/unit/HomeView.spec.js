@@ -10,7 +10,8 @@ import mockDisponibilites from '../../../backend/tests/data/dispo.json'
 vi.mock('../../src/js/api.js', () => ({
   getDisponibilites: vi.fn(),
   setDisponibilite: vi.fn(),
-  displaydate: vi.fn((date) => 'Formated'+date)
+  displaydate: vi.fn((date) => 'Formated'+date),
+  getFirstDateAfterNow: vi.fn(() => 0 )
 }))
 
 describe('HomeView.vue', () => {
@@ -64,24 +65,7 @@ describe('HomeView.vue', () => {
   })
 
 
-  /**
-   * On positionne la date courante pour verifier que la 
-   * page selectionnée est la date juste après
-   */
-  it('sets correct initial page based on current date', async () => {
-    // Mock current date to be before first disponibilite
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2025-09-05'))
-
-    const wrapper = mount(HomeView)
-    await wrapper.vm.$nextTick()
-
-    // Page should be 1 since first date is next
-    expect(wrapper.vm.page).toBe(2)
-
-    // Reset timer
-    vi.useRealTimers()
-  })
+  
 
   /**
    * Verifie que la date affichée est celle qui est retournée

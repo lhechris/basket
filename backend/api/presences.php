@@ -48,7 +48,7 @@ class Presences {
 		foreach ($entrainements as $e) {
 
 			$currententrainement=array( "id"    => $e->id,
-										"date"  => $e->jour,
+										"jour"  => $e->jour,
 										"users" => array());
 
 			foreach($myusers as $u) {

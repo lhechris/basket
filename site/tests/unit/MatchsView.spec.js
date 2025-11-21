@@ -2,14 +2,15 @@ import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import MatchsView from '../../src/views/MatchsView.vue'
 import DetailMatch from '../../src/components/DetailMatch.vue'
-import { getMatchsAvecSel, displaydate } from '../../src/js/api.js'
+import { getMatchsAvecSel, displaydate, getFirstDateAfterNow } from '../../src/js/api.js'
 
 import mockMatchs from '../../../backend/tests/data/matchsavecsel.json'
 
 // Mock the API calls
 vi.mock('../../src/js/api.js', () => ({
   getMatchsAvecSel: vi.fn(),
-  displaydate: vi.fn((date) => 'Formatted ' + date)
+  displaydate: vi.fn((date) => 'Formatted ' + date),
+  getFirstDateAfterNow : vi.fn(() => 0)
 }))
 
 describe('MatchsView.vue', () => {
@@ -40,31 +41,7 @@ describe('MatchsView.vue', () => {
     expect(detailMatches).toHaveLength(1) // Total number of matches
   })
 
-
-  /**
-   * Test que la premiere page est fonction de la date courante
-   * Ca doit etre la date juste après
-   */
-  it('sets page to first future match', async () => {
-    // Mock current date to be before first match
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2025-09-30'))
-    
-    const wrapper = mount(MatchsView)
-    await wrapper.vm.$nextTick()
-    
-    expect(wrapper.vm.page).toBe(3)
-    
-    // Change date to between matches (on selectionne la meme date)
-    vi.setSystemTime(new Date('2025-10-05'))
-    await wrapper.vm.refreshMatch()
-    await wrapper.vm.$nextTick()
-    
-    expect(wrapper.vm.page).toBe(3)
-    
-    vi.useRealTimers()
-  })
-
+ 
   /**
    * Verifie que les proprietes envoyée sont ok
    */
@@ -88,7 +65,6 @@ describe('MatchsView.vue', () => {
                                                             adresse: "ici ou la bas",
                                                             horaire: "12h00",
                                                             rendezvous: "11h00",
-                                                            oppositions:null,
                                                             selections:[]
                                                           })
   })

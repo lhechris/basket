@@ -19,7 +19,7 @@
   <script setup>
   // @ is an alias to /src
   import DetailMatchAdmin from '@/components/DetailMatchAdmin.vue'
-  import {getMatchsAvecOpp,displaydate,setOpposition,setMatch} from '@/js/api.js'
+  import {getMatchsAvecOpp,displaydate,setOpposition,setMatch,getFirstDateAfterNow} from '@/js/api.js'
   import {ref} from "vue"
   import Content from '@/components/Content.vue'
   import moment from 'moment'
@@ -30,22 +30,10 @@
 
   function refreshMatch(forcedate=0) {
       getMatchsAvecOpp().then( m => {
-            matchs.value = m
+          matchs.value = m
 
-            //selectionne la page courante
-            let d1=new Date()
-            if (forcedate!=0) {
-                d1=new Date(forcedate)
-            }
-            for (let i in m) {
-                let d2=new Date(m[i].jour)
-                if (d2 >= d1)  {
-                    page.value= parseInt(i) + 1
-                    break
-                }                
-            }
-            //console.log("refresh match",m,page.value)
-
+          //selectionne la page courante
+          page.value = 1 + getFirstDateAfterNow(m,false,forcedate)
       })
   }
 

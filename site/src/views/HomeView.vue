@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import {getDisponibilites,setDisponibilite,displaydate} from '../js/api.js'
+import {getDisponibilites,setDisponibilite,displaydate,getFirstDateAfterNow} from '../js/api.js'
 import Presence from '../components/Presence.vue'
 import {ref} from 'vue'
 //import CustPagination from "@/components/CustPagination.vue"
@@ -33,17 +33,8 @@ getDisponibilites().then( p => {
     disponibilites.value = p
 
     //selectionne la page courante
-    let d1=new Date()
-    for (let i in p) {
-        
-        //let s=p[i].date.split("/")
-        //let d2=new Date(s[2]+"-"+s[1]+"-"+s[0])
-        let d2=new Date(p[i].jour)
-        if (d2 > d1)  {
-            page.value= parseInt(i) + 1
-            break
-        }                
-    }
+    page.value = 1 + getFirstDateAfterNow(p,true)
+
 })
 
 function update(usr,jour,val) {            

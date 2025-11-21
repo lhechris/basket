@@ -20,15 +20,15 @@
                         <div :class="jour.dispo==1 ? 'bg-green-400' : jour.dispo==2 ? 'bg-red-400' : 'bg-orange-300'" class="grid grid-cols-3 w-16 p-1">
                             <span>
                                 <img v-if="jour.matchs[0].selection==1" src="../assets/one_10456722.png"/>
-                                <img v-else src="../assets/one_10456722_grey.png" @click="update(u.id,jour.matchs[0].id,1)"/>
+                                <img v-else src="../assets/one_10456722_grey.png" @click="update(u.id,jour.matchs[0].id,1,jour.jour)"/>
                             </span>
-                            <span class="col-start-2" @click="update(u.id,jour.matchs[0].id,0)">
+                            <span class="col-start-2" @click="update(u.id,jour.matchs[0].id,0,jour.jour)">
                                 <!--<img  v-if="jour.matchs[0].selection==0 && jour.matchs[1].selection==0" src="../assets/multiplier.png"/>
                                 <img  v-else src="../assets/multiplier_grey.png" @click="update(u.id,jour.matchs[0].id,0)" />     -->                           
                             </span>
                             <span class="col-start-3">
                                 <img  v-if="jour.matchs[1].selection==1" src="../assets/two_10456778.png" />
-                                <img  v-else src="../assets/two_10456778_grey.png" @click="update(u.id,jour.matchs[1].id,1)"/>
+                                <img  v-else src="../assets/two_10456778_grey.png" @click="update(u.id,jour.matchs[1].id,1,jour.jour)"/>
                             </span>
                         </div>
                     </td>
@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import {getSelections2,setSelection,displaydatemin} from '@/js/api.js'
+import {getSelections2,setSelection,displaydatemin,isjourdepasse} from '@/js/api.js'
 import {ref} from 'vue'
 
 import '@coreui/coreui/dist/css/coreui.min.css'
@@ -64,8 +64,13 @@ import '@coreui/coreui/dist/css/coreui.min.css'
 
     })
 
-    function update(usr,match,val) {
-            setSelection(usr,match,val).then( p => {
+    function update(usr,match,val,jour) {
+        if (isjourdepasse(jour)) {
+            return
+        }
+
+        
+        setSelection(usr,match,val).then( p => {
             jours.value = p["jours"]
             joueurs.value = p["joueurs"]
         })

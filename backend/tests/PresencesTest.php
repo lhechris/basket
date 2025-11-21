@@ -64,21 +64,21 @@ class PresencesTest extends TestCase
         $json = $this->presences->getArray();
 
         $s = '[{
-             "id": 1, "date" :"2025-09-01",
+             "id": 1, "jour" :"2025-09-01",
              "users": [ {"id" : 4,"pres" : 0,"prenom" : "daisy"},
                         {"id" : 2,"pres" : 1,"prenom" : "fifi" },
                         {"id" : 3,"pres" : 0,"prenom" : "loulou"},
                         {"id" : 1,"pres" : 1,"prenom" : "riri"} ]
              },
              {
-             "id": 2, "date" :"2025-09-04",
+             "id": 2, "jour" :"2025-09-04",
              "users": [ {"id" : 4,"pres" : 0,"prenom" : "daisy"},
                         {"id" : 2,"pres" : 0,"prenom" : "fifi" },
                         {"id" : 3,"pres" : 0,"prenom" : "loulou"},
                         {"id" : 1,"pres" : 0,"prenom" : "riri"} ]
             },
             {
-             "id": 3, "date" :"2025-09-08",
+             "id": 3, "jour" :"2025-09-08",
              "users": [ {"id" : 4,"pres" : 0,"prenom" : "daisy"},
                         {"id" : 2,"pres" : 0,"prenom" : "fifi" },
                         {"id" : 3,"pres" : 0,"prenom" : "loulou"},

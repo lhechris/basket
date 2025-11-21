@@ -29,13 +29,15 @@
                     <th>{{ s.nb }}</th>
                     <td class="odd:bg-blue-100 p-1" v-for="(u,j) in s.users" :key="j" >
                         <Selection :pres="u.dispo" 
-                                :sel="u.selection" 
-                                @onUpdate="update(u.id,s.id,$event)"/>
+                                :sel="u.selection"
+                                :disabled="isjourdepasse(s.jour)" 
+                                @onUpdate="update(u.id,s.id,$event,s.jour)"/>
                     </td>
                     <td class="odd:bg-blue-100 p-1" v-for="(u,j) in s.autres" :key="j" >
                         <Selection :pres="u.dispo" 
                                 :sel="u.selection" 
-                                @onUpdate="update(u.id,s.id,$event)"/>
+                                :disabled="isjourdepasse(s.jour)" 
+                                @onUpdate="update(u.id,s.id,$event,s.jour)"/>
                     </td>                
                 </tr>
                 </tbody>
@@ -49,7 +51,7 @@
 </template>
 
 <script setup>
-import {getSelections,setSelection,displaydatemin} from '@/js/api.js'
+import {getSelections,setSelection,displaydatemin,isjourdepasse} from '@/js/api.js'
 import Selection from '@/components/Selection.vue'
 import {ref} from 'vue'
 
@@ -68,9 +70,14 @@ import '@coreui/coreui/dist/css/coreui.min.css'
         equipeselected.value=p[0]['equipe']
     })
 
-    function update(usr,match,val) {
-            setSelection(usr,match,val).then( p => {
+    function update(usr,match,val,jour) {
+        if (isjourdepasse(jour)) {
+            return
+        }
+        setSelection(usr,match,val).then( () => {
+            getSelections().then( p => {
                 equipes.value = p
+            })
         })
     }
 

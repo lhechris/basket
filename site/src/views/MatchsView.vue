@@ -17,10 +17,10 @@
   <script setup>
   // @ is an alias to /src
   import DetailMatch from '../components/DetailMatch.vue'
-  import {getMatchsAvecSel,displaydate} from '../js/api.js'
+  import {getMatchsAvecSel,displaydate,getFirstDateAfterNow} from '../js/api.js'
   import {ref} from "vue"
   import Content from '../components/Content.vue'
-  
+
   const matchs = ref([])
   const page=ref(1)
 
@@ -29,14 +29,7 @@
             matchs.value = m
 
             //selectionne la page courante
-            let d1=new Date()
-            for (let i in m) {
-                let d2=new Date(m[i].jour)
-                if (d2 > d1)  {
-                    page.value= parseInt(i) + 1
-                    break
-                }                
-            }
+            page.value = 1 + getFirstDateAfterNow(m,false)
 
       })
   }

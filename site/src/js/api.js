@@ -243,3 +243,23 @@ export function displaydate(d) {
 export function displaydatemin(d) {
     return moment(d).local('fr').format("DD/MM")
 }
+
+export function isjourdepasse(j) {
+    return moment(j).isBefore() 
+
+}
+
+export function getFirstDateAfterNow(liste,stricte,forcedate=0) {
+    let d1=moment()
+    if (forcedate!=0) {
+        d1=moment(forcedate)
+    }
+
+    for (let i in liste) {
+        let d2=moment(liste[i].jour)
+        if (d2.isAfter(d1,'day') || ((stricte==false) && d2.isSame(d1,'day')))  {
+            return parseInt(i)            
+        }                
+    }
+    return 0
+}

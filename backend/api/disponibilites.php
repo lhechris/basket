@@ -96,9 +96,14 @@ class Disponibilites {
 				));
 			}
 			
+			//setlocale(LC_COLLATE, 'fr_FR.UTF-8');
+			//usort($currentmatch["users"], function($a, $b) {
+			//	return strcoll($a["prenom"], $b["prenom"]);
+			//});
+			
 			array_push($json,$currentmatch);
 		}
-
+		
 		return $json;
 	}
 

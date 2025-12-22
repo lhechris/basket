@@ -22,6 +22,11 @@
             </div>
             <div class="flex gap-2">
                 <div class="w-30 text-left">Lieu</div>
+                <div>
+                    <a v-if="currentmatch.lien" target="_blank" :href="currentmatch.lien" >
+                        <img src="../assets/destination.png" />
+                    </a>
+                </div>
                 <div>{{currentmatch.adresse}}</div>
             </div>
             <div class="flex gap-2">
@@ -47,6 +52,14 @@
 
     const currentmatch = ref(props.matchdetail)
 
+    
+    let adresse = currentmatch.value.adresse
+    currentmatch.value.lien = null
+    let i = adresse.indexOf("http")
+    if (i>=0) {
+        currentmatch.value.adresse = adresse.substring(0,i)
+        currentmatch.value.lien = adresse.substring(i)
+    }
 
     const onChange = () => {
         emit('changeMatch',currentmatch.value)

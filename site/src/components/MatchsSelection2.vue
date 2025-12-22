@@ -18,7 +18,7 @@
                     <td class="border-1 border-solid sticky left-0 h-fit bg-purple-200">{{ u.prenom }} ({{u.nb}})</td>
                     <td class="border-1 border-solid" v-for="(jour,k) in u.jours" :key="k">
                         <div :class="jour.dispo==1 ? 'bg-green-400' : jour.dispo==2 ? 'bg-red-400' : 'bg-orange-300'" class="grid grid-cols-3 w-16 p-1">
-                            <span>
+                            <span v-if="jour.matchs[0].equipe==1">
                                 <img v-if="jour.matchs[0].selection==1" src="../assets/one_10456722.png"/>
                                 <img v-else src="../assets/one_10456722_grey.png" @click="update(u.id,jour.matchs[0].id,1,jour.jour)"/>
                             </span>
@@ -26,9 +26,13 @@
                                 <!--<img  v-if="jour.matchs[0].selection==0 && jour.matchs[1].selection==0" src="../assets/multiplier.png"/>
                                 <img  v-else src="../assets/multiplier_grey.png" @click="update(u.id,jour.matchs[0].id,0)" />     -->                           
                             </span>
-                            <span class="col-start-3">
+                            <span class="col-start-3" v-if="jour.matchs.length>1">
                                 <img  v-if="jour.matchs[1].selection==1" src="../assets/two_10456778.png" />
                                 <img  v-else src="../assets/two_10456778_grey.png" @click="update(u.id,jour.matchs[1].id,1,jour.jour)"/>
+                            </span>
+                            <span class="col-start-3" v-else-if="jour.matchs[0].equipe==2">
+                                <img  v-if="jour.matchs[0].selection==1" src="../assets/two_10456778.png" />
+                                <img  v-else src="../assets/two_10456778_grey.png" @click="update(u.id,jour.matchs[0].id,1,jour.jour)"/>
                             </span>
                         </div>
                     </td>

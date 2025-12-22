@@ -18,9 +18,9 @@
                         <div class="font-bold bg-gray-200">Opposition B</div>
                         <div class="flex flex-col gap-2">
                             <div class="flex gap-2 text-left" v-for="opp of info.oppositions.B">
+                                <span class="min-w-25">{{ opp.licence }}</span>
                                 <span class="min-w-40">{{opp.nom}}</span>
                                 <span class="min-w-20">{{ opp.prenom }}</span>
-                                <span class="min-w-25">{{ opp.licence }}</span>
                                 <span >{{ opp.numero }}</span>
                             </div>
                         </div>
@@ -29,9 +29,9 @@
                         <div class="font-bold bg-gray-200">Opposition A</div>
                         <div class="flex flex-col gap-2 ">
                             <div class="flex gap-2 text-left" v-for="opp of info.oppositions.A">
+                                <span class="min-w-25">{{ opp.licence }}</span>
                                 <span class="min-w-40">{{opp.nom}}</span>
                                 <span class="min-w-20">{{ opp.prenom }}</span>
-                                <span class="min-w-25">{{ opp.licence }}</span>
                                 <span >{{ opp.numero }}</span>
                             </div>
                         </div>

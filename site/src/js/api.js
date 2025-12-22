@@ -245,8 +245,8 @@ export function displaydatemin(d) {
 }
 
 export function isjourdepasse(j) {
-    return moment(j).isBefore() 
-
+    let today=moment()
+    return (moment(j).isBefore(today,'day'))    
 }
 
 export function getFirstDateAfterNow(liste,stricte,forcedate=0) {

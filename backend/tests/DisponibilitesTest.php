@@ -70,7 +70,7 @@ final class DisponibilitesTest extends TestCase
 
     public function test_getDisponibilites(): void
     {
-        
+       
         $json = $this->disponibilites->getArray();
 
         $expected = json_decode(file_get_contents('tests/data/dispo.json'),true);

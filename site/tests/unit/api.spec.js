@@ -29,6 +29,11 @@ describe('dateUtils', () => {
         expect(isjourdepasse(futureDate)).toBe(false);
     });
 
+    it('isjourdepasse() doit retourner false pour la date du jour', () => {
+        const todayDate = moment().format('YYYY-MM-DD');
+        expect(isjourdepasse(todayDate)).toBe(false);
+    });
+
     describe('getFirstDateAfterNow()', () => {
         it('retourne l’index de la première date après maintenant', () => {
             const liste = [

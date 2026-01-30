@@ -70,12 +70,24 @@ class MatchInfosDAO extends BaseDAO {
 
     public function delete($matchid,$userid) {
 		
-		$sql='DELETE FROM matchinfos match WHERE match=:match AND user=:user';
+		$sql='DELETE FROM matchinfos WHERE match=:match AND user=:user';
 		$this->prepareAndExecute ($sql,[':match' => [$matchid, SQLITE3_INTEGER],
 									    ':user' => [$userid, SQLITE3_INTEGER]]); 
 
 		return $this->changes();
 	}
+
+    /** 
+     * Supprime le joueur de la journée
+     */
+    public function deleteByDay(string $jour, int $user): int {
+        $sql = "DELETE FROM matchinfos WHERE match IN (SELECT id FROM matchs B WHERE B.jour=:jour ) AND user=:user";
+        $this->prepareAndExecute($sql, [
+            ':jour' => [$jour, SQLITE3_TEXT],
+            ':user' => [$user, SQLITE3_INTEGER]
+        ]);
+        return $this->changes();
+    }    
 
 
 }

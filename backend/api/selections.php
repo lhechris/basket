@@ -5,11 +5,14 @@ require_once("dao/SelectionsDAO.php");
 require_once("dao/DisponibilitesDAO.php");
 require_once("dao/MatchsDAO.php");
 require_once("dao/UsersDAO.php");
+require_once("dao/MatchInfosDAO.php");
+
 
 use dao\SelectionsDAO;
 use dao\DisponibilitesDAO;
 use dao\MatchsDAO;
 use dao\UsersDAO;
+use dao\MatchInfosDAO;
 
 class Selections  {
 	private $users;	
@@ -226,6 +229,10 @@ class Selections  {
 			$match=$this->matchs->getById($json['match']);
 			if ($match==null) {return;}
 			$this->selections->deleteByDay($match->jour,$json['usr']);
+
+			//on supprime les enregistrements des oppositions
+			$matchinfos = new MatchInfosDAO();
+			$matchinfos->deleteByDay($match->jour,$json['usr']);
 			
 			//On ajoute donc un nouvel enregistrement
 			$this->selections->create($json['match'],$json['usr'],$json['selection']);

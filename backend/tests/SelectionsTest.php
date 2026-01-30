@@ -7,9 +7,11 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../api/utils.php';
 require_once __DIR__ . '/../api/env.php';
 require_once __DIR__ . '/../api/dao/BaseDAO.php';
+require_once __DIR__ . '/../api/dao/MatchInfosDAO.php';
 require_once __DIR__ . '/../api/selections.php';
 
 use dao\BaseDAO;
+use dao\MatchInfosDAO;
 
 class SelectionsTest extends TestCase
 {
@@ -121,9 +123,11 @@ class SelectionsTest extends TestCase
         
 
         //Test l'update sur un autre match le meme jour (il ne doit y avoir qu'un seul enregistrement a la fin)
+        self::$donnees->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(1,1,'A')");
         $input = array("match"=>2, "usr"=>1, "selection"=>33);
         $update->invoke($this->selections,$input);
         $json=$this->SelectionsGet();
+        
         $nb = 0;
         foreach ($json as $v) {
             if ($v["user"] == 1) {
@@ -133,8 +137,10 @@ class SelectionsTest extends TestCase
                 }
             }
         }
-
         $this->assertEquals(1,$nb,"update sur un autre match");
+
+        $matchinfos = new MatchInfosDAO();        
+        $this->assertFalse($matchinfos->exists(1,1),"Suppression de matchinfos");       
 
 
     }

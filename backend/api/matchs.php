@@ -5,10 +5,12 @@ require_once("utils.php");
 require_once("dao/MatchsDAO.php");
 require_once("dao/SelectionsDAO.php");
 require_once("dao/MatchInfosDAO.php");
+require_once("dao/UsersDAO.php");
 
 use dao\MatchsDAO;
 use dao\SelectionsDAO;
 use dao\MatchInfosDAO;
+use dao\UsersDAO;
 
 class Matchs {
 
@@ -44,7 +46,7 @@ class Matchs {
 
 		foreach($allmatchs as &$m) {			
 		
-			$m->oppositions = $this->getOppositions($m->id);
+			$m->oppositions = $this->getOppositions($m->id);			
 
 			$notfound=true;
 			foreach($results as &$res) {
@@ -62,6 +64,12 @@ class Matchs {
 			}		
 		}
 		//loginfo(print_r($results,true));
+
+		//pour chaque jour prepare la convocation
+		foreach ($results as &$j) {
+			
+			$j->convocation = $this->makeConvocation($j);
+		}
 
 		return $results;
 	}
@@ -165,6 +173,55 @@ class Matchs {
 
     }
 
+	private function makeconvocation($jour) {
+
+		$txt="";
+		$usersObj = new UsersDAO();
+		$users = $usersObj->getAll();
+		
+		$selected = array();
+
+		foreach ($jour->matchs as $match) {
+
+			if ($txt!="") { $txt.="\n";}
+			
+			$txt .= "Equipe ".$match->equipe.": ";
+			$l=false;
+			foreach ($match->oppositions->A as $j) {
+				if ($l) {$txt.=", ";}
+				$l=true;
+				array_push($selected,$j->prenom);
+				$txt .= $j->prenom;
+			}
+			foreach ($match->oppositions->B as $j) {
+				if ($l) {$txt.=", ";}
+				$l=true;
+				array_push($selected,$j->prenom);
+				$txt .= $j->prenom;
+			}
+			foreach ($match->oppositions->Autres as $j) {
+				if ($l) {$txt.=", ";}
+				$l=true;
+				array_push($selected,$j->prenom);
+				$txt .= $j->prenom;
+			}	
+
+		}
+		//recherche les non selectionnes
+		$txt .= "\nAu repos: ";	
+		$l=false;
+		foreach ($users as $u) {
+			if (! in_array($u->prenom,$selected) ) {
+				if ($l) {$txt.=", ";}
+				$l=true;				
+				$txt.= $u->prenom;
+			}
+		}
+
+
+
+		return $txt;			
+	}
 
 	/**
 	 * Execute la requete UPDATE sur la table match

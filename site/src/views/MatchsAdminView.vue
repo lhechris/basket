@@ -11,6 +11,7 @@
               <div v-for="match of jour['matchs']" class="pr-4 pl-4" >              
                   <detail-match-admin :matchdetail="match" @change-match="updateMatch" @changeOpp="updateOpp" /> 
               </div>
+              <convocation :value="jour['convocation']" />
             </template>
       </content>      
   </div>
@@ -22,6 +23,7 @@
   import {getMatchsAvecOpp,displaydate,setOpposition,setMatch,getFirstDateAfterNow} from '@/js/api.js'
   import {ref} from "vue"
   import Content from '@/components/Content.vue'
+  import Convocation from '@/components/Convocation.vue'
   import moment from 'moment'
 
   const matchs = ref([])

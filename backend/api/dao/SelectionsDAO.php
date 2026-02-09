@@ -96,7 +96,7 @@ class SelectionsDAO extends BaseDAO {
     }
 
     /**
-     * Retourne les joueurs selectionnées pour ce match
+     * Retourne les joueurs selectionnés pour ce match
      * Mais uniquement ceux qui sont dans une opposition
      * (pour l'affichage en mode non admin ! comme ça les
      * parents ne voient pas les sélections trop tot)
@@ -110,6 +110,37 @@ class SelectionsDAO extends BaseDAO {
         $res = $this->prepareAndExecute($sql, [':id' => [$id, SQLITE3_INTEGER]]);
         return $this->fetchAll($res);
     }
+
+    /**
+     * Retourne les joueurs selectionnés sur une journee
+     */
+    public function getPlayersSelectedByDay(int $jour) {
+		$sql = 'SELECT A.user,C.prenom,B.equipe '.
+               'FROM selections A, matchs B, users C'.
+               'WHERE A.match=B.id AND A.user=C.id AND B.jour=:jour AND A.val=1 '.
+               'ORDER BY C.prenom';
+
+        $res = $this->prepareAndExecute($sql, [':jour' => [$id, SQLITE3_TEXT]]);
+        return $this->fetchAll($res);
+    }
+
+    /**
+     * Retourne les joueurs non selectionnés sur une journee
+     */
+    public function getPlayersNotSelectedByDay(int $jour) {
+		$sql = 'SELECT A.prenom,B.jour '.
+               'FROM users A, matchs B LEFT JOIN selections C ON A.id=C.user AND B.id=C.match '.
+               'WHERE C.val is null OR C.val != 1 '.
+               'GROUP BY B.jour,A.prenom '.
+               'ORDER BY B.jour,A.prenom ';
+;
+
+               
+
+        $res = $this->prepareAndExecute($sql, [':jour' => [$id, SQLITE3_TEXT]]);
+        return $this->fetchAll($res);
+    }
+
 
     /** 
      * Supprime le joueur de la journée

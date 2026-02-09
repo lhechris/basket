@@ -172,6 +172,11 @@ class MatchsTest extends TestCase
         $this->assertEquals('2025-09-27',$results[1]->jour);
         $this->assertEquals('2025-10-05',$results[2]->jour);
 
+        //On verifie les convocations
+        $this->assertEquals("Equipe 1: \nAu repos: fifi, loulou, riri",$results[0]->convocation);
+        $this->assertEquals("Equipe 1: loulou, fifi, riri\nAu repos: ",$results[1]->convocation);
+        $this->assertEquals("Equipe 2: \nAu repos: fifi,loulou, riri",$results[2]->convocation);
+
         //Il y a un match par jour
         $this->assertIsArray($results[0]->matchs);
         $this->assertEquals(1,count($results[0]->matchs));        

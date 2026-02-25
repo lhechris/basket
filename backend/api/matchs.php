@@ -9,19 +9,22 @@ use dao\SelectionsDAO;
 use dao\MatchInfosDAO;
 use dao\UsersDAO;
 use dao\StaffMatchsDAO;
+use dao\StaffDAO;
 
 class Matchs {
 
 	private $matchinfos;
 	private $matchs;
 	private $selections;
-	private $matchstaff;
+	private $staffmatchs;
+	private $staff;
 
 	public function __construct() {
 		$this->matchinfos =  new MatchInfosDAO();
 		$this->matchs = new MatchsDAO();
 		$this->selections = new SelectionsDAO();	
-		$this->matchstaff = new StaffMatchsDAO();	
+		$this->staffmatchs = new StaffMatchsDAO();
+		$this->staff = new StaffDAO();
 	}
 
 	public function getArray($id=null) {
@@ -31,7 +34,23 @@ class Matchs {
 		} else {
 			$results = $this->matchs->getById($id);
 			$results->oppositions = $this->getOppositions($id);	
-			$results->entraineurs = $this->matchstaff->getEntraineurs($id);
+			$results->entraineurs = $this->staffmatchs->getEntraineurs($id);
+			$results->otm = $this->getOtmArray($id);
+		}
+		return $results;
+	}
+
+	public function getOtmArray(int $match) {	
+		$results = $this->staff->getOtm();
+		$active = $this->staffmatchs->getOtm($match);
+		
+		foreach ($results as &$row) {
+			$row->selected = false;
+			foreach($active as $a) {
+				if ($row->id == $a->id) {
+					$row->selected = true;
+				}
+			}
 		}
 		return $results;
 	}
@@ -48,7 +67,8 @@ class Matchs {
 		foreach($allmatchs as &$m) {			
 		
 			$m->oppositions = $this->getOppositions($m->id);			
-			$m->entraineurs = $this->matchstaff->getEntraineurs($m->id);
+			$m->entraineurs = $this->staffmatchs->getEntraineurs($m->id);
+			$m->otm = $this->getOtmArray($m->id);
 
 			$notfound=true;
 			foreach($results as &$res) {
@@ -226,11 +246,24 @@ class Matchs {
 	}
 
 	/**
+	 * Supprime tous les otm du match 
+	 * et cree les otm pour ce match
+	 */
+	private function updateOtm($id,$otm) {
+		$this->staffmatchs->deleteMatchs($id);
+		foreach($otm as $o) {			
+			if ($o["selected"]) {
+				$this->staffmatchs->create($id,$o["id"]);
+			}
+		}
+	}
+
+	/**
 	 * Execute la requete UPDATE sur la table match
 	 */
 	protected function update($id,$numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
-
-		$this->matchs->update($id,$numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);
+		$this->matchs->update($id,$numero,$equipe,$titre,$score,$jour,$collation,$maillots,$adresse,$horaire,$rendezvous);
+		$this->updateOtm($id,$otm);
 	}
 
 	/**
@@ -238,7 +271,8 @@ class Matchs {
 	 */
 	protected function ajoute($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
 
-		$this->matchs->create($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);				
+		$id = $this->matchs->create($numero,$equipe,$titre,$score,$jour,$collation,$maillots,$adresse,$horaire,$rendezvous);				
+		$this->updateOtm($id,$otm);
 	}
 
 	/**

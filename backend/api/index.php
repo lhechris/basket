@@ -36,7 +36,11 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 		$users->get();
 
 	} else if (array_key_exists('staff',$_GET)) {
-		$staff->get();
+		if (islogged()) {
+			$staff->get();
+		} else {
+			responseJson(array());
+		}
 
 	} else 	if (array_key_exists('matchs',$_GET)) {
 		if (islogged()) {

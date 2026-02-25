@@ -111,6 +111,12 @@ export function getStaff() {
     });
 }
 
+export function getOtm() {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('otm').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+}
+
 export function setStaff(staff) {
     var baseurl = "/api/";
     

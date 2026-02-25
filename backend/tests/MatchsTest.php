@@ -32,12 +32,12 @@ class MatchsTest extends TestCase
         self::$donnees->exec($sql);      
 
         //ajout donnees de test
-        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
-                        "VALUES('1234',1,'2025-09-27','match2','24/8','gontran','geo trouvetou','machine à laver','quelque part','12h15','11h20')");
-        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
-                        "VALUES('1235',1,'2025-09-20','match1','0/0','donald','picsou','nobody','ici ou la bas','12h00','11h00')");
-        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,otm,maillots) ".
-                        "VALUES('1236',2,'2025-10-05','match3','24/8','flagada','flairsou','rapetou')");
+        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,maillots,adresse,horaire,rendezvous) ".
+                        "VALUES('1234',1,'2025-09-27','match2','24/8','gontran','machine à laver','quelque part','12h15','11h20')");
+        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,maillots,adresse,horaire,rendezvous) ".
+                        "VALUES('1235',1,'2025-09-20','match1','0/0','donald','nobody','ici ou la bas','12h00','11h00')");
+        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,maillots) ".
+                        "VALUES('1236',2,'2025-10-05','match3','24/8','flairsou','rapetou')");
 
         self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('riri',1,  'duck','BC011001',1,1)");
         self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('fifi',1,  'duck','BC011002',0,1)");
@@ -121,7 +121,6 @@ class MatchsTest extends TestCase
         $this->assertEquals("match1",$result[0]->titre);
         $this->assertEquals("0/0",$result[0]->score);
         $this->assertEquals("donald",$result[0]->collation);
-        $this->assertEquals("picsou",$result[0]->otm);
         $this->assertEquals("nobody",$result[0]->maillots);
         $this->assertEquals("ici ou la bas",$result[0]->adresse);
         $this->assertEquals("12h00",$result[0]->horaire);
@@ -146,7 +145,6 @@ class MatchsTest extends TestCase
         $this->assertEquals("match2",$result->titre);
         $this->assertEquals("24/8",$result->score);
         $this->assertEquals("gontran",$result->collation);
-        $this->assertEquals("geo trouvetou",$result->otm);
         $this->assertEquals("machine à laver",$result->maillots);
         $this->assertEquals("quelque part",$result->adresse);
         $this->assertEquals("12h15",$result->horaire);
@@ -284,7 +282,7 @@ class MatchsTest extends TestCase
         $reflection = new ReflectionClass(get_class($this->matchs));
         $method = $reflection->getMethod('update');
         $method->setAccessible(true);
-        $method->invoke($this->matchs,1,'1233',2,'match numero 1','8/9','2025-10-06',"germaine","personne","gigi","la bas","15h30", "Au gymnase");
+        $method->invoke($this->matchs,1,'1233',2,'match numero 1','8/9','2025-10-06',"germaine",[],"gigi","la bas","15h30", "Au gymnase");
 
         $result = $this->matchs->getArray(1);
      
@@ -296,7 +294,6 @@ class MatchsTest extends TestCase
         $this->assertEquals("match numero 1",$result->titre);
         $this->assertEquals("8/9",$result->score);
         $this->assertEquals("germaine",$result->collation);
-        $this->assertEquals("personne",$result->otm);
         $this->assertEquals("gigi",$result->maillots);
         $this->assertEquals("la bas",$result->adresse);
         $this->assertEquals("15h30",$result->horaire);
@@ -310,7 +307,7 @@ class MatchsTest extends TestCase
         $reflection = new ReflectionClass(get_class($this->matchs));
         $method = $reflection->getMethod('ajoute');
         $method->setAccessible(true);
-        $method->invoke($this->matchs,'9999',2,'match numero 4','5/9','2025-11-08',"bubulle","jojo","coco","ici","11h","quelquepart");
+        $method->invoke($this->matchs,'9999',2,'match numero 4','5/9','2025-11-08',"bubulle",[],"coco","ici","11h","quelquepart");
 
         $result = $this->matchs->getArray(4);
      
@@ -322,7 +319,6 @@ class MatchsTest extends TestCase
         $this->assertEquals("match numero 4",$result->titre);
         $this->assertEquals("5/9",$result->score);
         $this->assertEquals("bubulle",$result->collation);
-        $this->assertEquals("jojo",$result->otm);
         $this->assertEquals("coco",$result->maillots);
         $this->assertEquals("ici",$result->adresse);
         $this->assertEquals("11h",$result->horaire);

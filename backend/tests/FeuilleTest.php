@@ -54,7 +54,9 @@ class FeuilleTest extends TestCase
 
         self::$donnees->exec("INSERT INTO staff(nom,prenom,licence,role) VALUES('zidane','zinedine','JH70356','entraineur')");
         self::$donnees->exec("INSERT INTO staff(nom,prenom,licence,role) VALUES('dus','jean-claude','JH48111','otm')");
+
         self::$donnees->exec("INSERT INTO staffmatchs(match,staff) VALUES(1,1)");
+        self::$donnees->exec("INSERT INTO staffmatchs(match,staff) VALUES(1,2)");
 
     }
 
@@ -85,7 +87,8 @@ class FeuilleTest extends TestCase
     }
 
     /**
-     * GetArray
+     * Test la feuille de match xlsx
+     * On verifie que les cellules contienent les valeurs attendu
      */
     public function testGet()
     {
@@ -118,6 +121,10 @@ class FeuilleTest extends TestCase
         $this->assertEquals('JH70356', (string)$activeWorksheet->getCell('A27')->getValue());
         $this->assertEquals('zidane', (string)$activeWorksheet->getCell('C27')->getValue());
         $this->assertEquals('zinedine', (string)$activeWorksheet->getCell('D27')->getValue());
+
+        $this->assertEquals('JH48111', (string)$activeWorksheet->getCell('A32')->getValue());
+        $this->assertEquals('dus', (string)$activeWorksheet->getCell('C32')->getValue());
+        $this->assertEquals('jean-claude', (string)$activeWorksheet->getCell('D32')->getValue());
 
     }
 

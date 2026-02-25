@@ -17,7 +17,17 @@
         <div class="flex flex-col gap-2 ">
             <div class="flex gap-2"><div class="text-left w-40">Score</div><input class="w-full bg-teal-300" v-model="currentmatch.score"  @input="debouncedOnChange()"/></div>
             <div class="flex gap-2"><div class="text-left w-40">Collation</div><input class="w-full bg-teal-300" v-model="currentmatch.collation"  @input="debouncedOnChange()"/></div>
-            <div class="flex gap-2"><div class="text-left w-40">OTM</div><input class="w-full bg-teal-300" v-model="currentmatch.otm"  @input="debouncedOnChange()"/></div>
+            <div class="flex gap-2">
+                <div class="text-left w-40">
+                    OTM
+                </div>
+                <div class="w-full bg-teal-300 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-1 p-2">
+                    <div v-for="(name, index) in currentmatch.otm" :key="index" class="flex items-center gap-2">
+                        <input type="checkbox" v-model="name.selected" @change="debouncedOnChange()" />
+                        <span>{{ name.prenom }}</span>
+                    </div>
+                </div>
+            </div>
             <div class="flex gap-2"><div class="text-left w-40">Maillots</div><input class="w-full bg-teal-300" v-model="currentmatch.maillots"  @input="debouncedOnChange()"/></div>
             <div class="flex gap-2"><div class="text-left w-40">Adresse</div><textarea class="w-full bg-teal-300" v-model="currentmatch.adresse"  @input="debouncedOnChange()"></textarea></div>
             <div class="flex gap-2"><div class="text-left w-40">Horaire</div><input class="w-full bg-teal-300" v-model="currentmatch.horaire"  @input="debouncedOnChange()"/></div>

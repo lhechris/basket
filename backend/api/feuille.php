@@ -30,7 +30,7 @@ class Feuille {
         $this->writeopposition($activeWorksheet,$match->oppositions->B,8);
         $this->writeopposition($activeWorksheet,$match->oppositions->A,18);
         $this->writestaff($activeWorksheet,$match->entraineurs,27);
-        //$this->writestaff($activeWorksheet,$match->otm,32);
+        $this->writestaff($activeWorksheet,$match->otm,32);
         $writer = new Xlsx($spreadsheet);
         
         //$writer->save("../feuille_match_$match->numero.xlsx");
@@ -58,9 +58,11 @@ class Feuille {
     {
         $numligne=$start;
         foreach($coachs as $coach) {
-            $sheet->setCellValue("A$numligne", $coach->licence);
-            $sheet->setCellValue("C$numligne", $coach->nom);
-            $sheet->setCellValue("D$numligne", $coach->prenom);
+            if ((!property_exists($coach,'selected')) || (property_exists($coach,'selected') && ($coach->selected))) {
+                $sheet->setCellValue("A$numligne", $coach->licence);
+                $sheet->setCellValue("C$numligne", $coach->nom);
+                $sheet->setCellValue("D$numligne", $coach->prenom);
+            }
             $numligne++;
         }
     }

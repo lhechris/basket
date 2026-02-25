@@ -8,7 +8,7 @@ use dao\StaffDAO;
 
 
 class Staff {
-	private $staff;
+	private StaffDAO $staff;
 
 	public function __construct() {
 		$this->staff = new StaffDAO();
@@ -16,7 +16,7 @@ class Staff {
 
 
 	public function getArray() {	
-		$results = $this->staff->getAll();
+		$results = $this->staff->getAll();		
 		$json = array();
 
 		foreach ($results as $row) {
@@ -33,7 +33,6 @@ class Staff {
 	public function get() {
 		responseJson($this->getArray());
 	}
-
 
 	/**
 	 * Modifie/Ajoute/Supprime des users 

@@ -33,7 +33,6 @@
   function refreshMatch(forcedate=0) {
       getMatchsAvecOpp().then( m => {
           matchs.value = m
-
           //selectionne la page courante
           page.value = 1 + getFirstDateAfterNow(m,false,forcedate)
       })

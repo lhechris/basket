@@ -21,9 +21,9 @@ class MatchsDAO extends BaseDAO {
         return $rows[0] ?? null;
     }
 
-    public function update($id,$numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+    public function update($id,$numero,$equipe,$titre,$score,$jour,$collation,$maillots,$adresse,$horaire,$rendezvous) {
         $sql='UPDATE matchs '.
-			  'SET numero=:numero, equipe=:equipe, titre=:titre, score=:score, jour=:jour, collation=:collation, otm=:otm, maillots=:maillots,adresse=:adresse, horaire=:horaire,rendezvous=:rendezvous  '.
+			  'SET numero=:numero, equipe=:equipe, titre=:titre, score=:score, jour=:jour, collation=:collation, maillots=:maillots,adresse=:adresse, horaire=:horaire,rendezvous=:rendezvous  '.
 			  'WHERE id=:id';
 		
 		$this->prepareAndExecute ($sql,
@@ -34,7 +34,6 @@ class MatchsDAO extends BaseDAO {
 			':score'=> [$score, SQLITE3_TEXT],
 			':jour'=> [$jour, SQLITE3_TEXT],
 			':collation'=> [$collation, SQLITE3_TEXT],
-			':otm'=> [$otm, SQLITE3_TEXT],
 			':maillots'=> [$maillots, SQLITE3_TEXT],
 			':adresse'=> [$adresse, SQLITE3_TEXT],
 			':horaire'=> [$horaire, SQLITE3_TEXT],
@@ -44,10 +43,10 @@ class MatchsDAO extends BaseDAO {
         return $this->changes();
     }
 	
-    public function create($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+    public function create($numero,$equipe,$titre,$score,$jour,$collation,$maillots,$adresse,$horaire,$rendezvous) {
 		
-		$sql = 'INSERT INTO matchs(titre,score,jour,numero,equipe,collation,otm,maillots,adresse,horaire,rendezvous) '.
-								   'VALUES(:titre,:score,:jour,:numero,:equipe,:collation,:otm,:maillots,:adresse,:horaire,:rendezvous)';
+		$sql = 'INSERT INTO matchs(titre,score,jour,numero,equipe,collation,maillots,adresse,horaire,rendezvous) '.
+								   'VALUES(:titre,:score,:jour,:numero,:equipe,:collation,:maillots,:adresse,:horaire,:rendezvous)';
 		$this->prepareAndExecute ($sql,
 			[':numero'=> [$numero, SQLITE3_TEXT],
 			':equipe'=> [$equipe, SQLITE3_INTEGER],
@@ -55,7 +54,6 @@ class MatchsDAO extends BaseDAO {
 			':score'=> [$score, SQLITE3_TEXT],
 			':jour'=> [$jour, SQLITE3_TEXT],
 			':collation'=> [$collation, SQLITE3_TEXT],
-			':otm'=> [$otm, SQLITE3_TEXT],
 			':maillots'=> [$maillots, SQLITE3_TEXT],
 			':adresse'=> [$adresse, SQLITE3_TEXT],
 			':horaire'=> [$horaire, SQLITE3_TEXT],

@@ -5,7 +5,7 @@
   </template>
   
 <script setup>
-  import Staff from '@/components/staff.vue'
+  import Staff from '@/components/Staff.vue'
   import {ref} from 'vue'
   import {getStaff,setStaff} from '../js/api.js'
 

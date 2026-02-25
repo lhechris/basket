@@ -1,5 +1,24 @@
 {
+    "name": "c.lhermitte/basket",
+    "description": "Gestion de la vie d'équipe de basket",
+    "type": "project",
     "require-dev": {
-        "phpunit/phpunit": "^12.4"
+        "phpunit/phpunit": "^12.5"
+    },
+    "license": "BSD",
+    "autoload": {
+        "psr-4": {
+            "Basket\\": "api/",
+            "dao\\": "api/dao/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Christophe Lhermitte",
+            "email": "lhechris@gmail.com"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.4"
     }
 }

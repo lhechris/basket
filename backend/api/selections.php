@@ -1,11 +1,13 @@
 <?php 
 
+namespace Basket;
+
 //require_once("utils.php");
-require_once("dao/SelectionsDAO.php");
-require_once("dao/DisponibilitesDAO.php");
-require_once("dao/MatchsDAO.php");
-require_once("dao/UsersDAO.php");
-require_once("dao/MatchInfosDAO.php");
+//require_once("dao/SelectionsDAO.php");
+//require_once("dao/DisponibilitesDAO.php");
+//require_once("dao/MatchsDAO.php");
+//require_once("dao/UsersDAO.php");
+//require_once("dao/MatchInfosDAO.php");
 
 
 use dao\SelectionsDAO;

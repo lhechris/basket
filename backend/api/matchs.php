@@ -1,27 +1,27 @@
 <?php 
 
-require_once("utils.php");
+namespace Basket;
 
-require_once("dao/MatchsDAO.php");
-require_once("dao/SelectionsDAO.php");
-require_once("dao/MatchInfosDAO.php");
-require_once("dao/UsersDAO.php");
+require_once("utils.php");
 
 use dao\MatchsDAO;
 use dao\SelectionsDAO;
 use dao\MatchInfosDAO;
 use dao\UsersDAO;
+use dao\StaffMatchsDAO;
 
 class Matchs {
 
 	private $matchinfos;
 	private $matchs;
 	private $selections;
+	private $matchstaff;
 
 	public function __construct() {
 		$this->matchinfos =  new MatchInfosDAO();
 		$this->matchs = new MatchsDAO();
-		$this->selections = new SelectionsDAO();
+		$this->selections = new SelectionsDAO();	
+		$this->matchstaff = new StaffMatchsDAO();	
 	}
 
 	public function getArray($id=null) {
@@ -30,7 +30,8 @@ class Matchs {
 		
 		} else {
 			$results = $this->matchs->getById($id);
-			$results->oppositions = $this->getOppositions($id);		
+			$results->oppositions = $this->getOppositions($id);	
+			$results->entraineurs = $this->matchstaff->getEntraineurs($id);
 		}
 		return $results;
 	}
@@ -42,11 +43,12 @@ class Matchs {
 	public function getAvecOppositionsArray() {
 		$allmatchs = $this->matchs->getAll();
 
-		$results=array();
+		$results=array();		
 
 		foreach($allmatchs as &$m) {			
 		
 			$m->oppositions = $this->getOppositions($m->id);			
+			$m->entraineurs = $this->matchstaff->getEntraineurs($m->id);
 
 			$notfound=true;
 			foreach($results as &$res) {
@@ -57,7 +59,7 @@ class Matchs {
 				}
 			}
 			if ($notfound) {
-				$nm = new stdClass();
+				$nm = new \stdClass();
 				$nm->jour = $m->jour;
 				$nm->matchs = [$m];				
 				array_push($results,$nm);
@@ -100,7 +102,7 @@ class Matchs {
 			}
 			//Sinon on crée une nouvelle journée avec ce match
 			if ($notfound) {
-				$nm = new stdClass();
+				$nm = new \stdClass();
 				$nm->jour = $m->jour;
 				$nm->matchs = [$m];				
 				array_push($results,$nm);				
@@ -146,7 +148,7 @@ class Matchs {
         //la table oppositions
         $selectionnes = $this->selections->getByMatch($match);
 
-        $ret = new stdClass;
+        $ret = new \stdClass;
         $ret->A = [];
         $ret->B = [];
         $ret->Autres = [];
@@ -226,17 +228,17 @@ class Matchs {
 	/**
 	 * Execute la requete UPDATE sur la table match
 	 */
-	protected function update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+	protected function update($id,$numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
 
-		$this->matchs->update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);
+		$this->matchs->update($id,$numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);
 	}
 
 	/**
 	 * Execute la requete INSERT INTO dans la table match
 	 */
-	protected function ajoute($equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+	protected function ajoute($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
 
-		$this->matchs->create($equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);				
+		$this->matchs->create($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous);				
 	}
 
 	/**
@@ -251,6 +253,7 @@ class Matchs {
 
 	private function setOne($tab) {
 		if (is_array($tab) && 
+			array_key_exists("numero",$tab) && 
 			array_key_exists("titre",$tab) && 
 			array_key_exists("jour",$tab) && 
 			array_key_exists("score",$tab) && 
@@ -267,6 +270,7 @@ class Matchs {
 
 				} else {
 					$this->update($tab["id"],
+								  $tab["numero"],
 								  $tab["equipe"],
 								  $tab["titre"],
 								  $tab["score"],
@@ -284,7 +288,8 @@ class Matchs {
 				/**
 				 * Il n'y a pas d'id pour ce match c'est donc un ajout 
 				 */
-				$this->ajoute($tab["equipe"],
+				$this->ajoute($tab["numero"],
+							  $tab["equipe"],
 							  $tab["titre"],
 							  $tab["score"],
 							  $tab["jour"],

@@ -39,9 +39,9 @@ export function getMatchsAvecSel() {
 }
 
 export function setMatch(onematch) {
-    var baseurl = "/api/";    
+    var baseurl = "/api/";
     return new Promise((successClbk,failClbk) => {
-        var data={"type":"match", tab:onematch}
+        var data={"type":"match", "tab":onematch}
         axios.post(baseurl, data).then(response =>{
         var r=response.data;        
         successClbk(r);
@@ -91,7 +91,31 @@ export function setUsers(users) {
     var baseurl = "/api/";
     
     return new Promise((successClbk,failClbk) => {
-        var data={"type":"users", tab:users}
+        var data={"type":"users", "tab":users}
+        axios.post(baseurl, data).then(response =>{
+        var r=response.data;        
+        successClbk(r);
+
+        }).catch(errmsg => {
+            failClbk(errmsg);
+        })
+
+    });
+
+}
+
+
+export function getStaff() {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('staff').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+}
+
+export function setStaff(staff) {
+    var baseurl = "/api/";
+    
+    return new Promise((successClbk,failClbk) => {
+        var data={"type":"staff", "tab":staff}
         axios.post(baseurl, data).then(response =>{
         var r=response.data;        
         successClbk(r);

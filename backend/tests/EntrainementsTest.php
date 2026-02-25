@@ -4,11 +4,10 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../api/env.php';
-require_once __DIR__ . '/../api/dao/BaseDAO.php';
 require_once __DIR__ . '/../api/utils.php';
-require_once __DIR__ . '/../api/entrainements.php';
 
 use dao\BaseDAO;
+use Basket\Entrainements;
 
 class EntrainementsTest extends TestCase
 {

@@ -6,14 +6,19 @@ include_once("env.php");
 loadEnv(".env");
 
 include_once("utils.php");
-include_once("users.php");
-include_once("matchs.php");
-include_once("entrainements.php");
 include_once("auth.php");
-include_once("presences.php");
-include_once("disponibilites.php");
-include_once("selections.php");
-include_once("matchinfos.php");
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Basket\Users;
+use Basket\MatchInfos;
+use Basket\Matchs;
+use Basket\Entrainements;
+use Basket\Presences;
+use Basket\Disponibilites;
+use Basket\Selections;
+use Basket\Feuille;
+use Basket\Staff;
 
 $users = new Users();
 $matchinfo = new MatchInfos();
@@ -22,12 +27,16 @@ $entrainements=new Entrainements();
 $presences = new Presences();
 $disponibilites = new Disponibilites();
 $selections = new Selections();
+$staff = new Staff();
 
 
 if ($_SERVER["REQUEST_METHOD"]=="GET") { 
 	//Gestion du GET
 	if (array_key_exists('users',$_GET)) {
 		$users->get();
+
+	} else if (array_key_exists('staff',$_GET)) {
+		$staff->get();
 
 	} else 	if (array_key_exists('matchs',$_GET)) {
 		if (islogged()) {
@@ -81,7 +90,16 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 			$selections->get();
 		} else {
 			responseJson(array());
-		}	} else 	if (array_key_exists('islogged',$_GET)) {	
+		}
+	} else 	if (array_key_exists('feuille',$_GET)) {
+		if (islogged()) {
+			$feuille = new Feuille();
+			$feuille->get($_GET['feuille']);
+		} else {
+			responseJson(array());
+		}
+
+	} else 	if (array_key_exists('islogged',$_GET)) {	
 			getIslogged();
 
 	} else {
@@ -141,6 +159,10 @@ else if ($_SERVER["REQUEST_METHOD"]=="POST")
 		} else if ($json["type"]=="users") {
 			//USERS
 			$users->set($json["tab"]);
+
+		} else if ($json["type"]=="staff") {
+			//STAFF
+			$staff->set($json["tab"]);
 
 		} else {
 			retourneErreur("Invalid Request");	

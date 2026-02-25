@@ -8,6 +8,7 @@ import JoueusesView from '../views/JoueusesView.vue'
 import MatchAdminView from '../views/MatchAdminView.vue'
 import MatchsView from '../views/MatchsView.vue'
 import FeuilleMatchView from '../views/FeuilleMatch.vue'
+import StaffView from '../views/StaffView.vue'
 
 const routes = [
   {
@@ -51,6 +52,11 @@ const routes = [
     path: '/joueuses',
     name: 'joueuses',
     component: JoueusesView
+  },
+  {
+    path: '/staff',
+    name: 'staff',
+    component: StaffView
   },
   {
     path: '/auth',

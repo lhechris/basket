@@ -3,10 +3,14 @@
 use PHPUnit\Framework\TestCase;
 
 include_once("api/env.php");
-include_once("api/dao/BaseDAO.php");
-include_once("api/matchinfos.php");
+include_once("api/utils.php");
+
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use dao\BaseDAO;
+use Basket\MatchInfos;
+use Basket\Matchs;
+
 
 class MatchsTest extends TestCase
 {
@@ -28,12 +32,12 @@ class MatchsTest extends TestCase
         self::$donnees->exec($sql);      
 
         //ajout donnees de test
-        self::$donnees->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
-                        "VALUES(1,'2025-09-27','match2','24/8','gontran','geo trouvetou','machine à laver','quelque part','12h15','11h20')");
-        self::$donnees->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
-                        "VALUES(1,'2025-09-20','match1','0/0','donald','picsou','nobody','ici ou la bas','12h00','11h00')");
-        self::$donnees->exec("INSERT INTO matchs(equipe, jour, titre, score,collation,otm,maillots) ".
-                        "VALUES(2,'2025-10-05','match3','24/8','flagada','flairsou','rapetou')");
+        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
+                        "VALUES('1234',1,'2025-09-27','match2','24/8','gontran','geo trouvetou','machine à laver','quelque part','12h15','11h20')");
+        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,otm,maillots,adresse,horaire,rendezvous) ".
+                        "VALUES('1235',1,'2025-09-20','match1','0/0','donald','picsou','nobody','ici ou la bas','12h00','11h00')");
+        self::$donnees->exec("INSERT INTO matchs(numero,equipe, jour, titre, score,collation,otm,maillots) ".
+                        "VALUES('1236',2,'2025-10-05','match3','24/8','flagada','flairsou','rapetou')");
 
         self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('riri',1,  'duck','BC011001',1,1)");
         self::$donnees->exec("INSERT INTO users(prenom,equipe,nom,licence,otm,charte) VALUES('fifi',1,  'duck','BC011002',0,1)");
@@ -175,7 +179,7 @@ class MatchsTest extends TestCase
         //On verifie les convocations
         $this->assertEquals("Equipe 1: \nAu repos: fifi, loulou, riri",$results[0]->convocation);
         $this->assertEquals("Equipe 1: loulou, fifi, riri\nAu repos: ",$results[1]->convocation);
-        $this->assertEquals("Equipe 2: \nAu repos: fifi,loulou, riri",$results[2]->convocation);
+        $this->assertEquals("Equipe 2: \nAu repos: fifi, loulou, riri",$results[2]->convocation);
 
         //Il y a un match par jour
         $this->assertIsArray($results[0]->matchs);
@@ -280,12 +284,13 @@ class MatchsTest extends TestCase
         $reflection = new ReflectionClass(get_class($this->matchs));
         $method = $reflection->getMethod('update');
         $method->setAccessible(true);
-        $method->invoke($this->matchs,1,2,'match numero 1','8/9','2025-10-06',"germaine","personne","gigi","la bas","15h30", "Au gymnase");
+        $method->invoke($this->matchs,1,'1233',2,'match numero 1','8/9','2025-10-06',"germaine","personne","gigi","la bas","15h30", "Au gymnase");
 
         $result = $this->matchs->getArray(1);
      
         //On verifie que les champs sont ok
         $this->assertEquals(1,$result->id);
+        $this->assertEquals('1233',$result->numero);
         $this->assertEquals(2,$result->equipe);
         $this->assertEquals("2025-10-06",$result->jour);
         $this->assertEquals("match numero 1",$result->titre);
@@ -305,12 +310,13 @@ class MatchsTest extends TestCase
         $reflection = new ReflectionClass(get_class($this->matchs));
         $method = $reflection->getMethod('ajoute');
         $method->setAccessible(true);
-        $method->invoke($this->matchs,2,'match numero 4','5/9','2025-11-08',"bubulle","jojo","coco","ici","11h","quelquepart");
+        $method->invoke($this->matchs,'9999',2,'match numero 4','5/9','2025-11-08',"bubulle","jojo","coco","ici","11h","quelquepart");
 
         $result = $this->matchs->getArray(4);
      
         //On verifie que les champs sont ok
         $this->assertEquals(4,$result->id);
+        $this->assertEquals('9999',$result->numero);
         $this->assertEquals(2,$result->equipe);
         $this->assertEquals("2025-11-08",$result->jour);
         $this->assertEquals("match numero 4",$result->titre);

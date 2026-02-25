@@ -1,10 +1,12 @@
 <?php 
 
+namespace Basket;
+
 require_once("utils.php");
 
-require_once("dao/EntrainementsDAO.php");
-require_once("dao/UsersDAO.php");
-require_once("dao/PresencesDAO.php");
+//require_once("dao/EntrainementsDAO.php");
+//require_once("dao/UsersDAO.php");
+//require_once("dao/PresencesDAO.php");
 
 use dao\EntrainementsDAO;
 use dao\UsersDAO;

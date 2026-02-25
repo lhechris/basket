@@ -6,12 +6,10 @@ use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../api/utils.php';
 require_once __DIR__ . '/../api/env.php';
-require_once __DIR__ . '/../api/dao/BaseDAO.php';
-require_once __DIR__ . '/../api/dao/MatchInfosDAO.php';
-require_once __DIR__ . '/../api/selections.php';
 
 use dao\BaseDAO;
 use dao\MatchInfosDAO;
+use Basket\Selections;
 
 class SelectionsTest extends TestCase
 {

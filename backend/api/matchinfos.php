@@ -1,21 +1,11 @@
 <?php
-require_once("utils.php");
-require_once("users.php");
-require_once("matchs.php");
 
-require_once("dao/MatchInfosDAO.php");
-require_once("dao/SelectionsDAO.php");
+namespace Basket;
+
+require_once("utils.php");
 
 use dao\MatchInfosDAO;
 use dao\SelectionsDAO;
-
-// Callback de usort pour trier les opposition par numero
-function cb_tri($a,$b) {
-    if ($a->numero === null) return 1;
-    if ($b->numero === null) return -1;
-    $ret=$a->numero - $b->numero;
-    return $a->numero - $b->numero;
-}
 
 class MatchInfos  {
 

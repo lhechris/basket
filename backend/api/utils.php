@@ -49,4 +49,12 @@ function loginfo($msg) {
 	fclose($fp);
 }
 
+// Callback de usort pour trier les opposition par numero
+function cb_tri($a,$b) {
+	if ($a->numero === null) return 1;
+	if ($b->numero === null) return -1;
+	$ret=$a->numero - $b->numero;
+	return $a->numero - $b->numero;
+}
+
 ?>

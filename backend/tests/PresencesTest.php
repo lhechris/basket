@@ -5,10 +5,10 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../api/env.php';
-require_once __DIR__ . '/../api/presences.php';
-require_once __DIR__ . '/../api/dao/BaseDAO.php';
+require_once __DIR__ . '/../api/utils.php';
 
 use dao\BaseDAO;
+use Basket\Presences;
 
 class PresencesTest extends TestCase
 {

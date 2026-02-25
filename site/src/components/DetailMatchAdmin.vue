@@ -4,7 +4,8 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pl-2">
                 <span class="font-bold"><input class="pl-2 bg-teal-300" v-model="currentmatch.titre"  @input="debouncedOnChange()"/></span>
                 <span>&nbsp;Equipe<input class="max-w-10 bg-teal-300" v-model="currentmatch.equipe"  @input="debouncedOnChange()"/></span>
-                <input class="max-w-30 p-1 bg-teal-300" v-model="currentmatch.jour" />
+                <input class="max-w-30 p-1 bg-teal-300" v-model="currentmatch.jour" @input="debouncedOnChange()"/>
+                <input class="max-w-30 p-1 bg-teal-300" v-model="currentmatch.numero" @input="debouncedOnChange()"/>
                 <span>
                     <button class="middle none center mr-4 rounded-lg bg-red-500 py-1 px-2 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" 
                             @click="supprime()">Supprimer
@@ -59,12 +60,11 @@
                 </div>
             </div> 
             <div class="mb-5 flex items-start">
-                <router-link 
-                    role="button" 
-                    :to="'/feuillematch/'+currentmatch.id"
-                    class="text-decoration-none inline-flex items-center justify-center rounded-lg bg-blue-500 py-1 px-3 text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-85 focus:outline-none active:opacity-85"
-                >Feuille de match</router-link>                
-            </div>       
+                <button @click="openFeuille"  
+                    class="text-decoration-none inline-flex items-center justify-center rounded-lg bg-blue-500 py-1 px-3 text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-85 focus:outline-none active:opacity-85">
+                    Feuille de match
+            </button>     
+            </div>
         </div>        
     </div>
 </template>
@@ -130,6 +130,10 @@
 
     }
 
+    function openFeuille() {
+        const url = `/api/?feuille=${currentmatch.value.id}`;
+        window.open(url, '_blank');
+    }
 
     const onChange = () => {
         emit('changeMatch',currentmatch.value)

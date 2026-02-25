@@ -3,10 +3,10 @@
 use PHPUnit\Framework\TestCase;
 
 include_once("api/env.php");
-include_once("api/dao/BaseDAO.php");
-include_once("api/matchinfos.php");
+include_once("api/utils.php");
 
 use dao\BaseDAO;
+use Basket\MatchInfos;
 
 class MatchInfosTest extends TestCase
 {

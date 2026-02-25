@@ -14,7 +14,8 @@
                 "adresse": "ici ou la bas",
                 "horaire": "12h00",
                 "rendezvous": "11h00",
-                "selections": []
+                "selections": [],
+                "numero" : "1235"
             }
         ]
     },
@@ -42,7 +43,8 @@
                         "user": 3,
                         "prenom": "loulou"
                     }
-                ]
+                ],
+                "numero" : "1234"
             }
         ]
     },
@@ -61,7 +63,8 @@
                 "adresse": null,
                 "horaire": null,
                 "rendezvous": null,
-                "selections": []
+                "selections": [],
+                "numero" : "1236"
             }
         ]
     }

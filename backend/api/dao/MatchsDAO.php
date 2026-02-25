@@ -21,13 +21,14 @@ class MatchsDAO extends BaseDAO {
         return $rows[0] ?? null;
     }
 
-    public function update($id,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+    public function update($id,$numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
         $sql='UPDATE matchs '.
-			  'SET equipe=:equipe, titre=:titre, score=:score, jour=:jour, collation=:collation, otm=:otm, maillots=:maillots,adresse=:adresse, horaire=:horaire,rendezvous=:rendezvous  '.
+			  'SET numero=:numero, equipe=:equipe, titre=:titre, score=:score, jour=:jour, collation=:collation, otm=:otm, maillots=:maillots,adresse=:adresse, horaire=:horaire,rendezvous=:rendezvous  '.
 			  'WHERE id=:id';
 		
 		$this->prepareAndExecute ($sql,
 			[':id'=> [$id, SQLITE3_INTEGER],
+			':numero'=> [$numero, SQLITE3_TEXT],
 			':equipe'=> [$equipe, SQLITE3_INTEGER],
 			':titre'=> [$titre, SQLITE3_TEXT],
 			':score'=> [$score, SQLITE3_TEXT],
@@ -43,12 +44,13 @@ class MatchsDAO extends BaseDAO {
         return $this->changes();
     }
 	
-    public function create($equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+    public function create($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
 		
-		$sql = 'INSERT INTO matchs(titre,score,jour,equipe,collation,otm,maillots,adresse,horaire,rendezvous) '.
-								   'VALUES(:titre,:score,:jour,:equipe,:collation,:otm,:maillots,:adresse,:horaire,:rendezvous)';
+		$sql = 'INSERT INTO matchs(titre,score,jour,numero,equipe,collation,otm,maillots,adresse,horaire,rendezvous) '.
+								   'VALUES(:titre,:score,:jour,:numero,:equipe,:collation,:otm,:maillots,:adresse,:horaire,:rendezvous)';
 		$this->prepareAndExecute ($sql,
-			[':equipe'=> [$equipe, SQLITE3_INTEGER],
+			[':numero'=> [$numero, SQLITE3_TEXT],
+			':equipe'=> [$equipe, SQLITE3_INTEGER],
 			':titre'=> [$titre, SQLITE3_TEXT],
 			':score'=> [$score, SQLITE3_TEXT],
 			':jour'=> [$jour, SQLITE3_TEXT],
@@ -76,6 +78,9 @@ class MatchsDAO extends BaseDAO {
 
 		$sql='DELETE FROM matchinfos WHERE match=:id';
 		$this->prepareAndExecute ($sql,[':id' => [$id, SQLITE3_INTEGER]]);
+
+        $sql = "DELETE FROM staffmatchs WHERE match=:id";
+        $this->prepareAndExecute($sql, [':id' => [$id, SQLITE3_INTEGER]]);
 
 	}
 

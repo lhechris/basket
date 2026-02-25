@@ -1,7 +1,5 @@
 <?php
 
-include_once("api/dao/DisponibilitesDAO.php");
-
 use PHPUnit\Framework\TestCase;
 use dao\DisponibilitesDAO;
 

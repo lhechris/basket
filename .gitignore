@@ -403,3 +403,5 @@ FodyWeavers.xsd
 data/*.json
 .credential
 site_prev
+
+/vendor/

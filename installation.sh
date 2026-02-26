@@ -2,16 +2,15 @@
 set -euo pipefail
 
 # === PARAMÈTRES ===
-USER_HOME="/home/clhermit"
+USER_HOME="/home/christophe"
 BUILD_DIR="${USER_HOME}/builds/basket"
 RELEASES_BUILD="${BUILD_DIR}/releases"
-SHARED="${BUILD_DIR}/shared"
 
-WEB_ROOT="${BUILD_DIR}/var/www/basket"
+WEB_ROOT="/var/www/basket"
 RELEASES_WEB="${WEB_ROOT}"
-CURRENT_LINK="${WEB_ROOT}/current"
+CURRENT_LINK="${WEB_ROOT}/u11"
+SHARED="${WEB_ROOT}/data"
 
-WORK_DIR="${USER_HOME}/Workspace/basket"
 
 #REPO="https://votre-repo-git.git"
 #BRANCH_OR_TAG="main"
@@ -29,6 +28,7 @@ mkdir -p "${NEW_BUILD}"
 echo ">>> Récupération du code"
 #git clone "${REPO}" .
 #git checkout "${BRANCH_OR_TAG}"
+WORK_DIR="${USER_HOME}/workspace/basket"
 cp -r ${WORK_DIR}/* ${NEW_BUILD}
 
 echo ">>> Installation vuejs"
@@ -41,50 +41,54 @@ echo ">>> Installation Composer"
 composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
 # === SHARED ===
-mkdir -p "${SHARED}/uploads"
+sudo mkdir -p "${SHARED}/uploads"
 
-if [ ! -f "${SHARED}/database.sqlite" ]; then
-    touch "${SHARED}/database.sqlite"
+if [ ! -f "${SHARED}/database.db" ]; then
+    sudo touch "${SHARED}/database.db"
+    sudo sqlite3 "${SHARED}/database.db" < ${NEW_BUILD}/backend/config/createdb.sql
 fi
 
-if [ ! -f "${SHARED}/.env.local" ]; then
-cat > "${SHARED}/.env.local" <<EOF
+if [ ! -f "${SHARED}/.env" ]; then
+cat > "${BUILD_DIR}/.env" <<EOF
 REPERTOIRE_DATA=../../data/
 ACTIVELOG=true
-DBLOCATION=../../data/basketu11.db
+DBLOCATION=../../data/database.db
+TEMPLATE_FILE=../template.xlsx
 EOF
+
+sudo mv ${BUILD_DIR}/.env ${SHARED}
 fi
 
 # === COPIE VERS /var/www ===
 echo "=== Copie vers ${NEW_WEB_RELEASE}"
 sudo mkdir -p "${NEW_WEB_RELEASE}"
-sudo cp -r "${NEW_BUILD}/site/dist/*" "${NEW_WEB_RELEASE}/"
-sudo cp -r "${NEW_BUILD}/site/backend/api" "${NEW_WEB_RELEASE}/"
-sudo cp -r "${NEW_BUILD}/site/backend/vendor" "${NEW_WEB_RELEASE}/"
+sudo cp -r ${NEW_BUILD}/site/dist/* ${NEW_WEB_RELEASE}/
+sudo cp -r ${NEW_BUILD}/backend/api ${NEW_WEB_RELEASE}/
+sudo cp -r ${NEW_BUILD}/backend/vendor ${NEW_WEB_RELEASE}/
 
 
 # === SYMLINK des éléments partagés ===
 echo "=== Symlink shared ==="
-sudo rm -f "${NEW_WEB_RELEASE}/database.sqlite"
-sudo ln -s "${SHARED}/database.sqlite" "${NEW_WEB_RELEASE}/database.sqlite"
+sudo rm -f "${NEW_WEB_RELEASE}/database.db"
+sudo ln -s "${SHARED}/database.db" "${NEW_WEB_RELEASE}/database.db"
 
 sudo rm -rf "${NEW_WEB_RELEASE}/uploads"
 sudo ln -s "${SHARED}/uploads" "${NEW_WEB_RELEASE}/uploads"
 
-sudo rm -f "${NEW_WEB_RELEASE}/.env.local"
-sudo ln -s "${SHARED}/.env.local" "${NEW_WEB_RELEASE}/.env.local"
+sudo rm -f "${NEW_WEB_RELEASE}/.env"
+sudo ln -s "${SHARED}/.env" "${NEW_WEB_RELEASE}/.env"
 
 # === PERMISSIONS ===
 echo "=== Permissions ==="
 sudo chown -R www-data:www-data "${NEW_WEB_RELEASE}"
 sudo chmod -R 755 "${NEW_WEB_RELEASE}"
 
-sudo chown www-data:www-data "${SHARED}/database.sqlite"
-sudo chmod 664 "${SHARED}/database.sqlite"
+sudo chown www-data:www-data "${SHARED}/database.db"
+sudo chmod 664 "${SHARED}/database.db"
 
 # === Activation atomique ===
 echo "=== Activation de la nouvelle release ==="
-sudo ln -sfn "${NEW_WEB_RELEASE}" "${CURRENT_LINK}"
+sudo ln -sfn "${TS}" "${CURRENT_LINK}"
 
 # === Reload services ===
 #echo "=== Reload PHP-FPM & apache ==="
@@ -93,3 +97,4 @@ sudo ln -sfn "${NEW_WEB_RELEASE}" "${CURRENT_LINK}"
 
 echo "=== Déploiement terminé ==="
 echo "Release active : ${TS}"
+

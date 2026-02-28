@@ -36,7 +36,8 @@ class Matchs {
 		
 		} else {
 			$results = $this->matchs->getById($id);
-			$results->oppositions = $this->getOppositions($id);	
+			$selectionnes = $this->selections->getByMatch($id);
+			$results->oppositions = $this->getOppositions($id,$selectionnes);	
 			$results->entraineurs = $this->staffmatchs->getEntraineurs($id);
 			$results->otm = $this->getOtmArray($id);
 		}

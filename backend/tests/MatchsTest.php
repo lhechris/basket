@@ -50,6 +50,10 @@ class MatchsTest extends TestCase
         self::$donnees->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(3,1,'A')");
         self::$donnees->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(2,1,'B')");
 
+        self::$donnees->exec("INSERT INTO animationsmatchs(match,user,role) VALUES(1,1,'collation')");
+
+
+
     }
 
     public static function tearDownAfterClass(): void
@@ -103,6 +107,13 @@ class MatchsTest extends TestCase
    
     }
 
+    /*public function testgetCollationArray() 
+    {    
+        $reflection = new ReflectionClass(get_class($this->matchs));
+        $method = $reflection->getMethod('getCollationArray');
+        $method->setAccessible(true);
+        $method->invoke($this->matchs,1,);
+    }*/
 
     /**
      * GetArray

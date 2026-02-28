@@ -10,6 +10,7 @@ use dao\MatchInfosDAO;
 use dao\UsersDAO;
 use dao\StaffMatchsDAO;
 use dao\StaffDAO;
+use dao\AnimationsMatchsDAO;
 
 class Matchs {
 
@@ -18,6 +19,7 @@ class Matchs {
 	private $selections;
 	private $staffmatchs;
 	private $staff;
+	private $AnimationsMatchsDAO;
 
 	public function __construct() {
 		$this->matchinfos =  new MatchInfosDAO();
@@ -25,6 +27,7 @@ class Matchs {
 		$this->selections = new SelectionsDAO();	
 		$this->staffmatchs = new StaffMatchsDAO();
 		$this->staff = new StaffDAO();
+		$this->animationsmatchs = new AnimationsMatchsDAO();
 	}
 
 	public function getArray($id=null) {
@@ -40,7 +43,7 @@ class Matchs {
 		return $results;
 	}
 
-	public function getOtmArray(int $match) {	
+	private function getOtmArray(int $match) {	
 		$results = $this->staff->getOtm();
 		$active = $this->staffmatchs->getOtm($match);
 		
@@ -52,6 +55,61 @@ class Matchs {
 				}
 			}
 		}
+		return $results;
+	}
+	private function getOtmOnlySelectedArray(int $match) {	
+		$results = $this->staffmatchs->getOtm($match);
+		return $results;
+	}
+
+	private function getCollationArray(int $match,$selectionnes) {	
+		$selected = $selectionnes;
+		$active = $this->animationsmatchs->getCollations($match);
+		$results=array();
+		foreach ($selected as $row) {
+			$r=new \StdClass();
+			$r->id = $row->user;
+			$r->prenom = $row->prenom;
+			$r->selected = false;
+			loginfo(print_r($active,true));
+			foreach($active as $a) {
+				if ($row->user == $a->id) {
+					$r->selected = true;
+				}
+			}
+			array_push($results,$r);
+		}
+		return $results;
+	}
+
+	private function getCollationsOnlySelectedArray(int $match) {	
+		$results = $this->animationsmatchs->getCollations($match);
+		return $results;
+	}
+
+
+	private function getMaillotsArray(int $match,$selectionnes) {	
+		$selected = $selectionnes;
+		$active = $this->animationsmatchs->getMaillots($match);
+		$results=array();
+		foreach ($selected as $row) {
+			$r=new \StdClass();
+			$r->id = $row->user;
+			$r->prenom = $row->prenom;
+			$r->selected = false;
+			loginfo(print_r($active,true));
+			foreach($active as $a) {
+				if ($row->user == $a->id) {
+					$r->selected = true;
+				}
+			}
+			array_push($results,$r);
+		}
+		return $results;
+	}
+
+	private function getMaillotsOnlySelectedArray(int $match) {	
+		$results = $this->animationsmatchs->getMaillots($match);
 		return $results;
 	}
 
@@ -66,9 +124,12 @@ class Matchs {
 
 		foreach($allmatchs as &$m) {			
 		
-			$m->oppositions = $this->getOppositions($m->id);			
+			$selectionnes = $this->selections->getByMatch($m->id);
+			$m->oppositions = $this->getOppositions($m->id,$selectionnes);			
 			$m->entraineurs = $this->staffmatchs->getEntraineurs($m->id);
 			$m->otm = $this->getOtmArray($m->id);
+			$m->maillots = $this->getMaillotsArray($m->id,$selectionnes);
+			$m->collation = $this->getCollationArray($m->id,$selectionnes);
 
 			$notfound=true;
 			foreach($results as &$res) {
@@ -110,7 +171,12 @@ class Matchs {
 		foreach($allmatchs as &$m) {			
 			//On ajoute les joueurs sélectionné pour ce match
 			$m->selections = $this->selections->getPlayersByMatchId($m->id);						
+			$m->otm = $this->getOtmOnlySelectedArray($m->id);			
 			
+			$m->entraineurs = $this->staffmatchs->getEntraineurs($m->id);
+			$m->maillots = $this->getMaillotsOnlySelectedArray($m->id);
+			$m->collation = $this->getCollationsOnlySelectedArray($m->id);			
+
 			//Si la journée existe déjà, on rajoute ce match
 			$notfound=true;
 			foreach($results as &$res) {
@@ -158,7 +224,7 @@ class Matchs {
 	}
 
 
-    private function getOppositions($match) {     
+    private function getOppositions($match,$selectionnes) {     
 
         //On recupère les oppositions dans la table matchinfos
         $opps = $this->matchinfos->getByMatch($match);
@@ -166,7 +232,7 @@ class Matchs {
 
         //on ajoute tous les joueurs sélectionnées pour le match et qui ne sont pas dans 
         //la table oppositions
-        $selectionnes = $this->selections->getByMatch($match);
+        
 
         $ret = new \stdClass;
         $ret->A = [];
@@ -249,11 +315,22 @@ class Matchs {
 	 * Supprime tous les otm du match 
 	 * et cree les otm pour ce match
 	 */
-	private function updateOtm($id,$otm) {
+	private function updateOtm($id,$otm,$maillots,$collations) {
 		$this->staffmatchs->deleteMatchs($id);
 		foreach($otm as $o) {			
 			if ($o["selected"]) {
 				$this->staffmatchs->create($id,$o["id"]);
+			}
+		}
+		$this->animationsmatchs->deleteMatchs($id);
+		foreach($maillots as $o) {	
+			if ($o["selected"]) {
+				$this->animationsmatchs->create($id,$o["id"],'maillots');
+			}
+		}
+		foreach($collations as $o) {			
+			if ($o["selected"]) {
+				$this->animationsmatchs->create($id,$o["id"],'collation');
 			}
 		}
 	}
@@ -262,8 +339,8 @@ class Matchs {
 	 * Execute la requete UPDATE sur la table match
 	 */
 	protected function update($id,$numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
-		$this->matchs->update($id,$numero,$equipe,$titre,$score,$jour,$collation,$maillots,$adresse,$horaire,$rendezvous);
-		$this->updateOtm($id,$otm);
+		$this->matchs->update($id,$numero,$equipe,$titre,$score,$jour,$adresse,$horaire,$rendezvous);
+		$this->updateOtm($id,$otm,$maillots,$collation);
 	}
 
 	/**
@@ -272,7 +349,7 @@ class Matchs {
 	protected function ajoute($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
 
 		$id = $this->matchs->create($numero,$equipe,$titre,$score,$jour,$collation,$maillots,$adresse,$horaire,$rendezvous);				
-		$this->updateOtm($id,$otm);
+		$this->updateOtm($id,$otm,$maillots,$collation);
 	}
 
 	/**

@@ -8,17 +8,17 @@
                 <div class="w-30 text-left">Score</div>
                 <div>{{currentmatch.score}}</div>
             </div>
-            <div class="flex gap-2" v-if="currentmatch.collation!='N/A'">
+            <div class="flex gap-2" v-if="currentmatch.collation.length>0">
                 <div class="w-30 text-left">Collation</div>
-                <div>{{currentmatch.collation}}</div>
+                <div><span v-for="(j,n) in currentmatch.collation"><span v-if="n>0">&nbsp;/&nbsp;</span>{{j.prenom}}</span></div>
             </div>
-            <div class="flex gap-2" v-if="currentmatch.otm!='N/A'"> 
+            <div class="flex gap-2" v-if="currentmatch.otm.length>0"> 
                 <div class="w-30 text-left">OTM</div>
-                <div>{{currentmatch.otm}}</div>
+                <div><span v-for="(otm,n) in currentmatch.otm"><span v-if="n>0">&nbsp;/&nbsp;</span>{{otm.prenom}}</span></div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-20" v-if="currentmatch.maillots.length>0">
                 <div class="w-30 text-left">Maillots</div>
-                <div>{{currentmatch.maillots}}</div>
+                <div><span v-for="(j,n) in currentmatch.maillots"><span v-if="n>0">&nbsp;/&nbsp;</span>{{j.prenom}}</span></div>
             </div>
             <div class="flex gap-2">
                 <div class="w-30 text-left">Lieu</div>

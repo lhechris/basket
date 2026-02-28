@@ -7,3 +7,4 @@ CREATE TABLE presences(entrainement integer, user integer,val integer);
 CREATE TABLE matchinfos(user integer,match integer,opposition text, numero integer, commentaire text);
 CREATE TABLE staff(id integer primary key, nom text, prenom text, licence text, role text);
 CREATE TABLE staffmatchs(match,staff);
+CREATE TABLE animationsmatchs(match,user,role);

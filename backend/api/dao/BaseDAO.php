@@ -53,6 +53,7 @@ class BaseDAO {
         $res = $stmt->execute();
 
         if ($res === false) {
+            debug_print_backtrace();
             throw new RuntimeException("Execute error: " . self::$db->lastErrorMsg());
         }
         return $res;

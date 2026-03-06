@@ -12,7 +12,7 @@ CURRENT_LINK="${WEB_ROOT}/u11"
 SHARED="${WEB_ROOT}/data"
 
 
-#REPO="https://votre-repo-git.git"
+REPO="git@github.com:lhechris/basket.git"
 #BRANCH_OR_TAG="main"
 
 #PHP_VERSION="8.4"
@@ -26,10 +26,11 @@ NEW_WEB_RELEASE="${RELEASES_WEB}/${TS}"
 echo "=== Build dans ${NEW_BUILD}"
 mkdir -p "${NEW_BUILD}"
 echo ">>> Récupération du code"
-#git clone "${REPO}" .
+cd ${NEW_BUILD}
+git clone "${REPO}" .
 #git checkout "${BRANCH_OR_TAG}"
-WORK_DIR="${USER_HOME}/workspace/basket"
-cp -r ${WORK_DIR}/* ${NEW_BUILD}
+#WORK_DIR="${USER_HOME}/workspace/basket"
+#cp -r ${WORK_DIR}/* ${NEW_BUILD}
 
 echo ">>> Installation vuejs"
 cd ${NEW_BUILD}/site

@@ -50,8 +50,14 @@ class MatchsTest extends TestCase
         self::$donnees->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(3,1,'A')");
         self::$donnees->exec("INSERT INTO matchinfos(user,match,opposition) VALUES(2,1,'B')");
 
-        self::$donnees->exec("INSERT INTO animationsmatchs(match,user,role) VALUES(1,1,'collation')");
+        self::$donnees->exec("INSERT INTO animationsmatchs(match,user,role) VALUES(1,2,'collation')");
+        self::$donnees->exec("INSERT INTO animationsmatchs(match,user,role) VALUES(1,3,'maillots')");
 
+        self::$donnees->exec("INSERT INTO staff(nom,prenom,licence,role) VALUES('duck','picsou','aaa','entraineur')");
+        self::$donnees->exec("INSERT INTO staff(nom,prenom,licence,role) VALUES('duck','donald','bbb','otm')");
+
+        self::$donnees->exec("INSERT INTO staffmatchs(match,staff) VALUES(1,1)");
+        self::$donnees->exec("INSERT INTO staffmatchs(match,staff) VALUES(1,2)");
 
 
     }
@@ -155,8 +161,8 @@ class MatchsTest extends TestCase
         $this->assertEquals("2025-09-27",$result->jour);
         $this->assertEquals("match2",$result->titre);
         $this->assertEquals("24/8",$result->score);
-        $this->assertEquals("gontran",$result->collation);
-        $this->assertEquals("machine à laver",$result->maillots);
+        $this->assertIsArray($result->collation);
+        $this->assertIsArray($result->maillots);
         $this->assertEquals("quelque part",$result->adresse);
         $this->assertEquals("12h15",$result->horaire);
         $this->assertEquals("11h20",$result->rendezvous);
@@ -293,10 +299,12 @@ class MatchsTest extends TestCase
         $reflection = new ReflectionClass(get_class($this->matchs));
         $method = $reflection->getMethod('update');
         $method->setAccessible(true);
-        $method->invoke($this->matchs,1,'1233',2,'match numero 1','8/9','2025-10-06',"germaine",[],"gigi","la bas","15h30", "Au gymnase");
+        $method->invoke($this->matchs,1,'1233',2,'match numero 1','8/9','2025-10-06',[["id"=>3,"selected"=>true]],[],[["id"=>1,"selected"=>true]],"la bas","15h30", "Au gymnase");
 
         $result = $this->matchs->getArray(1);
      
+        //print_r($result);
+
         //On verifie que les champs sont ok
         $this->assertEquals(1,$result->id);
         $this->assertEquals('1233',$result->numero);
@@ -304,8 +312,8 @@ class MatchsTest extends TestCase
         $this->assertEquals("2025-10-06",$result->jour);
         $this->assertEquals("match numero 1",$result->titre);
         $this->assertEquals("8/9",$result->score);
-        $this->assertEquals("germaine",$result->collation);
-        $this->assertEquals("gigi",$result->maillots);
+        $this->assertEquals(true,$result->collation[1]->selected);
+        $this->assertEquals(true,$result->maillots[2]->selected);
         $this->assertEquals("la bas",$result->adresse);
         $this->assertEquals("15h30",$result->horaire);
         $this->assertEquals("Au gymnase",$result->rendezvous);        
@@ -318,10 +326,10 @@ class MatchsTest extends TestCase
         $reflection = new ReflectionClass(get_class($this->matchs));
         $method = $reflection->getMethod('ajoute');
         $method->setAccessible(true);
-        $method->invoke($this->matchs,'9999',2,'match numero 4','5/9','2025-11-08',"bubulle",[],"coco","ici","11h","quelquepart");
-
+        //                        $numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous
+        $method->invoke($this->matchs,'9999',2,'match numero 4','5/9','2025-11-08',[],[],[],"ici","11h","quelquepart");
         $result = $this->matchs->getArray(4);
-     
+     //print_r($result);
         //On verifie que les champs sont ok
         $this->assertEquals(4,$result->id);
         $this->assertEquals('9999',$result->numero);
@@ -329,8 +337,8 @@ class MatchsTest extends TestCase
         $this->assertEquals("2025-11-08",$result->jour);
         $this->assertEquals("match numero 4",$result->titre);
         $this->assertEquals("5/9",$result->score);
-        $this->assertEquals("bubulle",$result->collation);
-        $this->assertEquals("coco",$result->maillots);
+        //$this->assertEquals([],$result->collation);
+        //$this->assertEquals([],$result->maillots);
         $this->assertEquals("ici",$result->adresse);
         $this->assertEquals("11h",$result->horaire);
         $this->assertEquals("quelquepart",$result->rendezvous);

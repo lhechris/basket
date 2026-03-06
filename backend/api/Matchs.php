@@ -14,12 +14,12 @@ use dao\AnimationsMatchsDAO;
 
 class Matchs {
 
-	private $matchinfos;
-	private $matchs;
-	private $selections;
-	private $staffmatchs;
-	private $staff;
-	private $AnimationsMatchsDAO;
+	private MatchInfosDAO $matchinfos;
+	private MatchsDAO $matchs;
+	private SelectionsDAO $selections;
+	private StaffMatchsDAO $staffmatchs;
+	private StaffDAO $staff;
+	private AnimationsMatchsDAO $animationsmatchs;
 
 	public function __construct() {
 		$this->matchinfos =  new MatchInfosDAO();
@@ -38,9 +38,31 @@ class Matchs {
 			$results = $this->matchs->getById($id);
 			$selectionnes = $this->selections->getByMatch($id);
 			$results->oppositions = $this->getOppositions($id,$selectionnes);	
-			$results->entraineurs = $this->staffmatchs->getEntraineurs($id);
+			$results->entraineurs = $this->getEntraineursArray($id);
 			$results->otm = $this->getOtmArray($id);
+			$results->maillots = $this->getMaillotsArray($id,$selectionnes);
+			$results->collation = $this->getCollationArray($id,$selectionnes);	
 		}
+		return $results;
+	}
+
+	private function getEntraineursArray(int $match) {	
+		$results = $this->staff->getEntraineurs();
+		$active = $this->staffmatchs->getEntraineurs($match);
+		
+		foreach ($results as &$row) {
+			$row->selected = false;
+			foreach($active as $a) {
+				if ($row->id == $a->id) {
+					$row->selected = true;
+				}
+			}
+		}
+		return $results;
+	}
+
+	private function getEntraineurOnlySelectedArray(int $match) {	
+		$results = $this->staffmatchs->getEntraineurs($match);
 		return $results;
 	}
 
@@ -58,6 +80,7 @@ class Matchs {
 		}
 		return $results;
 	}
+
 	private function getOtmOnlySelectedArray(int $match) {	
 		$results = $this->staffmatchs->getOtm($match);
 		return $results;
@@ -72,7 +95,7 @@ class Matchs {
 			$r->id = $row->user;
 			$r->prenom = $row->prenom;
 			$r->selected = false;
-			loginfo(print_r($active,true));
+			
 			foreach($active as $a) {
 				if ($row->user == $a->id) {
 					$r->selected = true;
@@ -98,7 +121,6 @@ class Matchs {
 			$r->id = $row->user;
 			$r->prenom = $row->prenom;
 			$r->selected = false;
-			loginfo(print_r($active,true));
 			foreach($active as $a) {
 				if ($row->user == $a->id) {
 					$r->selected = true;
@@ -127,7 +149,7 @@ class Matchs {
 		
 			$selectionnes = $this->selections->getByMatch($m->id);
 			$m->oppositions = $this->getOppositions($m->id,$selectionnes);			
-			$m->entraineurs = $this->staffmatchs->getEntraineurs($m->id);
+			$m->entraineurs = $this->getEntraineursArray($m->id);
 			$m->otm = $this->getOtmArray($m->id);
 			$m->maillots = $this->getMaillotsArray($m->id,$selectionnes);
 			$m->collation = $this->getCollationArray($m->id,$selectionnes);
@@ -174,7 +196,7 @@ class Matchs {
 			$m->selections = $this->selections->getPlayersByMatchId($m->id);						
 			$m->otm = $this->getOtmOnlySelectedArray($m->id);			
 			
-			$m->entraineurs = $this->staffmatchs->getEntraineurs($m->id);
+			$m->entraineurs = $this->getEntraineurOnlySelectedArray($m->id);
 			$m->maillots = $this->getMaillotsOnlySelectedArray($m->id);
 			$m->collation = $this->getCollationsOnlySelectedArray($m->id);			
 
@@ -319,18 +341,18 @@ class Matchs {
 	private function updateOtm($id,$otm,$maillots,$collations) {
 		$this->staffmatchs->deleteMatchs($id);
 		foreach($otm as $o) {			
-			if ($o["selected"]) {
+			if ($o["selected"]==true) {
 				$this->staffmatchs->create($id,$o["id"]);
 			}
 		}
-		$this->animationsmatchs->deleteMatchs($id);
+		$this->animationsmatchs->deleteMatchs($id);		
 		foreach($maillots as $o) {	
-			if ($o["selected"]) {
+			if ($o["selected"]==true) {
 				$this->animationsmatchs->create($id,$o["id"],'maillots');
 			}
 		}
 		foreach($collations as $o) {			
-			if ($o["selected"]) {
+			if ($o["selected"]==true) {
 				$this->animationsmatchs->create($id,$o["id"],'collation');
 			}
 		}
@@ -348,8 +370,7 @@ class Matchs {
 	 * Execute la requete INSERT INTO dans la table match
 	 */
 	protected function ajoute($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
-
-		$id = $this->matchs->create($numero,$equipe,$titre,$score,$jour,$collation,$maillots,$adresse,$horaire,$rendezvous);				
+		$id = $this->matchs->create($numero,$equipe,$titre,$score,$jour,$adresse,$horaire,$rendezvous);				
 		$this->updateOtm($id,$otm,$maillots,$collation);
 	}
 

@@ -65,6 +65,7 @@ sudo mkdir -p "${NEW_WEB_RELEASE}"
 sudo cp -r ${NEW_BUILD}/site/dist/* ${NEW_WEB_RELEASE}/
 sudo cp -r ${NEW_BUILD}/backend/api ${NEW_WEB_RELEASE}/
 sudo cp -r ${NEW_BUILD}/backend/vendor ${NEW_WEB_RELEASE}/
+sudo cp -r ${NEW_BUILD}/backend/templace.xlsx ${NEW_WEB_RELEASE}/
 
 
 # === SYMLINK des éléments partagés ===

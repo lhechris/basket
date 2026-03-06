@@ -13,7 +13,7 @@ class AnimationsMatchsDAO extends BaseDAO {
         $sql = "SELECT A.id, A.prenom, A.nom, B.role ".
                "FROM users A, animationsmatchs B ".
                "WHERE A.id=B.user AND B.match=:match AND B.role='collation' ".
-               "ORDER BY prenom";
+               "ORDER BY A.prenom";
         $res = $this->prepareAndExecute($sql, [
 			':match' => [ $match, SQLITE3_INTEGER]
         ]);

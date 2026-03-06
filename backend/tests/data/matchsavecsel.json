@@ -8,14 +8,15 @@
                 "jour": "2025-09-20",
                 "titre": "match1",
                 "score": "0\/0",
-                "otm": null,
-                "collation": "donald",
-                "maillots": "nobody",
+                "otm": [],
+                "collation": [],
+                "maillots": [],
                 "adresse": "ici ou la bas",
                 "horaire": "12h00",
                 "rendezvous": "11h00",
                 "selections": [],
-                "numero" : "1235"
+                "numero" : "1235",
+                "entraineurs" : [ ]
             }
         ]
     },
@@ -28,9 +29,9 @@
                 "jour": "2025-09-27",
                 "titre": "match2",
                 "score": "24\/8",
-                "otm": null,
-                "collation": "gontran",
-                "maillots": "machine \u00e0 laver",
+                "otm": [{"id":2,"nom":"duck","prenom":"donald","licence": "bbb","role":"otm"}],
+                "collation": [{"id":2,"prenom":"fifi","nom":"duck","role":"collation"}],
+                "maillots": [{"id":3,"prenom":"loulou","nom":"duck","role":"maillots"}],
                 "adresse": "quelque part",
                 "horaire": "12h15",
                 "rendezvous": "11h20",
@@ -44,7 +45,8 @@
                         "prenom": "loulou"
                     }
                 ],
-                "numero" : "1234"
+                "numero" : "1234",
+                "entraineurs" : [ {"id":1,"nom":"duck","prenom":"picsou","licence": "aaa","role":"entraineur"}]
             }
         ]
     },
@@ -57,14 +59,15 @@
                 "jour": "2025-10-05",
                 "titre": "match3",
                 "score": "24\/8",
-                "otm": null,
-                "collation": "flairsou",
-                "maillots": "rapetou",
+                "otm": [],
+                "collation": [],
+                "maillots": [],
                 "adresse": null,
                 "horaire": null,
                 "rendezvous": null,
                 "selections": [],
-                "numero" : "1236"
+                "numero" : "1236",
+                "entraineurs" : [ ]
             }
         ]
     }

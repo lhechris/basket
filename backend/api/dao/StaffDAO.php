@@ -21,6 +21,12 @@ class StaffDAO extends BaseDAO {
         return $this->fetchAll($res);
     }
 
+    public function getEntraineurs(): array {
+        $sql = "SELECT id, prenom, nom, licence,role FROM staff WHERE role='entraineur' ORDER BY prenom";
+        $res = $this->prepareAndExecute($sql);
+        return $this->fetchAll($res);
+    }
+
 
     public function getById(int $id): ?array {
         $sql = "SELECT * FROM staff WHERE id=:id";

@@ -54,16 +54,16 @@ class Feuille {
         }
     }
 
-    private function writestaff($sheet,$coachs,$start) 
+    private function writestaff($sheet,$staffs,$start) 
     {
         $numligne=$start;
-        foreach($coachs as $coach) {
-            if ((!property_exists($coach,'selected')) || (property_exists($coach,'selected') && ($coach->selected))) {
-                $sheet->setCellValue("A$numligne", $coach->licence);
-                $sheet->setCellValue("C$numligne", $coach->nom);
-                $sheet->setCellValue("D$numligne", $coach->prenom);
+        foreach($staffs as $s) {            
+            if ((!property_exists($s,'selected')) || (property_exists($s,'selected') && ($s->selected))) {
+                $sheet->setCellValue("A$numligne", $s->licence);
+                $sheet->setCellValue("C$numligne", $s->nom);
+                $sheet->setCellValue("D$numligne", $s->prenom);
+                $numligne++;
             }
-            $numligne++;
         }
     }
 

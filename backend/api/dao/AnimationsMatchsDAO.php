@@ -31,6 +31,20 @@ class AnimationsMatchsDAO extends BaseDAO {
         return $this->fetchAll($res);
     }
 
+    /**
+     * Retourne le nombre de collation et maillots pour chaque joueur
+     */
+    public function getStats() {
+        $sql =  "SELECT A.prenom,B.role,count(*) as nb ".
+                "FROM users A,animationsmatchs B ".
+                "WHERE A.id=B.user ".
+                "GROUP BY A.prenom,B.role ORDER BY A.prenom";
+
+        $res = $this->prepareAndExecute($sql, []);        
+        return $this->fetchAll($res);
+    }
+
+
     public function create(int $match,int $user,string $role): int {        
         $sql = "INSERT INTO animationsmatchs(match,user,role) VALUES(:match,:user,:role)";
         $this->prepareAndExecute($sql, [

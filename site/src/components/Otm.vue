@@ -1,6 +1,6 @@
 <template>
     <div class="w-full bg-teal-300 p-2">
-        <div class="grid grid-cols-4 gap-1">
+        <div class="grid grid-cols-2 gap-1">
             <div v-for="(selection, index) in selections" :key="index" class="flex gap-2">
                 <select 
                     v-model="selections[index]" 
@@ -22,6 +22,7 @@
 
     const model = defineModel()
     const emit = defineEmits(['update'])
+    const props= defineProps({max:Number})
     
     // Initialiser selections avec les éléments qui ont selected=true
     const selections = ref(
@@ -31,7 +32,11 @@
                   // si aucune sélection, on garde un champ vide
                   if (!initial.length) return [''];
                   // s'il y a déjà des sélections, ajouter un champ vide pour pouvoir en ajouter d'autres
-                  return [...initial, ''];
+                  if (initial.length < props.max) {
+                    return [...initial, ''];
+                  } else {
+                    return initial;
+                  }
               })()
             : ['']
     )
@@ -55,9 +60,11 @@
             selections.value = filtered
         }
 
-        // garantir qu'il y a toujours un select vide en queue
+        // garantir qu'il y a toujours un select vide en queue        
         if (!selections.value.includes('')) {
-            selections.value.push('')
+            if (selections.value.length < props.max) {
+                selections.value.push('')
+            }
         }
 
         onUpdate()

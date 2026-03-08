@@ -7,10 +7,11 @@ require_once("utils.php");
 //require_once("dao/UsersDAO.php");
 
 use dao\UsersDAO;
-
+use dao\SelectionsDAO;
+use dao\AnimationsMatchsDAO;
 
 class Users {
-	private $users;
+	private UsersDAO $users;
 
 	public function __construct() {
 		$this->users = new UsersDAO();
@@ -37,6 +38,40 @@ class Users {
 		responseJson($this->getArray());
 	}
 
+
+    public function getStats() {
+        $usrs=$this->users->getAll();
+
+		$sel = new SelectionsDAO();
+		$an = new AnimationsMatchsDAO();
+		$tm = array();
+
+		//Liste du nombre de match joués
+		$nmatchs=$sel->getNbMatchForEachPlayer();
+		//ranger le resultat
+		foreach($nmatchs as $r) {
+			$tm[$r->prenom]["matchs"] = $r->nb;
+		}
+
+		//Liste des collations et maillots
+		$amatchs=$an->getStats();
+		//ranger le resultat
+		foreach($amatchs as $r) {
+			$tm[$r->prenom][$r->role] = $r->nb;
+		}
+		//loginfo(print_r($tm,true));
+
+		$results = array();
+		foreach ($usrs as $row) {
+			array_push($results,array( "id" => $row->id,
+									"prenom"=>$row->prenom,
+									"matchCount"=> $tm[$row->prenom]["matchs"],
+									"maillotsCount" => array_key_exists("maillots",$tm[$row->prenom])?$tm[$row->prenom]["maillots"]:0,
+									"collationCount" => array_key_exists("collation",$tm[$row->prenom])?$tm[$row->prenom]["collation"]:0));
+		}
+
+        return responseJson($results);
+    }
 
 	/**
 	 * Modifie/Ajoute/Supprime des users 

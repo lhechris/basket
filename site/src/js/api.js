@@ -111,6 +111,12 @@ export function getStaff() {
     });
 }
 
+export function getStats() {
+    return new Promise( (successClbk,failClbk) => {
+        getResource('stats').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    
+    });
+}
+
 export function getOtm() {
     return new Promise( (successClbk,failClbk) => {
         getResource('otm').then(r => {successClbk(r)}).catch(m => {failClbk(m)})    

@@ -8,6 +8,7 @@
     <li class="mx-2 my-1" v-else><router-link to="/matchs">Matchs</router-link></li>
     <li class="mx-2 my-1" v-if="logged" ><router-link to="/joueuses">Joueuses</router-link> | </li>    
     <li class="mx-2 my-1" v-if="logged" ><router-link to="/staff">Staff</router-link> | </li>    
+    <li class="mx-2 my-1" v-if="logged" ><router-link to="/stats">Stats</router-link> | </li>    
     <li class="mx-2 my-1"><router-link to="/auth">
       <span v-if="logged" >Logout</span>
       <span v-else>Login</span>

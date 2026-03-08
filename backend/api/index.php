@@ -102,7 +102,12 @@ if ($_SERVER["REQUEST_METHOD"]=="GET") {
 		} else {
 			responseJson(array());
 		}
-
+	} else 	if (array_key_exists('stats',$_GET)) {
+		if (islogged()) {
+			$users->getStats();
+		} else {
+			responseJson(array());
+		}
 	} else 	if (array_key_exists('islogged',$_GET)) {	
 			getIslogged();
 

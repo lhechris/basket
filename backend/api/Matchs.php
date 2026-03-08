@@ -338,14 +338,18 @@ class Matchs {
 	 * Supprime tous les otm du match 
 	 * et cree les otm pour ce match
 	 */
-	private function updateOtm($id,$otm,$maillots,$collations) {
+	private function updateOtm($id,$entraineurs,$otm,$maillots,$collations) {
 		$this->staffmatchs->deleteMatchs($id);
 		foreach($otm as $o) {			
 			if ($o["selected"]==true) {
 				$this->staffmatchs->create($id,$o["id"]);
 			}
 		}
-		$this->animationsmatchs->deleteMatchs($id);		
+		foreach($entraineurs as $e) {			
+			if ($e["selected"]==true) {
+				$this->staffmatchs->create($id,$e["id"]);
+			}
+		}		$this->animationsmatchs->deleteMatchs($id);		
 		foreach($maillots as $o) {	
 			if ($o["selected"]==true) {
 				$this->animationsmatchs->create($id,$o["id"],'maillots');
@@ -361,17 +365,17 @@ class Matchs {
 	/**
 	 * Execute la requete UPDATE sur la table match
 	 */
-	protected function update($id,$numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+	protected function update($id,$numero,$equipe,$titre,$score,$jour,$entraineurs,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
 		$this->matchs->update($id,$numero,$equipe,$titre,$score,$jour,$adresse,$horaire,$rendezvous);
-		$this->updateOtm($id,$otm,$maillots,$collation);
+		$this->updateOtm($id,$entraineurs,$otm,$maillots,$collation);
 	}
 
 	/**
 	 * Execute la requete INSERT INTO dans la table match
 	 */
-	protected function ajoute($numero,$equipe,$titre,$score,$jour,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
+	protected function ajoute($numero,$equipe,$titre,$score,$jour,$entraineurs,$collation,$otm,$maillots,$adresse,$horaire,$rendezvous) {
 		$id = $this->matchs->create($numero,$equipe,$titre,$score,$jour,$adresse,$horaire,$rendezvous);				
-		$this->updateOtm($id,$otm,$maillots,$collation);
+		$this->updateOtm($id,$entraineurs,$otm,$maillots,$collation);
 	}
 
 	/**
@@ -391,11 +395,11 @@ class Matchs {
 			array_key_exists("jour",$tab) && 
 			array_key_exists("score",$tab) && 
 			array_key_exists("equipe",$tab)  && 
+			array_key_exists("entraineurs",$tab)  &&
 			array_key_exists("collation",$tab) && 
 			array_key_exists("otm",$tab) &&
 			array_key_exists("maillots",$tab)
-			) {
-		
+			) {		
 
 			if (array_key_exists("id",$tab)) {
 				if (array_key_exists("todelete",$tab)) {
@@ -408,6 +412,7 @@ class Matchs {
 								  $tab["titre"],
 								  $tab["score"],
 								  $tab["jour"],
+								  $tab['entraineurs'],
 								  $tab['collation'],
 								  $tab['otm'],
 								  $tab['maillots'],
@@ -426,6 +431,7 @@ class Matchs {
 							  $tab["titre"],
 							  $tab["score"],
 							  $tab["jour"],
+							  $tab["entraineurs"],
 							  $tab['collation'],
 							  $tab['otm'],
 							  $tab['maillots'],

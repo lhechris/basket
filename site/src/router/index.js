@@ -9,6 +9,7 @@ import MatchAdminView from '../views/MatchAdminView.vue'
 import MatchsView from '../views/MatchsView.vue'
 import FeuilleMatchView from '../views/FeuilleMatch.vue'
 import StaffView from '../views/StaffView.vue'
+import StatView from '../views/StatView.vue'
 
 const routes = [
   {
@@ -57,6 +58,11 @@ const routes = [
     path: '/staff',
     name: 'staff',
     component: StaffView
+  },
+  {
+    path: '/stats',
+    name: 'stats',
+    component: StatView
   },
   {
     path: '/auth',

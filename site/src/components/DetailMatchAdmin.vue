@@ -16,10 +16,10 @@
         </div>
         <div class="flex flex-col gap-2 ">
             <div class="flex gap-2"><div class="text-left w-40">Score</div><input class="w-full bg-teal-300" v-model="currentmatch.score"  @input="debouncedOnChange()"/></div>
-            <div class="flex gap-2"><div class="text-left w-40">Coach</div><otm v-model="currentmatch.entraineurs" @update="debouncedOnChange()"></otm></div>
-            <div class="flex gap-2"><div class="text-left w-40">Collation</div><otm v-model="currentmatch.collation" @update="debouncedOnChange()"></otm></div>
-            <div class="flex gap-2"><div class="text-left w-40">OTM</div><otm v-model="currentmatch.otm" @update="debouncedOnChange()"></otm></div>
-            <div class="flex gap-2"><div class="text-left w-40">Maillots</div><otm v-model="currentmatch.maillots" @update="debouncedOnChange()"></otm></div>
+            <div class="flex gap-2"><div class="text-left w-40">Coach</div><otm :max="1" v-model="currentmatch.entraineurs" @update="debouncedOnChange()"></otm></div>
+            <div class="flex gap-2"><div class="text-left w-40">Collation</div><otm :max="2" v-model="currentmatch.collation" @update="debouncedOnChange()"></otm></div>
+            <div class="flex gap-2"><div class="text-left w-40">OTM</div><otm :max="3" v-model="currentmatch.otm" @update="debouncedOnChange()"></otm></div>
+            <div class="flex gap-2"><div class="text-left w-40">Maillots</div><otm :max="1" v-model="currentmatch.maillots" @update="debouncedOnChange()"></otm></div>
             <div class="flex gap-2"><div class="text-left w-40">Adresse</div><textarea class="w-full bg-teal-300" v-model="currentmatch.adresse"  @input="debouncedOnChange()"></textarea></div>
             <div class="flex gap-2"><div class="text-left w-40">Horaire</div><input class="w-full bg-teal-300" v-model="currentmatch.horaire"  @input="debouncedOnChange()"/></div>
             <div class="flex gap-2"><div class="text-left w-40">Rendez-vous</div><input class="w-full bg-teal-300" v-model="currentmatch.rendezvous"  @input="debouncedOnChange()"/></div>

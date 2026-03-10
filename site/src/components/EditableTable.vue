@@ -1,69 +1,39 @@
 <template>
     <div class="main-container max-w-6xl mx-auto p-6">
-        <div class="mb-4 md:mb-8">
-            <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-1 md:mb-2">👥 Gestion des Joueuses</h1>
-            <p class="text-xs md:text-base text-gray-600">Gérez les informations de vos joueuses</p>
-        </div>
+        <!-- header slot allows parent to supply title -->
+        <slot name="header"></slot>
 
         <div class="bg-white rounded-lg shadow-lg overflow-x-auto">
             <!-- Table Header -->
-            <div class="grid grid-cols-7 gap-1 md:gap-2 lg:gap-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold p-2 md:p-4 text-xs md:text-base">
-                <div>Prénom</div>
-                <div>Nom</div>
-                <div>Équipe</div>
-                <div>Licence</div>
-                <div class="text-center">Charte</div>
-                <div class="text-center">OTM</div>
+            <div :class="headerClass">
+                <div v-for="f in fields" :key="f.key" :class="f.align || ''">{{ f.label }}</div>
                 <div class="text-center">Actions</div>
             </div>
 
             <!-- Table Body -->
             <div class="divide-y divide-gray-200">
-                <div v-for="(u, i) in props.value" :key="i" class="grid grid-cols-7 gap-1 md:gap-2 lg:gap-4 p-2 md:p-4 items-center text-xs md:text-base" :class="u.todelete ? 'bg-red-50' : 'hover:bg-gray-50'">
-                    <input 
-                        v-model="u.prenom" 
-                        placeholder="Prénom"
-                        :disabled="editingId !== i"
-                        class="input-field input-mobile" 
-                        :class="[u.todelete ? 'disabled-input' : '', editingId !== i ? 'input-disabled' : '']"
-                    />
-                    <input 
-                        v-model="u.nom" 
-                        placeholder="Nom"
-                        :disabled="editingId !== i"
-                        class="input-field input-mobile" 
-                        :class="[u.todelete ? 'disabled-input' : '', editingId !== i ? 'input-disabled' : '']"
-                    />
-                    <input 
-                        v-model="u.equipe" 
-                        placeholder="Équipe"
-                        :disabled="editingId !== i"
-                        class="input-field input-mobile text-center" 
-                        :class="[u.todelete ? 'disabled-input' : '', editingId !== i ? 'input-disabled' : '']"
-                    />
-                    <input 
-                        v-model="u.licence" 
-                        placeholder="Licence"
-                        :disabled="editingId !== i"
-                        class="input-field input-mobile" 
-                        :class="[u.todelete ? 'disabled-input' : '', editingId !== i ? 'input-disabled' : '']"
-                    />
-                    <div class="flex justify-center">
-                        <label class="custom-checkbox" :class="[u.todelete ? 'disabled' : '', editingId !== i ? 'disabled' : '']">
-                            <input type="checkbox" v-model="u.charte" :disabled="editingId !== i">
-                            <span class="checkmark checkmark-mobile"></span>                    
-                        </label>
-                    </div>
-                    <div class="flex justify-center">
-                        <label class="custom-checkbox" :class="[u.todelete ? 'disabled' : '', editingId !== i ? 'disabled' : '']">
-                            <input type="checkbox" v-model="u.otm" :disabled="editingId !== i">
-                            <span class="checkmark checkmark-mobile"></span>                    
-                        </label>
-                    </div>
+                <div v-for="(u, i) in props.value" :key="i" :class="rowClass(u, i)">
+                    <template v-for="f in fields" :key="f.key">
+                        <div v-if="f.type === 'checkbox'" class="flex justify-center">
+                            <label class="custom-checkbox" :class="[u.todelete ? 'disabled' : '', editingId !== i ? 'disabled' : '']">
+                                <input type="checkbox" v-model="u[f.key]" :disabled="editingId !== i">
+                                <span class="checkmark checkmark-mobile"></span>
+                            </label>
+                        </div>
+                        <div v-else>
+                            <input
+                                v-model="u[f.key]"
+                                :placeholder="f.label"
+                                :disabled="editingId !== i"
+                                class="input-field input-mobile"
+                                :class="[u.todelete ? 'disabled-input' : '', editingId !== i ? 'input-disabled' : '']"
+                            />
+                        </div>
+                    </template>
                     <div class="flex justify-center gap-2">
-                        <button 
+                        <button
                             v-if="editingId !== i"
-                            class="btn-edit" 
+                            class="btn-edit"
                             @click="editer(i)"
                             title="Éditer"
                         >
@@ -71,9 +41,9 @@
                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
                             </svg>
                         </button>
-                        <button 
+                        <button
                             v-if="editingId === i"
-                            class="btn-save" 
+                            class="btn-save"
                             @click="sauvegarder(i)"
                             title="Sauvegarder"
                         >
@@ -81,8 +51,8 @@
                                 <path d="M19.414 1.586A2 2 0 0018 1H2a2 2 0 00-1.414.586L0 3v14a2 2 0 002 2h16a2 2 0 002-2V3l-1.586-1.414zM9 15a3 3 0 110-6 3 3 0 010 6zm8-9H3V4h14v2z"/>
                             </svg>
                         </button>
-                        <button 
-                            class="btn-delete" 
+                        <button
+                            class="btn-delete"
                             @click="supprime(u.id)"
                             title="Supprimer"
                         >
@@ -97,22 +67,39 @@
 
         <!-- Action Button -->
         <div class="flex justify-center mt-4 md:mt-8">
-            <button 
+            <button
                 class="btn btn-primary text-sm md:text-base"
                 @click="ajoute()"
             >
-                ➕ Ajouter une joueuse
+                ➕ Ajouter
             </button>
         </div>
     </div>
 </template>
 
   <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   
-   const props= defineProps(['value'])
+   const props = defineProps({
+       value: { type: Array, default: () => [] },
+       fields: { type: Array, required: true },
+       newItem: { type: Object, default: () => ({}) }
+   })
    const emit = defineEmits(['onSave'])
    const editingId = ref(-1)
+
+   const headerClass = computed(() => {
+       const cols = props.fields.length + 1
+       return `grid grid-cols-${cols} gap-1 md:gap-2 lg:gap-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold p-2 md:p-4 text-xs md:text-base`
+   })
+
+   function rowClass(u, i) {
+       const base = 'grid ' +
+           `grid-cols-${props.fields.length + 1} ` +
+           'gap-1 md:gap-2 lg:gap-4 p-2 md:p-4 items-center text-xs md:text-base'
+       const state = u.todelete ? 'bg-red-50' : 'hover:bg-gray-50'
+       return `${base} ${state}`
+   }
 
     function supprime(id) {
         let indice=-1;
@@ -127,7 +114,8 @@
     }
 
     function ajoute() {
-        props.value.push({nom:"",prenom:"", equipe:"1", licence:"",otm:false, charte:false})
+        const template = { ...props.newItem }
+        props.value.push(template)
         editingId.value = props.value.length - 1
     }
 

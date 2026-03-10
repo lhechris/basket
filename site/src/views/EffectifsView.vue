@@ -24,8 +24,34 @@
 
         <!-- Content Section -->
         <div class="px-4">
-            <joueuses v-if="display==1" :value="players" @onSave="enregistrer($event)"></joueuses>
-            <staff v-if="display==2" :value="staffdata" @onAdd="addStaff($event)" @onDelete="deleteStaff($event)" @onUpdate="updateStaff($event)"/>
+            <EditableTable
+                v-if="display==1"
+                :value="players"
+                :fields="playerFields"
+                :new-item="playerTemplate"
+                @onSave="enregistrer($event)"
+            >
+                <template #header>
+                    <div class="mb-4 md:mb-8">
+                        <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-1 md:mb-2">👥 Gestion des Joueuses</h1>
+                        <p class="text-xs md:text-base text-gray-600">Gérez les informations de vos joueuses</p>
+                    </div>
+                </template>
+            </EditableTable>
+            <EditableTable
+                v-if="display==2"
+                :value="staffdata"
+                :fields="staffFields"
+                :new-item="staffTemplate"
+                @onSave="saveStaff($event)"
+            >
+                <template #header>
+                    <div class="mb-4 md:mb-8">
+                        <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-1 md:mb-2">👔 Gestion du Staff</h1>
+                        <p class="text-xs md:text-base text-gray-600">Gérez les membres du staff</p>
+                    </div>
+                </template>
+            </EditableTable>
         </div>
     </div>
 </template>
@@ -34,12 +60,29 @@
     // @ is an alias to /src
     import {getUsers,setUsers,getStaff,setStaff} from '@/js/api.js'
     import {ref} from "vue"
-    import Joueuses from '../components/Joueuses.vue'
-    import Staff from '../components/Staff.vue'
+    import EditableTable from '../components/EditableTable.vue'
 
     const players = ref([])
     const display = ref(1)
     const staffdata = ref([])
+
+    const playerFields = [
+        { key: 'prenom', label: 'Prénom' },
+        { key: 'nom', label: 'Nom' },
+        { key: 'equipe', label: 'Équipe' },
+        { key: 'licence', label: 'Licence' },
+        { key: 'charte', label: 'Charte', type: 'checkbox', align: 'text-center' },
+        { key: 'otm', label: 'OTM', type: 'checkbox', align: 'text-center' }
+    ]
+    const playerTemplate = { prenom:'', nom:'', equipe:'1', licence:'', charte:false, otm:false }
+
+    const staffFields = [
+        { key: 'nom', label: 'Nom' },
+        { key: 'prenom', label: 'Prénom' },
+        { key: 'licence', label: 'Licence' },
+        { key: 'role', label: 'Rôle' }
+    ]
+    const staffTemplate = { nom:'', prenom:'', licence:'', role:'' }
 
 
     getUsers().then( u => {
@@ -51,33 +94,18 @@
             players.value = u
         })
     }
+
+    function saveStaff(data) {
+        // we simply replace whole array for now
+        staffdata.value = data
+        // optionally persist changes per element
+        data.forEach(member => setStaff(member))
+    }
  
 
   getStaff().then( u => {
         staffdata.value = u
   })
-
-  const addStaff = (val) => {
-    staffdata.value.push(val);
-    setStaff(val);
-  }
-
-  const deleteStaff = (id) => {
-    const member = staffdata.value.find(m => m.id === id);
-    if (member) {
-      member.todelete = true;
-      setStaff(member);
-      staffdata.value = staffdata.value.filter(m => m.id !== id);
-    }
-  }
-
-  const updateStaff = ({ id, data }) => {
-    const index = staffdata.value.findIndex(m => m.id === id);
-    if (index !== -1) {
-      staffdata.value[index] = { ...staffdata.value[index], ...data };
-      setStaff(staffdata.value[index]);
-    }
-  }
 
 </script>
 

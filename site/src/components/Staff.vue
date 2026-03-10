@@ -209,7 +209,7 @@ const cancelEdit = () => {
 
 const editMember = (member) => {
     form.value = { ...member }
-    emit('onDelete', member.id)
+    //emit('onDelete', member.id)
     emit('onChange', member)
 }
 

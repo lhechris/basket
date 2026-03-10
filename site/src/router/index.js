@@ -4,11 +4,10 @@ import SelectionView from '../views/SelectionView.vue'
 import AuthView from '../views/AuthView.vue'
 import EntrainementView from '../views/EntrainementView.vue'
 import MatchsAdminView from '../views/MatchsAdminView.vue'
-import JoueusesView from '../views/JoueusesView.vue'
+import EffectifsView from '../views/EffectifsView.vue'
 import MatchAdminView from '../views/MatchAdminView.vue'
 import MatchsView from '../views/MatchsView.vue'
 import FeuilleMatchView from '../views/FeuilleMatch.vue'
-import StaffView from '../views/StaffView.vue'
 import StatView from '../views/StatView.vue'
 
 const routes = [
@@ -50,14 +49,9 @@ const routes = [
     component: MatchsView
   },
   {
-    path: '/joueuses',
-    name: 'joueuses',
-    component: JoueusesView
-  },
-  {
-    path: '/staff',
-    name: 'staff',
-    component: StaffView
+    path: '/effectifs',
+    name: 'effectifs',
+    component: EffectifsView
   },
   {
     path: '/stats',

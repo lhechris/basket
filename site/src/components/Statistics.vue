@@ -6,7 +6,7 @@
             <!-- Collation par joueur -->
             <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
                 <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-                    <span class="text-green-500 mr-2">🍽️</span> Collations 
+                    <span class="text-green-500 mr-2"><img src="@/assets/food.png"/></span> Collations 
                 </h3>
                 <div class="space-y-2">
                     <div v-for="player in players" :key="player.id" class="flex justify-between items-center p-2 bg-gray-50 rounded">
@@ -19,7 +19,7 @@
             <!-- Maillots par joueur -->
             <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
                 <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-                    <span class="text-blue-500 mr-2">👕</span> Maillots
+                    <span class="text-blue-500 mr-2"><img src="@/assets/basketball-jersey.png"/></span> Maillots
                 </h3>
                 <div class="space-y-2">
                     <div v-for="player in players" :key="player.id" class="flex justify-between items-center p-2 bg-gray-50 rounded">
@@ -32,7 +32,7 @@
             <!-- Matchs joués par joueuse -->
             <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-pink-500">
                 <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-                    <span class="text-pink-500 mr-2">⚽</span> Matchs Joués
+                    <span class="text-pink-500 mr-2 "><img src="@/assets/basketball.png"/></span> Matchs Joués
                 </h3>
                 <div class="space-y-2">
                     <div v-for="player in femalePlayers" :key="player.id" class="flex justify-between items-center p-2 bg-gray-50 rounded">

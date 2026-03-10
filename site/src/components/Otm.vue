@@ -1,11 +1,11 @@
 <template>
     <div class="w-full bg-teal-300 p-2">
-        <div class="grid grid-cols-2 gap-1">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-1">
             <div v-for="(selection, index) in selections" :key="index" class="flex gap-2">
                 <select 
                     v-model="selections[index]" 
                     @change="handleChange()"
-                    class="px-2 py-1 border rounded"
+                    class="px-2 py-1 border rounded !text-base"
                 >
                     <option value="">Sélectionner...</option>
                     <option v-for="otm in model" :key="otm.id || otm.prenom" :value="otm.prenom">

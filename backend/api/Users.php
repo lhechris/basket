@@ -102,7 +102,7 @@ class Users {
 					/**
 					 * Il n'y a pas d'id pour ce match c'est donc un ajout 
 					 */
-					$this->ajoute($nm["prenom"],$nm["equipe"]);
+					$this->ajoute($nm["prenom"],$nm["nom"],$nm["equipe"],$nm["licence"],$nm["otm"],$nm["charte"]);
 				}
 			}
 		}
@@ -120,9 +120,9 @@ class Users {
 	 * Execute la requete INSERT INTO dans la table match
 	 * 
 	 */
-	protected function ajoute($prenom,$equipe) {
+	protected function ajoute($prenom,$nom,$equipe,$licence,$otm,$charte) {
 		
-		return $this->users->create($prenom,"",$equipe,"",0,0);		
+		return $this->users->create($prenom,$nom,$equipe,$licence,$otm,$charte);		
 
 	}
 

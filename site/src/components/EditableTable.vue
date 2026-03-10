@@ -146,7 +146,7 @@
 
 .input-field:focus {
     outline: none;
-    ring: 2px;
+    /* ring is not a valid CSS property; replaced by box-shadow above */
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     border-color: #3b82f6;
 }

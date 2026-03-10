@@ -5,14 +5,14 @@
 
         <div class="bg-white rounded-lg shadow-lg overflow-x-auto">
             <!-- Table Header -->
-            <div :class="headerClass">
+            <div :class="headerClass" :style="gridStyle">
                 <div v-for="f in fields" :key="f.key" :class="f.align || ''">{{ f.label }}</div>
                 <div class="text-center">Actions</div>
             </div>
 
             <!-- Table Body -->
             <div class="divide-y divide-gray-200">
-                <div v-for="(u, i) in props.value" :key="i" :class="rowClass(u, i)">
+                <div v-for="(u, i) in props.value" :key="i" :class="rowClass(u, i)" :style="gridStyle">
                     <template v-for="f in fields" :key="f.key">
                         <div v-if="f.type === 'checkbox'" class="flex justify-center">
                             <label class="custom-checkbox" :class="[u.todelete ? 'disabled' : '', editingId !== i ? 'disabled' : '']">
@@ -89,14 +89,17 @@
    const editingId = ref(-1)
 
    const headerClass = computed(() => {
+       // grid-cols is handled via style binding for arbitrary column counts
+       return `grid gap-1 md:gap-2 lg:gap-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold p-2 md:p-4 text-xs md:text-base`
+   })
+   const gridStyle = computed(() => {
        const cols = props.fields.length + 1
-       return `grid grid-cols-${cols} gap-1 md:gap-2 lg:gap-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold p-2 md:p-4 text-xs md:text-base`
+       return { gridTemplateColumns: `repeat(${cols}, minmax(0,1fr))` }
    })
 
    function rowClass(u, i) {
-       const base = 'grid ' +
-           `grid-cols-${props.fields.length + 1} ` +
-           'gap-1 md:gap-2 lg:gap-4 p-2 md:p-4 items-center text-xs md:text-base'
+       // remove dynamic grid-cols; it's managed with style binding below
+       const base = 'grid gap-1 md:gap-2 lg:gap-4 p-2 md:p-4 items-center text-xs md:text-base'
        const state = u.todelete ? 'bg-red-50' : 'hover:bg-gray-50'
        return `${base} ${state}`
    }
